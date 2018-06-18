@@ -1,0 +1,172 @@
+---
+title: "Time Serie Analysis"
+author: "Anaïs Ladoy"
+date: "5/12/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+# LIBRARIES
+
+library(tidyverse) #tibbles
+library(tsibble) #manage temporal data frame in tidy form
+
+library(sf) #simple features
+
+library(forecast) #univariate time series forecasts
+library(imputeTS) #univariate time series imputation
+
+```
+
+Study case : Chicago Com Ed station. 
+
+* almost complete dataset (>90% complete)  
+* the site is designed to study population exposure, with a neighborhood scale
+* there are two PM2.5 sensors at this location (with non-calibrated though) but it can still be interesting to compare the trend
+
+```{r, warning=FALSE, message=FALSE}
+#Load data
+counties <- read_sf('Data/Spatial/counties.shp') #study area
+MS <- read_sf('Data/Spatial/MS_PM25.shp') %>% filter(AQSID=='170310076') #metadata for the MS
+data <- read_csv('Data/CSV/data_PM25.csv') %>% filter(AQSID=='170310076') #data for the MS
+
+#Visualize the location of the MS in the study area
+ggplot() + geom_sf(data=counties,fill="#d3ffce",alpha=0.2) + geom_sf(data=MS,colour="#f07d00",pch=18,cex=3) + ggtitle('Chicago Com Ed Monitoring Station')
+
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+#Data conversion
+data <- as_tsibble(data,key=id(AQSID),index=date) #conversion to time series
+data <- rename(data, value=PM25) #change the name of the column to a more generic one
+
+#Graphic parameters
+title <- 'PM2.5 daily peak at the Com Ed site (AQSID:170310076) for the period 2013-2018'
+xlab <- 'Date'
+ylab <- 'PM2.5 [ug/m3]'
+
+#Plot the time serie with the average daily limit according US.EPA
+data %>% ggplot(aes(x=date, y=value)) + geom_line() + geom_hline(aes(yintercept=35,colour='average daily limit (NAAQS)')) + labs(title=title, x=xlab, y=ylab) + theme(legend.title=element_blank(),legend.position='bottom',plot.title = element_text(size = 12))
+
+```
+
+The daily peak values of the PM2.5 concentration don't show a particular trend but it seems that seasonality is present in the time series, with higher values of PM2.5 during summer. Time series patterns will be further studied in the following section.
+
+It is important to note that the red line, showing the PM2.5 limit according to the National Air Quality Standards (NAAQS) concern daily average and not daily peak. Thus, we cannot say that there are exceedances to the NAAQS standards. However, it allows to detect particulary high values of the PM2.5 concentration at three different days, that could be harmful for the exposed population.
+
+During 2016 summer, we can detect points of PM2.5 concentration that seem negative. Indeed, 24 days recorded negative values which is completely impossible in reality, this may correspond period with sensor malfunction and the data were falsely keepen in the dataset. These values are replaced by NA (missing values). I will add a step in the cleaning process to detect if this problem appear in other time series.  
+
+
+```{r, warning=FALSE, message=FALSE}
+#Print rows with negative values for the PM2.5 concentration (inconsistent values)
+data %>% filter(!is.na(value) & value<0) 
+
+#Replace the negative values by NA
+data <- data %>% mutate(value=replace(value,value<0,NA))
+```
+
+Discontinuities in the time serie reveal periods with missing values. Various reasons can generate missing values in the dataset and numerous methods can be used to handle missing values. The more common ones are to discard missing values but we may lose useful information or to replace them by a specific values (e.g. overall mean) but we may ignore intrinsic variability and include bias.
+
+In my case, I cannot discard missing values as further analysis steps (e.g. forecast) rely on complete time series. Furthermore, the standard methods for the imputation process rely on inter-attribute correlations to estimate values for the missing data so working with an univariate time serie is even more complicated.
+
+Thus, it is important to understand the mechanism that generate missing values and the different patterns of the univariate time serie to choose an optimal method for the imputation.
+
+## Time serie EDA
+
+### Missing values
+
+Let $Y=(Y_{obs},Y_{min})$ denotes the complete set of data which would be available without missing values where $Y_{obs}$ are the observed data and $Y_{mis}$ the missing observations. $R_i$ denotes an indicator which is equal to 1 if $Y_i$ is missing and 0 if not.
+According to the notation proposed by Little and Rubin (2014), the missing data mechanism can be classified in three ways :  
+
+* completely random (MCAR) if $R_i$ is independant of both $Y_{obs}$ and $Y_{mis}$  
+* random (MAR) if $R_i$ is independant of $Y_{mis}$  
+* informative if $R_i$ is dependant of $Y_{mis}$  
+
+```{r, warning=FALSE, message=FALSE}
+#Distribution of missing values in the time serie
+plotNA.distribution(data$value,pch=NA,ylab=ylab)
+
+#Statistics about missing values
+statsNA(data$value)
+
+#Which day of the week the missing values appear?
+data %>% filter(is.na(value)) %>% mutate(weekday=weekdays(date)) %>% mutate(weekday=factor(weekday,levels = c('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') )) %>%  select(weekday,.drop=TRUE) %>% group_by(weekday)%>% summarise(nb_NA=n())
+
+```
+
+As we may expect with daily sensors data, there are a lot of missing values in the dataset (168 days without PM2.5 daily peak value) representing *10.3%* of the entire dataset. Moreover, these data seem randomly distributed along the time series which can suggest instrument malfunction. 
+
+We can also detect a huge gap in the time serie with 42 consecutive days with no data, around september 2016. Nevertheless, the gap size is usually short (1 or 2 days).
+
+In our case, the missing values could be due to sensors malfunction (MCAR) or correspond to days where sensors status are checked (e.g. first suday of the month) and the latter would be a MAR mechanism. We cannot detect a pattern in the weekday where missing data appear so we can consider the missing value process to be MCAR.
+
+*suggestion : MCAR could also be tested for with t-test or Little’s test.*
+
+### Time serie characteristics
+
+Decomposition and autocorrelation
+Time serie decomposition allows to distinctly see the three main components characterizing a time serie :
+
+* the trend component : 
+* the seasonal component : 
+* the irregular component : 
+
+## Univariate time serie imputation
+
+### Simulation of missing data
+
+### Imputation algorithms
+
+### Performance evaluation
+
+Chelani (2010) for the daily maximum ground-level ozone concentration, has 7% of missing values in the time series and replaces with previous day's observed values. 
+-> First, the ozone peak can change a lot between two days at the same location (could be valid if we would use daily average) and in my case, periods concern consecutive days most of the time so I would borrow the value of 3-4 days before, which doesn't seem appropriate.
+
+Expectation-Maximisation (EM) algorithm (possible in Amelia package)
+
+Model-based likelihood method : Model the missing data mechanism and then proceed to make a proper likelihood-based analysis, either via the method of maximum-likelihood or using Bayesian methods.
+
+For now, just use mean to replace missing values in order to have a complete time series and continue the analysis.
+
+```{r, warning=FALSE, message=FALSE}
+#Replace missing values by mean (temporary solution !!)
+data <- data %>% mutate(value=replace(value,is.na(value),mean(data$value,na.rm=TRUE)))
+```
+
+Use low pass filter to remove the noise and see the trend in the time series.
+Or use frequency (tsibble)
+
+```{r, warning=FALSE, message=FALSE}
+
+data %>% ggplot() + geom_line(aes(x=date,y=value)) + geom_line(aes(x=date,y=slide(value,~ mean(.,na.rm=TRUE),size = 7),colour='7 days')) + geom_line(aes(x=date,y=slide(value,~ mean(.,na.rm=TRUE),size = 30),colour='30 days')) + geom_line(aes(x=date,y=slide(value,~ mean(.,na.rm=TRUE),size = 365),colour='365 days')) + labs(colour ="Moving average") + scale_colour_manual(values = c("7 days" = "#00ccff", "30 days" = "#99ff66", "365 days" = "#ff9933")) + labs(title=title, x=xlab, y=ylab)
+
+```
+
+
+
+Getting trend and seasonnal effects right can improve forecasting, and even imputation results a lot
+
+Seasonality (seems higher during summer) but no trend
+acf for autocorrelation
+
+Several possibilities for the imputation of univariate missing data
+-
+
+## Applications to the Array of Things
+
+* impution but multivariate this time (several parameters measured at the same node)
+* use spatial dependence ?
+* compute an AQI ?
+* short term forecast of the values ?
+
+## Sources 
+
+* Moritz, “Comparison of Different Methods for Univariate Time Series Imputation in R.”
+* Shaddick and Zidek, Spatio-Temporal Methods in Environmental Epidemiology.
+

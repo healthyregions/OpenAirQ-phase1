@@ -1,0 +1,345 @@
+---
+title: "EPA's Ambient Air Monitoring"
+author : "Anaïs Ladoy"
+date : "27.04.2018"
+output:
+  html_document:
+    fig_caption: yes
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The present notebook contains :
+
+1. Informations about the design of the USA's ambient air monitoring network
+2. Definition of the study area
+3. Extraction of the EPA's data for $O_{3}$ and $PM_{2.5}$ and data cleaning/wrangling 
+4. An overview of the monitoring stations that record (or have recorded) $O_{3}$ and $PM_{2.5}$
+5. An overview of the time series for $O_{3}$ and $PM_{2.5}$ measurements
+6. Further directions
+
+```{r, results='hide',message=FALSE,warning=FALSE}
+# LIBRARIES
+
+library(tidyverse) #Set of packages that work in harmony for data representations and API design (ggplot2, dplyr, readr, etc)
+
+library(sf) #Package for Simple Features, way to encode spatial vector data. Binds to GDAL for reading/writing of data, GEOS for geometrical operations and PROJ for projection conversions/datum transformations (http://strimas.com/r/tidy-sf/)
+
+library(tmap)
+
+library(USAboundaries) #Boundaries for geographical units in the United States of America (U.S. Census Bureau)
+
+library(tidyr) #Use to reshape dataframe
+
+library(lubridate) #Handle dates/time series
+
+library(forcats) #Handle factors
+
+```
+
+# 1. Informations about the design of the USA's ambient air monitoring network
+
+
+The monitoring network used to assess ambient air quality is operated by state and local (county) agencies and the Environmental Protection Agency (EPA) provides oversight. EPA controls, among other things, the IT infrastructure through the maintenance of data repositories available through the AQS and AirNow platforms and fix the minimum national monitoring requirements. The costs for routine monitoring are shared between the federal agency (60%) and the state (40%).
+The ambient monitoring network is designed by state and local agency and must be able to provide air pollution data to the public in a timely manner, to support compliance with the NAAQS, emissions strategy development and air pollution research studies.
+
+Thereby, the Code of Federal Regulation defines three parameters that must be take into account when designing a monitoring network : the station type, the monitoring objective and the desired spatial scale of representativeness. 
+
+
+### Station type
+
+#### State or Local Ambient Monitoring Station (SLAMS)
+The SLAMS includes the ambient air quality monitoring sites and monitors that are needed for the monitoring objectives including the comparisons with the National Ambient Air Quality Standards (NAAQS). Are considered as SLAMS the NCore, PAMS, CSN and all other states or locally criteria pollutant monitors that have not be designed as SPM stations. Except for the NCores, SLAM are usually single-pollutant measuring station, designed to address specific quality air management interests. (table 4)
+
+* **National Core multi-pollutant monitoring station (NCore) :** The federal regulation require sites that measure multi-pollutant including $CO$, $NO/NO_y$, $SO_2$, $O_3$, $PM_{10}$, speciated $PM_{2.5}$, $PM_{2.5}$, and $PM_{10-2.5}$ both neighbourhood and urban scale. They aim to provide support to integrated air quality management data needs used for air quality trend analyses, model evaluation and tracking metropolitan area statistics. As such, continuous monitoring methods are to be used and the sites must be placed away from direct emission sources.
+
+* **Photochemical Assessment Monitoring Station (PAMS) :** According to federal legislation, state and local monitoring agencies are required to collect and report PAMS measurements at each NCore site located in a CBSA with a population of 1,000,000 or more (Milwaukee and Chicago for Illinois). The PAMS measurements (hourly averaged speciated VOCs, $O_3$, $NO$, mixing-height, ultraviolet radiation, etc.) aim to obtain more informations about ozone and its precursors.
+
+* **Chemical Speciation Network (CSN) :** Each state must conduct chemical speciation monitoring and analyses at sites designated to be part of the PM2.5 Speciation Trends Network (STN). The aim is to provide informations about the chemical species that compose fine particulate, which is needed to develop State implementation plans and for atmospheric or health effects related studies.
+
+#### Special Purpose Monitor (SPM)
+SPM stations can be included in an agency's monitoring network and in the AQS but cannot be count in the minimum requirements for the number and siting of monitors of various types needed to NAAQS compliance.
+
+
+### Monitoring objectives
+
+A monitoring network must be able to capture the maximum variability of the air pollution in a specific area with a minimal number of nodes. That is why the sites are characterised according to the type of air quality information they will provide. Specifically, we are interested about peak air pollution levels, typical levels in populated areas to assess the population exposure, air pollution transported into and outside of a city or region, and air pollution levels near specific sources.
+
+
+* **Highest concentration :** Site located to determine the highest concentration expected to occur in the area covered by the network.
+* **Source impact :** Site located to determine the impact of significant sources or source categories on air quality.
+* **Population oriented :** Site located to measure typical concentrations in areas of high population density.
+* **General background :** Site located to determine general background concentration levels.
+* **Regional transport :** Site located to determine the extent of regional pollutant transport among populated areas and in support of secondary standards.
+* **Welfare-related impact :** Site located to measure air pollution impacts on visibility, vegetation damage, or other welfare-based impacts.
+
+### Spatial scale of representativeness
+
+The spatial scale of representativeness is described in terms of the physical dimensions of the air parcel nearest to a monitoring site throughout which actual pollutant concentrations are reasonably similar. 
+
+![](Screenshots/Spatial scale representativeness_table.png)
+***Fig.1:*** *Monitoring objective and pollutant that are adapted for a specific spatial scale of representativeness*
+
+
+# 2. Definition of the study area
+
+```{r, message=FALSE, warning=FALSE}
+
+#Absolute path of the MS locations in the FTP server
+locfile <- 'Data/AirNow/monitoring_site_locations.dat'
+
+#Metadata on MonitoringSiteFactSheet.pdf
+fieldnames <- c("AQSID","parameter.name","site.code","site.name","status","agency.id","agency.name","EPA.region","latitude","longitude","elevation","GMT.offset","country.code","CMSA.code","CMSA.name","MSA.code","MSA.name","state.code","state.name","county.code","county.name","city.code","city.name")
+
+#Read the .dat file in a tibble dataframe. Tibbles are modern data frames that keep the useful features of the traditional data frames and drop ones that were frustating (e.g. character vectors to factor, show only columns that fit to the screen when printing, etc.)
+MS <- read_delim(locfile, delim='|', col_names = fieldnames, progress = TRUE)
+print(MS)
+
+#List of parameters measured
+MS.chems <- unique(MS$parameter.name)
+print(paste('In total, there are',length(MS.chems),'parameters measured',sep=' '))
+print(MS.chems)
+
+#List of stations
+MS.stat <- unique(MS$AQSID)
+print(paste('In total, there are',length(MS.stat),'different stations',sep=' '))
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+#MS locations
+
+#Extract stations measuring ozone (MS.chems=O3) and particulate matter (MS.chems=PM2.5)
+MS <- filter(MS,parameter.name %in% c('PM2.5','O3'))
+
+#Convert the data frame to a spatial data frame and project the coordinates in USA Contiguous Albers Equal Area Conic (EPSG:102003)
+MS <- st_as_sf(MS, coords = c('longitude','latitude'), agr = 'identity', crs=4326) %>% st_transform(MS, crs=102003) 
+
+#Visualisation of PM2.5 and O3 MS (different colors for active/inactive MS)
+tmap_mode("view")
+tm_shape(us_counties()) + tm_borders(col='black', lty=2) +
+  tm_shape(us_states()) + tm_borders(col='black', lwd=2) +
+  tm_shape(MS[MS$parameter.name=='PM2.5',],name='PM2.5 MS locations') +          tm_dots(col='status',palette=c('blue','red')) +
+  tm_shape(MS[MS$parameter.name=='O3',],name='O3 MS locations') + tm_dots(col='status',palette=c('blue','red'),legend.show=FALSE)
+
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+#CREATE TWO DATAFRAMES : counties to store all the counties we want to keep, MS to store all the monitoring stations belonging to the counties
+
+#include neighboring counties of Chicago and also Lake and Porter from Indiana (lot of industries)
+counties <- us_counties() %>% filter((state_name=='Illinois' & name %in% c('Cook','Lake','DuPage','Will','Kankakee','McHenry','Kane','Kendall','Grundy')) | (state_name=="Wisconsin" & name %in% c('Racine','Walworth','Kenosha')) | (state_name=="Indiana" & name %in% c('Lake','Porter','Newton','Jasper','LaPorte','Starke','Pulaski'))) %>% st_transform(counties, crs=102003) 
+
+#Sites measuring O3 and PM2.5 at the 6 counties we're interested in
+MS <- MS[which(st_intersects(MS,counties) > 0),]
+
+#Same MS for PM2.5 and O3
+MS.both<-group_by(MS,by=AQSID) %>% summarise(length=n()) %>% filter(length==2) %>% .[['by']]
+
+#Plot the counties included in the MS location
+ggplot(counties,aes(fill = state_name)) + geom_sf()
+
+#Add metadata about the Monitoring Stations (Type, Objectives, ...) from the different states documents (Illinois, Indiana, Wisconsin). Informations for Wisconsin and Indiana will be added manually (only a few stations)
+path_docs <- '/Volumes/GoogleDrive/My Drive/PDM/Docs/'
+
+MS <- read_csv(paste0(path_docs,'meta_O3_MS.csv'),col_names = TRUE,na = c("N/A", "NA")) %>% rbind(read_csv(paste0(path_docs,'meta_PM25_MS.csv'),col_names = TRUE,na = c("N/A", "NA"))) %>% mutate(AQSID = gsub(pattern='-',replacement = '',x=AQSID)) %>% merge(x=MS,by=c('AQSID','parameter.name'),all.x=TRUE)
+
+MS <- MS %>% select(AQSID,site.name.x,parameter.name,status,state.name,county.name,primary.objective,secondary.objective,spatial.scale,station.type) %>% rename(site.name=site.name.x)
+
+#Overwrite if one layer already exists
+st_write(counties,'Data/Spatial/counties.shp',delete_layer = TRUE)
+
+```
+
+# 3. Extraction of the EPA's data for $O_{3}$ and $PM_{2.5}$ and data cleaning/wrangling 
+
+```{r, warning=FALSE, message=FALSE}
+#READ DATA FOR ALL YEARS
+
+yeardir <- 'Data/AirNow/DailyPeak'
+yearfiles <- list.files(yeardir,full.names=TRUE)
+fieldnames <- c("vdate","AQSID","site.name","parameter.name","report.units",
+                "value","avg.period","agency.name")
+
+#Function to extract the desired data (Ozone-8h and PM2.5-24h) for a given file
+extract_data <- function(file) {
+  return(read_delim(file, "|", col_names = fieldnames, progress = FALSE) %>% filter(AQSID %in% unique(MS$AQSID)) %>% filter(parameter.name=='OZONE-8HR' | parameter.name=='PM2.5-24hr'))
+}
+
+#For loop to go over all the files in the directory
+data <- data.frame()
+
+for(j in 1:length(yearfiles)) {
+  datadir <- paste0(yeardir,substr(yearfiles[j],nchar(yearfiles[j])-4,nchar(yearfiles[j])))
+  datfiles <- list.files(datadir,full.names=TRUE)
+  
+  for(i in 1:length(datfiles))
+  {
+  res <- extract_data(datfiles[i])
+  data <- rbind(data,res)
+  }
+}
+
+head(data)
+```
+
+```{r, warning=FALSE, message=FALSE}
+#DATA WRANGLING
+data.bckp <- data
+#data <- data.bckp
+
+data_wrangling <- function(df) {
+
+  #Keep only useful fields (time, AQSID, parameter, values)
+  df <- select(df,c('vdate','AQSID','parameter.name','value')) 
+  
+  #Convert to tidy format (spread parameter name)
+  df <- spread(df, key='parameter.name', value='value')
+  
+  #Change name of columns
+  names(df) <- c('date','AQSID','O3','PM25')
+  
+  #Data conversion
+  df$date<-mdy(df$date) #date from char to date
+  df$AQSID<-factor(df$AQSID) #AQSID from char to factor
+
+  return(df)
+}
+
+#Data wrangling process
+data <- data_wrangling(data)
+
+#Make appear missing dates explicitely using complete() from tidyr
+data <- complete(data,date = seq.Date(min(date), max(date), by="day"))
+
+#Print implicit missing values
+missingD <- filter(data, is.na(O3) & is.na(PM25)) %>% .[['date']] %>% format("%Y%m%d")
+print(missingD) #Dates with missing data
+ 
+#Extract missing data in http://files.airnowtech.org/ if possible
+extract_missingD <- function(missingD) {
+  
+  df<-data.frame()
+  
+  for (i in 1:length(missingD)) {
+    
+  df_sub <- read.delim(paste0("https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/",substr(missingD[i],1,4),"/",missingD[i],"/daily_data.dat"), sep="|", header=FALSE, col.names = fieldnames) %>% filter(AQSID %in% unique(MS$AQSID)) %>% filter(parameter.name=='OZONE-8HR' | parameter.name=='PM2.5-24hr') #Extract data and filter to only have the wanted MS and parameters (PM2.5/O3)
+   
+  df <- rbind(df,df_sub)
+  }
+  
+  return(df)
+}
+
+#Extract missing data
+missingD.data <- extract_missingD(missingD)
+
+#Rearrange the results according to the wrangling process
+missingD.data <- data_wrangling(missingD.data)
+
+#Check if the daily_data.dat is daily peak values by using the same function to extract known informations
+missingD.test <- sample_n(data, 10) #Take 10 random rows of the initial dataframe
+missingD.test.data <- extract_missingD(format(missingD.test$date,"%Y%m%d")) #Extract values on files.airnowtech.org
+missingD.test.data<- data_wrangling(missingD.test.data) #Reshape the resulting dataframe
+
+missingD.comp<-inner_join(missingD.test,missingD.test.data,by=c('date','AQSID'))
+#print(missingD.comp$O3.x==missingD.comp$O3.y)
+#print(missingD.comp$PM25.x==missingD.comp$PM25.y)
+#daily_data.dat corresponds to daily peak values
+
+#Bind retrieved missing values to dataframe
+data <- data %>% drop_na(AQSID) #Remove the rows added to detect missing values
+data <- rbind(data,missingD.data)
+
+#Number of missing values still missing
+print(nrow(complete(data,date = seq.Date(min(date), max(date), by="day")))-nrow(data))
+
+#Number of observations we're supposed to have for a complete time series (nb of days between the first and last day as daily measurements)
+nbDays<-as.numeric(max(data$date) - min(data$date))
+
+```
+
+```{r, warning=FALSE, message=FALSE}
+#EXPLORATORY DATA ANALYSIS of Ozone
+
+MS.O3 <- filter(MS,parameter.name=='O3') %>% select(-parameter.name) #monitoring stations measuring O3
+data.O3 <- data %>% filter(AQSID %in% MS.O3[['AQSID']]) %>% subset(select = -PM25) #subset of the dataframe keep only the MS recording O3 (the ones in MS.O3)
+
+data.O3 <- data.O3 %>% droplevels() %>% complete(date,AQSID) #complete the dataframe with the missing combinaisons (data,AQSID) of data in order to make explicite the missing values
+MS.O3 <- data.O3 %>% group_by(AQSID) %>% summarize(nb_na = sum(is.na(O3)), mean_val = mean(O3, na.rm=TRUE)) %>% full_join(MS.O3, by='AQSID') #count the nb of missing observations (obs=dailyPeak record) per node
+
+data.O3 %>% ggplot(aes(x=date, y=O3)) + geom_line() + facet_wrap(~AQSID, nrow=5) + ggtitle('2013-2018 time series for the O3 measurements at each node') + labs(x='Date',y='O3 [ppb]') %>% print() #time series for each O3 monitoring station
+
+MS.O3 <- MS.O3 %>% mutate(group=ifelse(nb_na < 0.1*nbDays, '>90%', ifelse(nb_na > 0.8*nbDays, '<20%', '20%-90%'))) #create groups according the different type of data frequency as noticed in the time series diagnostic
+pal.typeData <- c('<20%'='#f66253','>90%'='#86b24f','20%-90%'='#f6a760') #create a color palette corresponding to these groups
+
+print(MS.O3)
+  
+# ggplot() + geom_sf(data=counties) + geom_sf(data=MS.O3,aes(color=group)) + scale_colour_manual(values = pal.typeData,na.value='black') + ggtitle('O3 monitoring stations') + labs(colour='Time series completeness') + theme_void() #plot the O3 monitoring stations according the data frequency they have
+
+write_csv(data.O3,'Data/CSV/data_O3.csv')
+
+```
+
+```{r, warning=FALSE, message=FALSE}
+#EXPLORATORY DATA ANALYSIS of PM2.5
+
+MS.PM25 <- filter(MS,parameter.name=='PM2.5') %>% select(-parameter.name) #monitoring stations measuring PM2.5
+data.PM25 <- data %>% filter(AQSID %in% MS.PM25[['AQSID']]) %>% subset(select = -O3) #subset of the dataframe keep only the MS recording PM2.5 (the ones in MS.PM25)
+
+data.PM25 <- data.PM25 %>% droplevels() %>% complete(date,AQSID) #complete the dataframe with the missing combinaisons (data,AQSID) of data in order to make explicite the missing values
+MS.PM25 <- data.PM25 %>% group_by(AQSID) %>% summarize(nb_na = sum(is.na(PM25))) %>% full_join(MS.PM25, by='AQSID') #count the nb of missing observations (obs=dailyPeak record) per node
+
+print(MS.PM25)
+
+data.PM25 %>% ggplot(aes(x=date, y=PM25)) + geom_line() + facet_wrap(~AQSID, nrow=4) + ggtitle('2013-2018 time series for the PM2.5 measurements at each node') + labs(x='Date',y='PM2.5 [ug/m3]') %>% print() #time series for each PM2.5 monitoring station
+
+MS.PM25 <- MS.PM25 %>% mutate(group=ifelse(nb_na < 0.1*nbDays, '>90%', ifelse(nb_na > 0.8*nbDays, '<20%', '20%-90%'))) #create groups according the different type of data frequency as noticed in the time series diagnostic
+
+print(MS.PM25)
+
+# ggplot() + geom_sf(data=counties) + geom_sf(data=MS.PM25,aes(color=group)) + scale_colour_manual(values = pal.typeData,na.value='black') + ggtitle('PM2.5 monitoring stations') + labs(colour='Time series completeness') + theme_void() #plot the O3 monitoring stations according the data frequency they have
+
+write_csv(data.PM25,'Data/CSV/data_PM25.csv')
+
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+tmap_mode("view")
+popup.vars <- c("AQSID"="AQSID","Site Name"="site.name","State"="state.name","County"="county.name","Primary Objective"="primary.objective","Secondary Objective"="secondary.objective","Spatial Scale"="spatial.scale","Station Type"="station.type")
+
+tm_shape(counties) + tm_borders(col='black', lty=2) +
+  tm_shape(st_sf(MS.O3), name='O3 monitoring stations') + tm_dots(col='group',palette=pal.typeData,popup.vars=popup.vars) +
+  tm_shape(st_sf(MS.PM25), name='PM2.5 monitoring stations') + tm_dots(col='group',palette=pal.typeData,legend.show=FALSE,popup.vars=popup.vars) + tm_layout(title='Select MS for a specific pollutant in the layer selection')
+
+MS.PM25$spatial.scale <- factor(MS.PM25$spatial.scale,levels=c("Neighborhood","Urban","Regional", "Middle"),ordered=TRUE)
+MS.O3$spatial.scale <- factor(MS.O3$spatial.scale,levels=c("Neighborhood","Urban","Regional", "Middle"),ordered=TRUE)
+
+pal.spatialscale <- c('Neighborhood'='#d11141','Urban'='#00b159','Regional'='#00aedb','Middle'='#f37735') #create a color palette corresponding to these groups
+
+tm_shape(counties) + tm_borders(col='black', lty=2) +
+  tm_shape(st_sf(MS.PM25), name='PM2.5 monitoring stations') + tm_dots(col='spatial.scale',palette=pal.spatialscale,popup.vars=popup.vars) +
+  tm_shape(st_sf(MS.O3), name='O3 monitoring stations') + tm_dots(col='spatial.scale',palette=pal.spatialscale,legend.show=FALSE,popup.vars=popup.vars) +
+ tm_layout(title='Select MS for a specific pollutant in the layer selection')
+
+```
+
+```{r, warning=FALSE, message=FALSE}
+# O3 : Remove CHI_U (inactive)
+# Where is Evanston? Data missing
+MS.O3 <- MS.O3 %>% filter(!AQSID %in% c('170310064'))
+
+# PM2.5 : Remove CHI-WASH and MAYWOOD (inactives)
+MS.PM25 <- MS.PM25 %>% filter(!AQSID %in% c('170310022','170316006'))
+
+# Write the spatial shapefiles for the location of the monitoring stations (+metadata) for each pollutant
+write_sf(st_as_sf(MS.PM25,geom=MS.PM25$geometry),'Data/Spatial/MS_PM25.shp', delete_layer = TRUE)
+write_sf(st_as_sf(MS.O3,geom=MS.O3$geometry),'Data/Spatial/MS_O3.shp', delete_layer = TRUE)
+
+```
+
+

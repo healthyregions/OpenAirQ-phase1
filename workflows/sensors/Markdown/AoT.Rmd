@@ -1,0 +1,221 @@
+---
+title: "Preliminary analysis of the non-calibrated data for the Array of Things project"
+author: "Anaïs Ladoy^[anais.ladoy@epfl.ch]"
+date: "04/19/2018"
+output: html_document
+---
+
+###1. Download the non-calibrated raw data
+```{r, results='hide'}
+#Download file
+
+# url <- "http://www.mcs.anl.gov/research/projects/waggle/downloads/datasets/AoT_Chicago.public.latest.tar.gz"
+# destfile <- 'Data/aot_public.tar.gz'
+
+url <- "http://www.mcs.anl.gov/research/projects/waggle/downloads/datasets/AoT_Chicago.complete.latest.tar.gz"
+destfile <- 'Data/aot_raw.tar.gz'
+
+# Download file
+file <- download.file(url,destfile = destfile,cacheOK = FALSE)
+
+# Look at the files in the tar.gz
+untar(destfile,exdir="Data")
+untarFile <- untar(destfile,list=TRUE)
+
+```
+###2. Read the csv files (data + metadata)
+```{r, results='hide'}
+#Read files
+library(data.table)
+
+start.time <- Sys.time()
+nodes <- read.csv(paste('Data/',untarFile[which(grepl('nodes',untarFile)==TRUE)],sep=''))
+sensors <- read.csv(paste('Data/',untarFile[which(grepl('sensors',untarFile)==TRUE)],sep=''))
+provenance <- read.csv(paste('Data/',untarFile[which(grepl('provenance',untarFile)==TRUE)],sep=''))
+data <- fread(paste('Data/',untarFile[which(grepl('data',untarFile)==TRUE)],sep=''),showProgress=FALSE)
+end.time <- Sys.time()
+print(end.time-start.time)
+
+# #Path if we've already download the data
+# path <- 'AoT_Chicago.complete.2018-04-17/'
+# 
+# nodes <- read.csv(paste('Data/',path,'nodes.csv',sep=''))
+# sensors <- read.csv(paste('Data/',path,'sensors.csv',sep=''))
+# provenance <- read.csv(paste('Data/',path,'provenance.csv',sep=''))
+# data <- fread(paste('Data/',path,'data.csv',sep=''))
+
+#Basic informations about the csv files
+str(nodes) #Structure of nodes.csv
+str(sensors) #Structure of sensors.csv
+str(provenance) #Structure of provenance.csv
+head(data) #Head of data.csv
+
+```
+
+###3. Data Cleaning and Wrangling
+
+Concerning duplicated rows, two cases appear in the raw data :  
+-*41 784* rows are duplicated
+-*56 946* rows have the same combinaison of node_id/parameter/sensor/plugin but with different values recorded
+
+Once the calibrated data will be available, an outlier detection must me implemented before computing the hourly average.
+
+Another potential issue that has been noticed in the raw dataset is that several sensors are sometimes measuring the same parameter at a single node (e.g temperature). Either the measurements would need to be the same once the data will be calibrated or we'll have to decide which sensor do we consider for a given parameter and node. *(See the NbSensorsPerNode.csv to have the list of nodes having more than one sensor for a given parameter)*
+
+```{r, results='hide'}
+#Data Wrangling
+library(fasttime)
+library(dplyr)
+
+#Assign data format
+start.time <- Sys.time()
+data$timestamp <- fastPOSIXct(data$timestamp,tz='America/Chicago') #Timestamp
+data$value <- as.numeric(data$value) #Int
+end.time <- Sys.time()
+print(end.time-start.time)
+
+#Save a copy of the data 
+data.copy <- data
+
+#Data Cleaning, duplicated rows
+duplicates.all <-data[duplicated(data) | duplicated(data,fromLast=TRUE),] #Exactly same rows (saving the two duplicated rows)
+duplicates.diffValues <- anti_join(data[duplicated(data[,c('node_id','timestamp','sensor','parameter','plugin')]) | duplicated(data[,c('node_id','timestamp','sensor','parameter','plugin')],fromLast=TRUE),], duplicates.all) #Rows with different values for the same node, parameter and sensor (saving the two duplicated rows)
+
+data <- data[!duplicated(data, by=c('node_id','timestamp','plugin','sensor','parameter')),] #Keep only the first duplicated row (not necessarly the good one if duplicated with different values)
+
+#Number of nodes where the same parameter is measured
+NbSensorsPerNode <-aggregate(data[,c('node_id','parameter','sensor')],by=list(data$node_id,data$parameter),FUN=function(x) length(unique(x)))
+NbSensorsPerNode$node_id <- NULL
+NbSensorsPerNode$parameter <- NULL
+names(NbSensorsPerNode) <- c('node_id','parameter','nb_sensors')
+write.csv(NbSensorsPerNode[NbSensorsPerNode$nb_sensors>1,],'Data/NbSensorsPerNode.csv',row.names = FALSE)
+
+nodes.id <- unique(data$node_id) #Unique nodes id for the for loop
+data.agg <- data.frame() #Empty df to store the aggregate nodes
+
+```
+
+
+###4. Reshape the dataframe and compute the hourly average for each parameter
+```{r, results='hide'}
+#Function to compute the hourly mean for a node
+#The function removes the duplicated rows (keep the first one if two different values measured for the same parameter, timestamp and sensor), reshape the dataframe (timestamp in index) and compute the hourly mean for all the parameter measured.
+#The missing values are omitted during the computation of mean values (na.rm=TRUE)
+library(xts)
+library(zoo)
+
+hourly_average <- function(data) {
+
+  var.node <- data$node_id[1]
+  var.data <- data[,-1]
+  
+  #Reshaphe with dcast
+  data <- dcast(var.data , timestamp ~ parameter + sensor, value.var = 'value')
+  xts <- xts(data[,-1],data$timestamp)
+  
+  agg <- period.apply(xts[,-1],endpoints(xts[,1],'hours'),FUN=function(x) apply(x,2,function(y) mean(y,na.rm = TRUE))) %>% fortify.zoo(names = c(Index= 'timestamp'))
+  return(agg)
+}
+
+```
+
+
+```{r, results='hide'}
+
+start.time <- Sys.time()
+#Compute for each node_id the hourly average (for each parameter and each sensor) and bind in a dataframe
+for (i in 1:length(nodes.id)) {
+  avg <- hourly_average(data[which(data$node_id==nodes.id[i]),])
+  avg$node_id <- nodes.id[i]
+  data.agg <- bind_rows(data.agg,avg)
+}
+end.time <- Sys.time()
+print(end.time-start.time)
+
+#Save the data in csv
+write.csv(data.agg, file = "Data/hourly_avg_raw_19042018.csv")
+
+```
+
+###5. Descriptive Statistics
+
+```{r, results='hide'}
+#Data Analysis
+library(ggplot2)
+
+# ## Uncomment the next lines if starting with the pregenerated files
+# library(data.table)
+# library(fasttime)
+# data.agg <- fread('Data/hourly_avg_raw_19042018.csv',showProgress = FALSE)
+# nodes <- read.csv('Data/nodes.csv')
+# sensors <- read.csv('Data/sensors.csv')
+# data.agg$timestamp <- fastPOSIXct(data.agg$timestamp,tz='America/Chicago') #Timestamp
+
+#Summary, Descriptive statistics of all the fields (parameter/sensor)
+summary(data.agg[,!names(data.agg) %in% c('X','timestamp','node_id','mac_address_Coresense.ID')])
+
+#Hourly average of PM2.5
+#print(colnames(data.agg)[grepl('pm',colnames(data.agg))]) #Columns with PM measurements
+pm25<-data.agg[!is.na(data.agg$pm2.5_Alphasense),c('timestamp','node_id','pm2.5_Alphasense')] #PM2.5 subset
+
+#Timeseries of PM2.5 values
+ggplot(pm25,aes(x=pm25$timestamp,y=pm25$pm2.5_Alphasense,group=pm25$node_id,colour = factor(node_id))) + geom_line()
+#Non-missing hourly averages values for the nodes 001e0610bbe5 (orange) and 001e0610e539 (green)
+#Note : Here the values are the hourly average (the timestamp has been previously aggregated to hourly scale)
+print('Non-missing hourly averages values for the node 001e0610bbe5 (orange)')
+data.agg[data.agg$node_id=='001e0610bbe5' & data.agg$pm2.5_Alphasense != 'NaN',c('timestamp','pm2.5_Alphasense')] # 001e0610bbe5 (orange)
+print('Non-missing hourly averages values for the node 001e0610e539 (green)')
+data.agg[data.agg$node_id=='001e0610e539' & data.agg$pm2.5_Alphasense != 'NaN',c('timestamp','pm2.5_Alphasense')] # 001e0610e539 (green)
+
+#Timeseries of PM2.5 values after removing the nodes with unconsistent measurements 
+pm25<-pm25[which(pm25$node_id=='001e06113cff' | pm25$node_id=='001e06113107'),]
+ggplot(pm25,aes(x=pm25$timestamp,y=pm25$pm2.5_Alphasense,group=pm25$node_id,colour = factor(node_id))) + geom_line() + ggtitle('PM 2.5 concentration after removing nodes with unconsistent measurements. The two nodes are at the same location according nodes metadata.')
+
+#Nodes having the same coordinates
+nodes[duplicated(nodes[,c('lat','lon')]) | duplicated(nodes[,c('lat','lon')],fromLast = TRUE) ,]
+
+```
+*Note :* The only nodes measuring PM2.5 and having a consistent time serie (001e06113107 and 001e06113cff) have the same coordinates according the node metadata. 
+
+###6. Locations of nodes
+Select the layer that you want to visualise (clicking on the button at the left of the map). By default, all the layers are selected and overlaid.
+```{r, message=FALSE, warning=FALSE}
+#Spatial visualisation
+library(sp)
+library(tmap)
+library(leaflet)
+tmap_mode('view')
+
+#Group by node ID (average but temporary solution, maximum would be more relevant for air quality parameter
+data.agg.node <- aggregate(x=data.agg[,!names(data.agg) %in% c('X','timestamp','mac_address_Coresense.ID')], by=list(node=data.agg$node_id), function(x) mean(x,na.rm = TRUE))
+data.agg.node<-data.agg.node[,-which(names(data.agg.node)=='node_id')]
+
+#Merge with the nodes metadata and transform to Spatial Dataframe
+data.agg.spt<-merge(nodes[,c('node_id','lat','lon')],data.agg.node,by.x = 'node_id',by.y='node')
+
+data.agg.spt <- SpatialPointsDataFrame(data.agg.spt[,c('lon','lat')],data.agg.spt)
+proj4string(data.agg.spt) <- CRS("+init=epsg:4326")
+data.agg.spt <- spTransform(data.agg.spt,CRS("+init=epsg:32616")) #Project the coordinates in UTM zone 16N
+
+#Leaflet map for the air quality data
+tm_shape(data.agg.spt,name=paste('o3_Chemsense',sensors[which(sensors$sensor=='Chemsense' & sensors$parameter=='o3'),'unit'],sep='-')) +
+  tm_dots(col='o3_Chemsense',style='jenks',palette='YlOrRd',n=3) +
+  tm_shape(data.agg.spt,name=paste('no2_Chemsense',sensors[which(sensors$sensor=='Chemsense' & sensors$parameter=='no2'),'unit'],sep='-')) + 
+  tm_dots(col='no2_Chemsense',style='jenks',palette='YlOrRd',n=3) +
+  tm_shape(data.agg.spt,name=paste('co_Chemsense',sensors[which(sensors$sensor=='Chemsense' & sensors$parameter=='co'),'unit'],sep='-')) +
+  tm_dots(col='co_Chemsense',style='jenks',palette='YlOrRd',n=3) +
+  tm_shape(data.agg.spt,name=paste('so2_Chemsense',sensors[which(sensors$sensor=='Chemsense' & sensors$parameter=='so2'),'unit'],sep='-')) +
+  tm_dots(col='so2_Chemsense',style='jenks',palette='YlOrRd',n=3) +
+  tm_shape(data.agg.spt[data.agg.spt$pm2.5_Alphasense!='NaN',],name='pm monitors') +
+  tm_dots()
+
+```
+
+
+###7. Going further
+-Improve the data cleaning  
+-What sensor choose for a node ? (in case of several sensors measuring the same parameter)  
+-Importation in a data warehouse  
+-Selection of different levels of aggregation according the parameters (daily max peak, daily average, etc)  
+-Add the daily measurements directly to the reshaped dataframe (without downloading the entire raw file everyday)  
+

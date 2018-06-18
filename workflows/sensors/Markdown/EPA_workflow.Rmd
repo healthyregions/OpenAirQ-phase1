@@ -1,0 +1,215 @@
+---
+title: "EPA workflow"
+author: "Anaïs Ladoy"
+date: "5/21/2018"
+output: 
+  html_document:
+    toc: true # table of content true
+    toc_depth: 3  # upto three depths of headings (specified by #, ## and ###)
+    theme: united
+---
+
+The present notebook is dedicated to the workflow implementation for the EPA's air quality data. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, results=FALSE, warning=FALSE}
+
+library(tidyverse) # (ggplot2, dplyr, readr, etc)
+
+library(sf) # Simple Features
+
+library(USAboundaries) # Boundaries for geographical units in the United States of America (U.S. Census Bureau)
+
+```
+
+
+# Get the data
+
+Download the dataset from the available sources providing EPA's data.
+
+  * Historical hourly data (run once)
+  * Hourly data from the previous day (will become an automatic process)
+  * Metadata about the monitoring stations
+
+
+```{r, results=FALSE, warning=FALSE}
+
+#ftp://ftp.airnowapi.org/
+#files.airnowtech.org
+
+#HOURLY DATA FOR THE PREVIOUS DAY
+date <- Sys.Date()-1
+date <- str_replace_all(date,pattern='-',replacement = '')
+
+hour <- c("00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23")
+fieldnames.hourly <- c("vdate","vtime","AQSID","site.name","GMT.offset","parameter.name","report.units",
+                "value","data.source")
+data <- data.frame()
+
+for(i in 1:24)
+{
+hourly_dat <- read.delim(paste0("https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/",substring(date,0,4),"/",date,"/HourlyData_",date,hour[i],".dat"), sep="|", header=FALSE, col.names = fieldnames.hourly)
+data <- rbind(data,hourly_dat)
+}
+
+#Backup
+write_csv(data,paste0("Data/AirNow/HourlyValues/",date,".csv"))
+
+#DOWNLOAD MONITORING SITES METADATA FOR THE PREVIOUS DAY (up-to-date)
+
+fieldnames.meta <- c("AQSID","parameter.name","site.code","site.name","status","agency.id","agency.name","EPA.region","latitude","longitude","elevation","GMT.offset","country.code","CMSA.code","CMSA.name","MSA.code","MSA.name","state.code","state.name","county.code","county.name","city.code","city.name")
+
+MS <- read.delim(paste0("https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/",substring(date,0,4),"/",date,"/monitoring_site_locations.dat"), sep="|", header=FALSE, col.names = fieldnames.meta)
+
+
+#HISTORICAL DATA (RUN ONCE)
+
+#Ask Luc for the Hourly data and not daily data
+
+```
+
+
+```{r, results=FALSE, warning=FALSE}
+#aqs.epa.org
+#For now only criteria but see the list of parameters group
+
+
+
+# for(i in 1:24)
+# {
+# hourly_dat <- read.delim(paste0("https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/",substring(date,0,4),"/",date,"/HourlyData_",date,hour[i],".dat"), sep="|", header=FALSE, col.names = fieldnames.hourly)
+# data <- rbind(data,hourly_dat)
+# }
+# r<-read_csv("https://aqs.epa.gov/api/rawData?user=anais.ladoy@epfl.ch&pw=saffrongoose78&format=AQCSV&pc=CRITERIA&param=&bdate=20180401&edate=20180401&state=17&county=31&dur=1")
+
+
+bdate <- "20180301"
+edate <- "20180401"
+
+#Function to extract data for a specific time period and for a specific county.
+aqs_dat <- function(bdate,edate,state,county) {
+  return (read_csv(paste0("https://aqs.epa.gov/api/rawData?user=anais.ladoy@epfl.ch&pw=saffrongoose78&format=AQCSV&pc=CRITERIA&param=&bdate=",bdate,"&edate=",edate,"&state=",state,"&county=",county,"&dur=1")))
+}
+
+data <- data.frame()
+
+#IL counties
+counties.IL <- c('031','097','043','197','091','111','089','093','063')
+for (i in 1:length(counties.IL)) {
+  r.IL <- aqs_dat(bdate,edate,"17",counties.IL[i])
+  data <- rbind(data,r.IL) 
+}
+
+#IN counties ('LAKE','PORTER','NEWTON','JASPER','LA PORTE','STARKE','PULASKI')
+counties.IN <- c('089','127','111','073','091','149','131')
+for (i in 1:length(counties.IN)) {
+  r.IN <- aqs_dat(bdate,edate,"92",counties.IN[i])
+  data <- rbind(data,r.IN) 
+}
+
+#WI counties ('RACINE','WALWORTH','KENOSHA','MILWAUKEE','WAUKESHA')
+counties.WI <- c('101','127','059','079','133')
+for (i in 1:length(counties.WI)) {
+  r.WI <- aqs_dat(bdate,edate,"55",counties.WI[i])
+  data <- rbind(data,r.WI) 
+}
+
+data.bk <- data
+data <- data.bk
+
+#Remove empty values (NA lines), must be equal to 21 (nb of requests=nb of counties)
+if(nrow(data %>% filter(is.na(site) | site=='END OF FILE')) == 21){
+  data <- data %>% filter(!is.na(site) & site!='END OF FILE')
+}
+{
+  print('There are more NA lines than expected. You may check again.')
+}
+
+
+#Time
+
+
+#Send to timescale
+fieldnames.AQS <- c('site_id','dat_status','act_code','datetime','param_code','dur_code','freq','value','unit','qc','poc','lat','lon','datum','elev','meth_code','mpc','mpc_value','uncert','qualif')
+
+```
+
+
+
+
+# Daily Dump
+
+First connection to the spatial database, the raw file (csv) is pushed in order to have a copy of the dataset.
+
+  1. Filter the monitoring stations to keep the ones surrounding Chicago (15 neighboring counties distributed through Wisconsin, Indiana and Illinois)
+  2. In the metadata dataframe, add informations (manually) about the spatial scale and monitoring objective of each site using the different state's EPA reports
+  3. Check if the metadata has changed since the last dump and if it's the case, overwrite the metadata file in the DB with the new file
+  4. Add the hourly data file in the DB (raw values filtered with the Monitoring Stations)
+  
+
+```{r, results=FALSE, warning=FALSE}
+
+#FILTER THE MONITORING STATIONS
+MS <- MS %>% filter((state.name=='IL' & county.name %in% c('COOK','LAKE','DU PAGE','WILL','KANKAKEE','MC HENRY','KANE','KENDALL','GRUNDY')) | (state.name=="WI" & county.name %in% c('RACINE','WALWORTH','KENOSHA','MILWAUKEE','WAUKESHA')) | (state.name=="IN" & county.name %in% c('LAKE','PORTER','NEWTON','JASPER','LA PORTE','STARKE','PULASKI') ))  %>% droplevels() %>% st_as_sf(coords=c('longitude','latitude'),agr = 'identity',crs = 4326) %>% st_transform(crs=32616)
+
+#Filter the data to keep only the MS in the study area, drop unused levels (from the previous datagrame) and convert to a tibble dataframe (optimal data format)
+data <- data %>% filter(AQSID %in% MS$AQSID) %>% droplevels() %>% as_tibble()
+
+#ADD INFORMATION IN METADATA
+#From official reports (Illinois, Indiana, Wisconsin)
+
+head(data)
+
+#Check if the metadata has changed ?
+#st_transform(counties, crs=32616)
+
+```
+
+
+```{r, results=FALSE, warning=FALSE}
+#MS where we don't have any data
+print(MS %>% filter(AQSID %in% setdiff(levels(MS$AQSID), levels(data$AQSID))))
+```
+
+Here is the list of the monitoring stations registered in the metadata file but for which we don't have any data. Except for two stations (LaPorte-E. Lincolnway, CHI-SP), it corresponds to stations that are no longer active.
+
+No insights about the reason why we don't have any data for these two active stations :
+* 17-031-0057 : Springfield Pump Station (1745 N. Springfield Ave.)
+* 18-091-0010 : LaPorte - E. Lincolnway (2011 E. Lincolnway)
+
+# Data Wrangling
+
+Rearrange the dataframe in order to have an optimal format (tidy) for the DB integration.
+
+  1. Check for any duplicates or other "dirty data" problems
+  2. Remove unecessary variables to keep only ID/timestamp/parameter/value (to be consistent with the AoT format)
+  3. Reshape the dataframe in a tidy format
+  4. Complete the time serie to make missing values explicit (insert a NA row for missing timestamp)
+
+don't forget to convert timestamp
+
+```{r, results=FALSE, warning=FALSE}
+
+#Map the counties
+limits.counties <- us_counties() %>% filter((state_name=='Illinois' & name %in% c('Cook','Lake','DuPage','Will','Kankakee','McHenry','Kane','Kendall','Grundy')) | (state_name=="Wisconsin" & name %in% c('Racine','Walworth','Kenosha','Milwaukee','Waukesha')) | (state_name=="Indiana" & name %in% c('Lake','Porter','Newton','Jasper','LaPorte','Starke','Pulaski'))) %>% st_transform(counties, crs=32616) 
+
+ggplot() + geom_sf(data=limits.counties,mapping=aes(fill = state_name)) + geom_sf(data=MS) + facet_wrap(~parameter.name, nrow=3) + ggtitle('Monitoring Sites location according to the AirNow metadata file (both active and inactive stations)')
+
+
+d <- data[duplicated(data),]
+```
+
+
+
+# Before Modeling
+
+Tasks that need to be implemented once the data will be on the dataset and before any modeling.
+
+  1. Outliers / Anomalies detection
+  2. Imputation of missing values
+
+

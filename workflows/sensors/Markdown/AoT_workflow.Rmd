@@ -1,0 +1,412 @@
+---
+title: "AoT workflow"
+author: "Anaïs Ladoy"
+date: "5/07/2018"
+output:
+  html_document:
+    toc: true # table of content true
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Array of Things worflow
+
+Steps :  
+1. Current situation "http://www.mcs.anl.gov/research/projects/waggle/downloads/datasets/AoT_Chicago.public.latest.tar.gz"   
+2. Extract only the last day  
+3. Push the daily dump (raw) on the database   
+4. Data conversion of the daily measurements (selection of sensors, tidy data,  hourly average, daily peak)  
+5. Data cleaning / Outliers detection  
+6. Push the cleaned data on the database  
+
+
+```{r, results=FALSE, warning=FALSE}
+#LIBRARIES
+
+library(tidyverse) # (ggplot2, dplyr, readr, etc)
+
+library(sf) # simple features (spatial)
+
+library(fasttime) # conversion to POSIXct
+
+library(ggmap) #retrieve raster maps (Google maps, OSM, Stamen Maps)
+
+library(tsibble)
+
+library(lubridate)
+
+library(tmap)
+
+library(imputeTS)
+
+library(httr)
+
+library(jsonlite)
+
+```
+
+
+#Current situation of the AoT project
+
+Only .. nodes are installed on ... planned.
+The majority of the sensors are still under the calibration process (wait for enough test data, comparison at EPA's collocated nodes, determine the precision of the measurements).
+Problem with the PM2.5 sensors.
+
+# 1. Get the data
+
+Currently the data recorded at the AoT nodes are splitted in two datasets :
+
+* *Public dataset* : calibrated data (complete sensor stream evaluation process). These values are supposed to be reliable, quantifying the air quality at the node location.
+Until last week, public dataset was only available in bulk download at <https://aot-file-browser.plenar.io/public.html> but a preliminary AoT API is now available <https://dev.plenar.io/api/v2/aot>. The latter allows a request on the timestamp which will be particularly useful if we only want a daily dump.
+
+* *Complete/Raw dataset* : data coming directly from the AoT sensors. These values must not be considered as reliable as the sensors are not calibrated yet.
+The complete dataset is only available in bulk download at <https://aot-file-browser.plenar.io/complete.html>.
+
+Once all the sensors will be calibrated, the easiest way to access to the recorded data will be via the AoT API.
+The format avaialble in the current platform is not optimal, especially for a daily workflow. Indeed, we can either download the entire dataset (already 30GB after 2 months of data and growing subsequently everyday) or download all the data for one specific node which is not very useful as we are intereset by the cross-sectional analysis.
+
+Different scripts have been written, testing all the possible options to acccess to the data. More specifically, one read the entire dataset R memory using read_csv() and then filter for the previous day, one processing the data with bash commands and importing only the previous day's data in R and the last using the AoT API (only valid for public dataset).
+
+
+```{r, results=FALSE, warning=FALSE}
+#GET THE DATA - Read all the dataset in R memory from the aot-file-browser.plenar.io source
+
+# #Public dataset
+# url <- "http://www.mcs.anl.gov/research/projects/waggle/downloads/datasets/AoT_Chicago.public.latest.tar.gz"
+# destfile <- 'Data/AoT/aot_public.tar.gz'
+
+#Complete dataset
+url <- 'http://www.mcs.anl.gov/research/projects/waggle/downloads/datasets/AoT_Chicago.complete.latest.tar.gz'
+destfile <- './Data/AoT/aot_raw.tar.gz'
+
+# Download file
+file <- download.file(url,destfile = destfile,cacheOK = FALSE)
+
+# Look at the files in the tar.gz
+untarFile <- untar(destfile,list=TRUE,exdir=exdir)
+
+#READ DATA
+exdir <- 'Data/AoT'
+
+start.time <- Sys.time()
+nodes <- read_csv(paste(exdir,untarFile[which(grepl('nodes',untarFile)==TRUE)],sep=''))
+sensors <- read_csv(paste(exdir,untarFile[which(grepl('sensors',untarFile)==TRUE)],sep=''))
+provenance <- read_csv(paste(exdir,untarFile[which(grepl('provenance',untarFile)==TRUE)],sep=''))
+data <- read_csv(paste(exdir,untarFile[which(grepl('day',untarFile)==TRUE)],sep='')) #data from the previous day
+end.time <- Sys.time()
+print(end.time-start.time)
+
+str(nodes) #Structure of nodes.csv
+str(sensors) #Structure of sensors.csv
+str(provenance) #Structure of provenance.csv
+head(data) #Head of data.csv
+
+```
+
+
+```{r, engine = 'bash', eval = FALSE}
+#GET THE DATA - Use bash commands to download / untar and select only the previous day's data and then read in R the resulting CSV.
+
+start=`date +%s`
+cd "/Users/irene/Documents/AL/Data" 
+wget -O file.tar.gz http://www.mcs.anl.gov/research/projects/waggle/downloads/datasets/AoT_Chicago.complete.latest.tar.gz
+tar -xvzf file.tar.gz
+cd "./AoT_Chicago.complete.""$(date +%F)"
+day="$(date -v-1d +%Y/%m/%d)"
+cat data.csv | awk -F "," -v var="$day" '(index($2, var) != 0)' > day.csv
+end=`date +%s`
+runtime=$((end-start))
+``` 
+```{r, message=FALSE, warning=FALSE} 
+#R Part
+
+dir <- paste0('Data/AoT/AoT_Chicago.complete.',Sys.Date(),'/') #complete
+#dir <- paste0('Data/AoT/AoT_Chicago.public.',Sys.Date(),'/') #public
+
+start.time <- Sys.time()
+nodes <- read_csv(paste0(dir,'nodes.csv'))
+sensors <- read_csv(paste0(dir,'sensors.csv'))
+provenance <- read_csv(paste0(dir,'provenance.csv'))
+#data <- read_csv(paste0(dir,'data.csv'))
+data <- read_csv(paste0(dir,'day.csv'),col_names = c('node_id','timestamp','plugin','sensor','parameter','value'))
+end.time <- Sys.time()
+print(end.time-start.time)
+
+str(nodes) #Structure of nodes.csv
+str(sensors) #Structure of sensors.csv
+str(provenance) #Structure of provenance.csv
+
+```
+
+```{r, results=FALSE, warning=FALSE}
+#GET THE DATA - Use the preliminary AoT API to filter by timestamp and get only data for the previous day (only for public dataset !) ,timestamp=ge:',Sys.Date()-1,'T00:00:00z
+
+#TRANSFORM THE JSON TO DATAFRAME
+r <- fromJSON(paste0('https://dev.plenar.io/api/v2/aot?timestamp=2018-05-09T00:00:00z'))
+
+data <- r$data
+data <- flatten(data$observations) %>% cbind(data) %>% select(-c(observations,location,id))
+
+meta <- c("updated_at","timestamp","node_id","longitude","latitude","inserted_at","human_address","aot_meta_id")
+
+obs <- melt.data.frame(data=data,id.vars=c('timestamp','node_id'),measure.vars=colnames(data)[which(!colnames(data) %in% meta)]) 
+obs$variable <- as.character(obs$variable)
+obs <- separate(data = obs, col = variable, into = c('sensor','parameter'), sep = "\\.")
+
+data <- join(obs,data[,meta], by=c('timestamp','node_id'),type='left') %>% filter(!is.na(value))
+
+#EITHER PUSH THE JSON FILE DIRECTLY INTO THE DATAFRAME OR THE RESULTING FILE
+
+# latest <- fromJSON('https://dev.plenar.io/api/v2/aot/@head')
+# 
+# data <- cbind(r$data$timestamp, r$data$observations, r$data$node_id)
+# nodes <- cbind(r$data$node_id, r$data$location) %>% unique()
+
+data <- read_csv("/Volumes/GoogleDrive/My Drive/PDM/R/Data/AoT/AoT_Chicago.complete.2018-05-15/day.csv")
+data <- as_tibble(data)
+e<- data %>% select(temperature, TMP421) %>% distinct()
+```
+
+```{r, results=FALSE, warning=FALSE}
+
+#GET THE METADATA
+
+#Nodes
+nodes <- read_csv("https://aot-file-browser.plenar.io/files/public/nodes.csv")
+complete_nodes <- read_csv("https://aot-file-browser.plenar.io/files/complete/nodes.csv")
+
+#Sensors
+sensors <- read_csv("https://aot-file-browser.plenar.io/files/public/sensors.csv")
+complete_sensors <- read_csv("https://aot-file-browser.plenar.io/files/complete/sensors.csv")
+
+#Add additional informations
+nodes <- nodes %>% mutate(type=regmatches(description, gregexpr("\\[.+?\\]", description))) %>% mutate(type=replace(type,type=="character(0)",NA)) %>% mutate(type=gsub("\\[|\\]", "",type))
+
+
+
+```
+
+
+
+
+```{r}
+#Create 
+
+#Bind to the database in storage
+sqldf
+```
+
+Comments : the API contains only data until May 9th.
+
+Better to increase page size or to use pagination ?
+Bug after page_size > 100 000 (HTTP error 502)
+
+
+##Chemical data
+
+![](Screenshots/Chemsense.png)
+***Fig.1: Chemsense components***
+
+
+```{r}
+data <- read_csv('/Volumes/GoogleDrive/My Drive/PDM/R/Data/AoT/AoT_Chicago.complete.2018-05-15/day.csv')
+colnames(data) <- c('node_id','timestamp','plugin','sensor','parameter','value')
+data <- as_tibble(data) #Convert to tibble dataframe
+data <- data %>% select(-plugin)
+head(data)
+
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+
+#unique(sensors$sensor) #Find which sensor measure the chemical parameters
+
+data <- data %>% filter(sensor=='Chemsense') %>% select(-c(plugin,sensor)) #Filter only chemical data and remove the sensor/plugin columns to keep only nodeID, timestamp, parameter and values informations
+data <- as_tibble(data) #Convert to tibble dataframe
+
+#Assign data format
+start.time <- Sys.time()
+data$timestamp <- fastPOSIXct(data$timestamp,tz='America/Chicago') #Timestamp
+data$value <- as.numeric(data$value) #Int
+end.time <- Sys.time()
+print('Data Format')
+print(end.time-start.time)
+
+#Data cleaning - Duplicates
+start.time <- Sys.time()
+duplicates.all <-data[duplicated(data),] #Exactly same rows (saving one of the duplicated row)
+duplicates.diffValues <- anti_join(data[duplicated(data[,c('node_id','timestamp','parameter')]) | duplicated(data[,c('node_id','timestamp','parameter')],fromLast=TRUE),], duplicates.all) #Rows with different values for the same node, parameter and sensor (saving the two duplicated rows)
+data <- data %>% distinct %>% anti_join(duplicates.diffValues) #Remove all the rows that are concern by the problem 2 concerning duplicated values
+end.time <- Sys.time()
+print('Data Cleaning')
+print(end.time-start.time)
+
+#Data wrangling - Conversion to a tibble dataframe and reshape to a tidy format
+
+start.time <- Sys.time()
+data <- spread(data, key = parameter, value = value) #Spread the dataframe to have a tidy format
+
+head(data)
+
+round_to_hour <- function(timestamp){
+  date=date(timestamp)
+  hours=hour(timestamp)
+  hour(date) <- hours
+  return(date)
+}
+
+#Remove second/minute precision and compute the mean per hour (ignoring missing values)
+data <- data %>% mutate(timestamp=as.POSIXct(round_to_hour(timestamp))) 
+  %>% group_by(node_id,timestamp) %>% 
+  summarise_at(vars(at0:so2),mean,na.rm=TRUE)
+
+#Convert to tsibble (time/serie) and make the implicit values explicit
+data <- data %>% as_tsibble(key=id(node_id), index=timestamp) %>% complete(node_id,timestamp)
+
+end.time <- Sys.time()
+print('Data Wrangling')
+print(end.time-start.time)
+
+
+#write_csv(data,paste0(dir,'hourly_mean_all.csv'))
+write_csv(data,paste0(dir,'hourly_mean_day.csv'))
+write_csv(duplicates.diffValues,paste0(dir,'duplicates_diffValues.csv'))
+
+
+#data<-mutat
+
+```
+
+
+```{r}
+plotNA.mod <- function(x, colPoints = "steelblue", colBackgroundMV = "indianred2",
+                                main="Distribution of NAs", xlab = "Time", ylab="Value", pch = 20, cexPoints = 0.8, col ="black", ... ) {
+  
+  data <- x
+  
+  ##
+  ## Input check
+  ## 
+  
+  if(!is.null(dim(data)) && dim(data)[2] != 1)
+  {stop("Input x is not univariate")}
+  
+  if(!is.numeric(data))
+  {stop("Input x is not numeric")}
+  
+  
+  id.na <- which(is.na(data))
+  
+  #Red Bars only if missing data in time series
+  if (length(id.na > 0)) 
+  {
+    barplotData <- rep(NA,length(data))
+    
+    #make sure the end of the bar can not be seen
+    barplotData[id.na] <- max(data, na.rm =TRUE )*100
+    
+    ##Plot the red in background for unknown values
+    p<-ggplot() + geom_bar(barplotData, col = colBackgroundMV,xaxt = "n", yaxt = "n",   xlab = "", ylab = "", border = colBackgroundMV) +facet_grid(~Loc)
+    par(new=TRUE)
+  }
+  ## Plot the line diagram of known values
+
+  p + geom_line(data)
+  
+}
+```
+
+
+```{r}
+
+
+
+
+
+dat <- data %>% filter(node_id=='001e0610b9e5') %>% select(c(timestamp,o3)) 
+plotNA.distribution(dat$o3)
+
+datat <- data %>% select(node_id,timestamp,no2)
+id.na <- which(is.na(data$no2))
+
+barplotData <- as.data.frame(rep(NA,length(datat)))
+barplotData[id.na] <- max(datat$no2, na.rm =TRUE )*100
+
+ggplot() + geom_bar(data=barplotData, mapping=aes(col = "red",xaxt = "n", yaxt = "n", border = "red")) + facet_grid(~datat$node_id)
+
+par(new=TRUE)
+
+
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+#EDA
+
+data <- read_csv(paste0(dir,'hourly_mean_all.csv'),na=c('NA','NaN')) %>% as_tsibble(key=id(node_id), index=timestamp)
+dup_diff <- read_csv(paste0(dir,'duplicates_diffValues.csv'))
+
+summary(data)
+
+#Distribution of missing values in the time serie
+plotNA.distribution(data$no2,pch=NA) + facet_wrap(~node_id, nrow=5)
+
+#Statistics about missing values
+statsNA(data$value)
+
+
+```
+
+
+
+
+
+```{r}
+#Function to have an overview of the nodes recording this parameter and the different time series recorded (including the missing values distribution)
+
+
+
+chicago_bbox<-c(-88.486633,41.453020,-87.138062,42.342305)
+chicago_tonerL <- get_stamenmap(chicago_bbox,maptype = "toner-lite")
+
+#Convert the nodes data frame to a spatial data frame and project the coordinates in USA Contiguous Albers Equal Area Conic (EPSG:102003)
+nodes <- st_as_sf(nodes, coords = c('lon','lat'), agr = 'identity', crs=4326) %>% st_transform(nodes, crs=102003) 
+
+#data <- fread(gzfile('20180514_complete_data_chemsense.csv.gz'))
+
+tmap_mode("view")
+
+tm_shape(nodes) + tm_dots(col='black')
+
+ggplot(bgMap=chicago_tonerL) + geom_sf(data=nodes, colour='black')
+
+
+EDA <- function(data) {
+  
+  chicago_bbox<-c(-88.486633,41.453020,-87.138062,42.342305)
+  map <- get_stamenmap(chicago_bbox,maptype = "toner-lite")
+  
+  ggplot() + geom_sf(data=counties,fill="#d3ffce",alpha=0.2) + geom_sf(data=MS,colour="#f07d00",pch=18,cex=3) + ggtitle('Chicago Com Ed Monitoring Station')
+  
+  
+}
+```
+
+
+
+##Meteorological data
+
+![](Screenshots/Metsense.png)
+***Fig.2: Metsense components***
+
+##Work
+
+* Analyse Metsense to find best sensor for temp and RH
+* Use bash to download files
+
+
+
