@@ -6,32 +6,64 @@ library(leaflet)
 library("tmap")
 library(sp)
 library(sf)
+library(shinydashboard)
 
-#Chicagoshp = readOGR(".", "Chicago")
-ui= fluidPage(
-  
-    titlePanel("Dashboard Prototype v1.4"),
-    sidebarLayout(
-    sidebarPanel(
-      selectInput(inputId="type", label="Choose type of data",c('Temperature Min', 'Temperature Max', 'Precipitation', 'etc')),
-      sliderInput(inputId="year",label = "Choose a year",
-                  value = 2012, min=2012,max=2018),
-      selectInput(inputId="monthOrYear",  label="Choose Monthly or Yearly",c('Yearly', 'Monthly')),
-      sliderInput(inputId="month",label = "Choose a month",
-                  value = 1, min=1,max=12)
-      
-    ),
-    mainPanel(
-      leafletOutput("working_map"),
-      plotOutput("graph")
+
+ui <- dashboardPage(
+  dashboardHeader(title = "Test Dashboard"),
+  dashboardSidebar(
+    sidebarMenu(
+      menuItem("NOAA", tabName = "noaa"),
+      menuItem("etc", tabName = "etc")
     )
+  ),
+  dashboardBody(
+    tabItems(
+      # First tab content
+      tabItem(tabName = "noaa",
+              
+              fluidRow(
+                box(
+                  width = 4,
+                  selectInput(inputId="type", label="Choose type of data",c('Temperature Min', 'Temperature Max', 'Precipitation','Sensor locations')),
+                  sliderInput(inputId="year",label = "Choose a year",
+                              value = 2012, min=2012,max=2018),
+                  selectInput(inputId="monthOrYear",  label="Choose Monthly or Yearly",c('Yearly', 'Monthly')),
+                  
+                  
+                  conditionalPanel(
+                    condition = "input.monthOrYear == 'Monthly'",
+                    
+                    sliderInput(inputId="month",label = "Choose a month",
+                                value = 1, min=1,max=12),
+                    
+                    selectInput("var", 
+                                label = "Choose a medical condition:",
+                                choices = c("Asthma Cases",
+                                            "Diabetes Cases",
+                                            "Depression Cases"),
+                                selected = "Asthma Cases") 
+                  ) ),
+                 
+                
+                box(
+                  width = 8,
+                  leafletOutput("working_map")
+                )
+              ),
+              
+              fluidRow(
+                plotOutput("graph")
+                
+              )
+      )
+      
+      
+    
   )
-  
-  
-  
-  #plotOutput(outputId = "hist")
-  
 )
+)
+
 
 server = function(input, output){
   
@@ -60,7 +92,7 @@ server = function(input, output){
       title = paste(input$type,input$month,input$year, sep=" ")
       data_point = paste("X",input$year,"_",input$month,typee,"_mo" ,sep="")
       working_map = tm_shape(Chicagoshp)+tm_borders(alpha=1)+
-      tm_shape(MergedMonthly)+ tm_dots(alpha =1, title="Precipitation - March 2013",col = data_point, size = data_point,border.col="black",border.lwd=0.1,border.alpha=0.4, style = "quantile", palette = "Reds")
+      tm_shape(MergedMonthly)+ tm_dots(alpha =1, title=title,col = data_point, size = data_point,border.col="black",border.lwd=0.1,border.alpha=0.4, style = "quantile", palette = "Reds")
     }
    
     tmap_leaflet(working_map)})
