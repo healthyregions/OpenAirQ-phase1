@@ -6,4 +6,4 @@ library(shiny)
 #install.packages("shinydashboard")
 library(shinydashboard)
 
-runApp("Test-Dashboard")
+runApp("dashboard")
