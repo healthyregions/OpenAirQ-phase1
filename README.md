@@ -27,12 +27,12 @@ Multiple variables for both modelling approaches are required. The drivers and s
 Name | Source(s) | File | Spatial Resolution | Time Resolution | Comments
 --- | --- | --- | --- | --- | --- 
 Point Emission Data | NEI and CDPH | CSV | address-level | varies | Options for use: (1) Distance to nearest facility (either all or subset of high polluters), (2) Raster surface (over 100 available for Chicago area)
-Area Emission Data: building heights as proxy or heating fuel | OSM, LiDar from Cook County GIS | varies | varies | NEI area data not available below county-level
-Road Emissions: (1) road length summary, (2) traffic volume summary | OSM, IDOT | SHP | Varies | Multiple proxies
+Area Emission Data: building heights as proxy or heating fuel | OSM, LiDar from Cook County GIS | varies | varies | varies | NEI area data not available below county-level
+Road Emissions: (1) road length summary, (2) traffic volume summary | OSM, IDOT | SHP | varies | varies| Multiple proxies
 Meteorological Data | NOAA monitoring stations | CSV | address-level | Daily, Monthly | few validated weather stations in metro area; weather underground data not reliabale and historical data is costly
 NDVI - Greenness Index | MODIS | raster | 1km, 500m, 250, grid | Monthly, Yearly | 
 Land Cover | SAL product, CMAP | raster | 30m | 2016, 2011, 2006 |
-Land Use | CMAP | raster | parcel | 2013, 2010, 2005, 2001 | 
-Elevation | National Land Elevation Model | raster | 1m | alt: building height dataset
+Land Use | CMAP | raster | parcel | 2013, 2010, 2005, 2001 | | 
+Elevation | National Land Elevation Model | raster | 1m | yearly | alt: building height dataset
 Demographic and SES data | ACS | CSV, SHP | tract | 5-year average | 
 
