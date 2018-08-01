@@ -1,0 +1,22 @@
+<VRTDataset rasterXSize="1200" rasterYSize="1200">
+  <Metadata domain="GEOLOCATION">
+     <mdi key="X_DATASET">h03v04_lon.vrt</mdi>
+     <mdi key="X_BAND">1</mdi>
+     <mdi key="Y_DATASET">h03v04_lat.vrt</mdi>
+     <mdi key="Y_BAND">1</mdi>
+     <mdi key="PIXEL_OFFSET">0</mdi>
+     <mdi key="LINE_OFFSET">0</mdi>
+     <mdi key="PIXEL_STEP">1</mdi>
+     <mdi key="LINE_STEP">1</mdi>
+  </Metadata>
+  <VRTRasterBand dataType="Float32" band="1">
+    <ColorInterp>Gray</ColorInterp>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="0">HDF4_EOS:EOS_GRID:"C:/Users/arpan/Documents/MAIAC/2016\MAIACTAOT.h03v04.20160031635.hdf":grid1km:Optical_Depth_047</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="1200" RasterYSize="1200" DataType="Float32" BlockXSize="1200" BlockYSize="1200" />
+      <SrcRect xOff="0" yOff="0" xSize="1200" ySize="1200" />
+      <DstRect xOff="0" yOff="0" xSize="1200" ySize="1200" />
+    </SimpleSource>
+  </VRTRasterBand>
+</VRTDataset>

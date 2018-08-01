@@ -1,0 +1,17 @@
+<VRTDataset rasterXSize="1200" rasterYSize="1200">
+  <SRS>PROJCS["unnamed",GEOGCS["Unknown datum based upon the WGS 84 ellipsoid",DATUM["Not specified (based on WGS 84 spheroid)",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]],PROJECTION["Albers_Conic_Equal_Area"],PARAMETER["standard_parallel_1",1145915590.261647],PARAMETER["standard_parallel_2",3437746770.784939],PARAMETER["latitude_of_center",1317802928.800894],PARAMETER["longitude_of_center",-5500394833.255903],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["Meter",1]]</SRS>
+  <GeoTransform> -4.0000000000000000e+05,  1.0000000000000000e+03,  0.0000000000000000e+00,  2.4000000000000000e+06,  0.0000000000000000e+00, -1.0000000000000000e+03</GeoTransform>
+  <Metadata>
+    <MDI key="HDFEOSVersion">HDFEOS_V2.12</MDI>
+  </Metadata>
+  <VRTRasterBand dataType="Float32" band="1">
+    <ColorInterp>Gray</ColorInterp>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="0">HDF4_EOS:EOS_GRID:"C:/Users/arpan/Documents/MAIAC/MAIACLatlon.h03v04.hdf":latlon:lat</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="1200" RasterYSize="1200" DataType="Float32" BlockXSize="1200" BlockYSize="1200" />
+      <SrcRect xOff="0" yOff="0" xSize="1200" ySize="1200" />
+      <DstRect xOff="0" yOff="0" xSize="1200" ySize="1200" />
+    </SimpleSource>
+  </VRTRasterBand>
+</VRTDataset>
