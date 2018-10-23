@@ -79,13 +79,44 @@ ui <- dashboardPage(
                 plotOutput("graph")
                 
               )
+      ),
+      tabItem(tabName = "area_emissions",
+        h1("Area-Emissions")
+      ),
+      tabItem(tabName = "demographic_data",
+        h1("Demographic-Data")
+        
+      ),
+      tabItem(tabName = "elevation",
+              h1("Elevation")
+        
+      ),
+      tabItem(tabName = "land_cover",
+              h1("Land-Cover")
+        
+      ),
+      tabItem(tabName = "land_use",
+              h1("Land-Use")
+        
+      ),
+      tabItem(tabName = "ndvi",
+              h1("NDVI")
+        
+      ),
+      tabItem(tabName = "point_emissions",
+              h1("Point-Emissions")
+        
+      ),
+      tabItem(tabName = "road_emissions",
+              h1("Road-Emissions")
+        
       )
-      
-      
+        
+      )
     
   )
 )
-)
+
 
 
 server = function(input, output){
