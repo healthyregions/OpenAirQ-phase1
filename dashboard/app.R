@@ -16,13 +16,14 @@ ui <- dashboardPage(
       menuItem("Homepage", tabName = "homepage"),
       menuItem("Weather", tabName = "noaa"),
       menuItem("Area-Emissions", tabName = "area_emissions"),
-      menuItem("Demographic-Data", tabName = "demographic_data"),
+      menuItem("Socioeconomic Data", tabName = "demographic_data"),
       menuItem("Elevation", tabName = "elevation"),
       menuItem("Land-Cover", tabName = "land_cover"),
       menuItem("Land-Use", tabName = "land_use"),
       menuItem("NDVI", tabName = "ndvi"),
       menuItem("Point-Emissions", tabName = "point_emissions"),
-      menuItem("Road-Emissions", tabName = "road_emissions")
+      menuItem("Road-Emissions", tabName = "road_emissions"),
+      menuItem("Array of Things", tabName = "aot")
     )
   ),
   dashboardBody(
@@ -115,6 +116,10 @@ ui <- dashboardPage(
       tabItem(tabName = "road_emissions",
               h1("Road-Emissions")
         
+      ),
+
+      tabItem(tabName = "aot",
+              h1("Array of Thing Sensors")
       )
         
       )
