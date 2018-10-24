@@ -1,0 +1,7 @@
+setwd("~/Documents/code/airquality-master 2/workflows")
+library(shiny)
+library(shinydashboard)
+runApp("dashboard")
+setwd("~/code/airquality")
+library(shiny)
+runApp("dashboard")

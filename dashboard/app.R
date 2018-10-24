@@ -14,7 +14,7 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Homepage", tabName = "homepage"),
-      menuItem("NOAA", tabName = "noaa"),
+      menuItem("Weather", tabName = "noaa"),
       menuItem("Area-Emissions", tabName = "area_emissions"),
       menuItem("Demographic-Data", tabName = "demographic_data"),
       menuItem("Elevation", tabName = "elevation"),
@@ -44,10 +44,11 @@ ui <- dashboardPage(
         
       ),
       tabItem(tabName = "noaa",
-              
+              h1("Weather (Temperature and Precipitation)"),
               fluidRow(
                 box(
                   width = 4,
+                  h3("Weather (Temperature and Precipitation)"),
                   selectInput(inputId="type", label="Choose type of data",c('Temperature Min', 'Temperature Max', 'Precipitation','Sensor locations')),
                   sliderInput(inputId="year",label = "Choose a year",
                               value = 2012, min=2012,max=2018),
@@ -65,8 +66,12 @@ ui <- dashboardPage(
                                 choices = c("Asthma Cases",
                                             "Diabetes Cases",
                                             "Depression Cases"),
-                                selected = "Asthma Cases") 
-                  ) ),
+                                selected = "Asthma Cases")
+
+                    )
+
+
+                  ),
                  
                 
                 box(
