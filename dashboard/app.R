@@ -8,27 +8,106 @@ library(sp)
 library(sf)
 library(shinydashboard)
 
+#lib 
+library(mapedit)
+library(mapview)
+library(rlist)
+library(ggplot2)
+library(DT)
+library(leaflet.extras)
+library(ggplot2)
+library(lubridate)
+library(plotly)
+library(dygraphs) # interactive time series
+# library(xts) # create time series objects (class xs)
+library(tidyverse) # data wrangling
+library(tmap) #modern data visualizations
+library(data.table)
+library(RCurl)
 
+
+# https://ladsweb.modaps.eosdis.nasa.gov/search/
+#read aircasting
+#https://github.com/HabitatMap/AirCasting/blob/master/doc/api.md
+#library(httr)
+#tar<-GET("http://aircasting.org/api/averages.json?q[west]=-105.42674388525387&q[east]=-104.28347911474606&q[south]=39.530285217883865&q[north]=39.99792504639966&q[time_from]=1320&q[time_to]=1319&q[day_from]=0&q[day_to]=365&q[year_from]=2015&q[year_to]=2016&q[grid_size_x]=46.98081264108352&q[grid_size_y]=25&q[sensor_name]=AirBeam-PM&q[measurement_type]=Particulate+Matter&q[unit_symbol]=%C2%B5g/m%C2%B3")
+# tar<-GET("http://aircasting.org/api/averages.json?q[west]=-105.42674388525387&q[east]=-104.28347911474606&q[south]=39.530285217883865&q[north]=39.99792504639966&q[time_from]=1320&q[time_to]=1319&q[day_from]=0&q[day_to]=365&q[year_from]=2015&q[year_to]=2016&q[grid_size_x]=46.98081264108352&q[grid_size_y]=25&q[sensor_name]=AirBeam-PM&q[measurement_type]=Particulate+Matter&q[unit_symbol]=%C2%B5g/m%C2%B3")
+#content(tar)[[111]]$value
+
+#initilization ----
+AotNodesNonspatial <- fread("data/nodes.csv") #readAotNodes
+AotNodes <- st_as_sf(AotNodesNonspatial, coords = c("lon", "lat"), crs = 4326, agr = "constant") #create points obj
+ChicagoBoundary <- st_read("Chicago.shp")
+AotNodes_vis <- AotNodes
+Drawned <-1 #the drawned and intersected selection area. this might be infeasible for a multilayer case
+
+
+#method ----
+#ReadAotData ----
+ReadAotData<-function(ExtraDate,ThisWorkPath)
+{
+  DataType = c("complete","public")
+  if(is.Date(ExtraDate))
+  {
+    #get the name
+    DateText <- format(ExtraDate, format = "%Y-%m-%d"); 
+    
+    FileNameWithoutExt<-paste0("chicago-",DataType[1],".daily.",DateText)
+    FileName<-paste0("chicago-",DataType[1],".daily.",DateText,".tar")
+    AotDateUrl <- paste0("https://s3.amazonaws.com/aot-tarballs/",FileName)
+    SaveUrl <-paste0(ThisWorkPath,FileName) #Aot Chicago Public Daily
+    file.path <- c(AotDateUrl)
+    file.dest <- c(SaveUrl)
+    if(!file.exists(file.dest)){
+      download.file(file.path, file.dest,method="curl")
+      if(file.info(file.dest)$size<1500)
+      {
+        pc <<- list(DWS = FALSE)
+        return(pc)
+      }
+      
+    }
+    untar(file.dest,exdir=ThisWorkPath)
+    if(file.info(file.dest)$size<1500)
+    {
+      pc <<- list(DWS = FALSE)
+      return(pc)
+    }
+    outupt.data <- fread(paste0(ThisWorkPath,FileNameWithoutExt,"/data.csv.gz"))
+    outupt.nodes <- fread(paste0(ThisWorkPath,FileNameWithoutExt,"/nodes.csv"))
+    outupt.nodes.spt <- SpatialPointsDataFrame(outupt.nodes[,c('lon','lat')],outupt.nodes)
+    outupt.prjN <- proj4string(outupt.nodes.spt) <- CRS("+init=epsg:4326")
+    
+    
+    pc <- list (DWS = TRUE, data = outupt.data,nodes = outupt.nodes, spt = outupt.nodes.spt, prjN = outupt.prjN)
+    setDT(pc$data)
+    setDT(pc$nodes)
+  }
+  return(pc)
+}
+
+
+#ui ----
 ui <- dashboardPage(
   dashboardHeader(title = "Test Dashboard"),
   dashboardSidebar(
     sidebarMenu(
       menuItem("Homepage", tabName = "homepage"),
-      menuItem("Weather", tabName = "noaa"),
+      menuItem("NOAA", tabName = "noaa"),
       menuItem("Area-Emissions", tabName = "area_emissions"),
-      menuItem("Socioeconomic Data", tabName = "demographic_data"),
+      menuItem("Demographic-Data", tabName = "demographic_data"),
       menuItem("Elevation", tabName = "elevation"),
       menuItem("Land-Cover", tabName = "land_cover"),
       menuItem("Land-Use", tabName = "land_use"),
       menuItem("NDVI", tabName = "ndvi"),
       menuItem("Point-Emissions", tabName = "point_emissions"),
       menuItem("Road-Emissions", tabName = "road_emissions"),
-      menuItem("Array of Things", tabName = "aot")
+      menuItem("Aot", tabName = "aot")
     )
   ),
   dashboardBody(
     tabItems(
-      # First tab content
+      #First tab content ----
       tabItem(tabName = "homepage",
               h1("CSDS Air Quality Analysis Application Homepage"),
               h2("Center for Spatial Data Science"),
@@ -42,20 +121,18 @@ ui <- dashboardPage(
               h4("Covariate Data"),
               h3("Analysis"),
               p()
-        
+              
       ),
+      #tabitem noaa ----
       tabItem(tabName = "noaa",
-              h1("Weather (Temperature and Precipitation)"),
+              
               fluidRow(
                 box(
                   width = 4,
-                  h3("Weather (Temperature and Precipitation)"),
                   selectInput(inputId="type", label="Choose type of data",c('Temperature Min', 'Temperature Max', 'Precipitation','Sensor locations')),
                   sliderInput(inputId="year",label = "Choose a year",
                               value = 2012, min=2012,max=2018),
                   selectInput(inputId="monthOrYear",  label="Choose Monthly or Yearly",c('Yearly', 'Monthly')),
-                  
-                  
                   conditionalPanel(
                     condition = "input.monthOrYear == 'Monthly'",
                     
@@ -67,70 +144,132 @@ ui <- dashboardPage(
                                 choices = c("Asthma Cases",
                                             "Diabetes Cases",
                                             "Depression Cases"),
-                                selected = "Asthma Cases")
-
-                    )
-
-
-                  ),
-                 
-                
+                                selected = "Asthma Cases") 
+                  ) ),
                 box(
                   width = 8,
                   leafletOutput("working_map")
                 )
               ),
-              
               fluidRow(
                 plotOutput("graph")
-                
               )
       ),
-      tabItem(tabName = "area_emissions",
-        h1("Area-Emissions")
-      ),
-      tabItem(tabName = "demographic_data",
-        h1("Demographic-Data")
-        
-      ),
-      tabItem(tabName = "elevation",
-              h1("Elevation")
-        
-      ),
-      tabItem(tabName = "land_cover",
-              h1("Land-Cover")
-        
-      ),
-      tabItem(tabName = "land_use",
-              h1("Land-Use")
-        
-      ),
-      tabItem(tabName = "ndvi",
-              h1("NDVI")
-        
-      ),
-      tabItem(tabName = "point_emissions",
-              h1("Point-Emissions")
-        
-      ),
-      tabItem(tabName = "road_emissions",
-              h1("Road-Emissions")
-        
-      ),
-
+      #tabitem aot ----
       tabItem(tabName = "aot",
-              h1("Array of Thing Sensors")
+              fluidRow(
+                box(
+                  width = 12,
+                  editModUI("editor")
+                ),
+                box(
+                  actionButton("DWLDAot","Load AoT Data"),
+                  actionButton("VisAot","Visualize Aot Data"),
+                  dateInput('DownloadDate',
+                            label = 'Date input: yyyy-mm-dd',
+                            value = Sys.Date()
+                  ),
+                  selectInput("AotField","AotField",c("Node_id","Value")),
+                  DT::dataTableOutput("visAot_Text")
+                )
+              )
       )
-        
-      )
+    )
+    
+    
     
   )
+  
 )
 
-
-
-server = function(input, output){
-  
+#server ----
+server = function(input, output,session){
+  # aot logic ----
+  ns <- NS("editor")# set namespace
+  labels <- sprintf(
+    "<strong>%s</strong><br/>%g Area",
+    ChicagoBoundary$community, ChicagoBoundary$shape_area
+  ) %>% lapply(htmltools::HTML)
+  base_map <- leaflet(ns("map")) %>% 
+    addProviderTiles(providers$Stamen.TonerLite)%>% 
+    addDrawToolbar(
+      # targetLayerId = "draw",
+      targetGroup = "draw",
+      # polygonOptions = FALSE,
+      circleOptions = FALSE,
+      # rectangleOptions = FALSE,
+      polylineOptions = FALSE,
+      markerOptions = FALSE,
+      circleMarkerOptions = FALSE,
+      singleFeature = TRUE
+      #editOptions = editToolbarOptions()
+    )%>% 
+    addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.1, stroke = FALSE,
+                highlight = highlightOptions(
+                  # weight = 5,
+                  color = "#666",
+                  # dashArray = "",
+                  fillOpacity = 0.7),
+                  # bringToFront = TRUE),
+                label = labels)%>%
+    addFeatures(AotNodes)
+    
+  #addLayersControl(overlayGroups = c("draw"), options = layersControlOptions(collapsed = FALSE))
+  drawn <- callModule(editMod, "editor", base_map)
+  #brushing
+  testdrawn <-function(){
+    req(drawn()$finished)
+    if(Drawned <= length(drawn()$finished$X_leaflet_id))
+    {
+      qk_intersect_test <<- st_intersection(drawn()$finished[length(drawn()$finished$X_leaflet_id),], nc)
+      Drawned <<- Drawned +1
+    }
+    return(qk_intersect_test) 
+  }
+  #refresh the map
+  RefreshMap <- function(){
+    qpal <- colorQuantile(
+      palette = "Blues",
+      domain = AotNodes_vis$V1)
+   
+    leafletProxy(ns("map"),data = AotNodes_vis) %>%
+      addProviderTiles(providers$Stamen.TonerLite) %>% 
+      removeControl(layerId = "L1") %>% #remove the original legend then add a new one
+      clearMarkers()%>%
+      addCircleMarkers(
+        color = ~qpal(V1),
+        weight = 2,
+        opacity = 0.8,
+        radius = 3,
+        fill=TRUE,
+        popup =~as.character(V1)
+      )%>%
+      leaflet::addLegend(pal = qpal, values = ~V1, opacity = 1,layerId = "L1")
+  }
+  #load aot
+  observeEvent(input$DWLDAot,{
+    #download data at given date
+    SRAot <<- ReadAotData(input$DownloadDate,"data/")
+    req(SRAot$DWS)
+    print(paste0("Data loaded",as.character(input$DownloadDate),as.character(SRAot$DWS)))
+    vq <- SRAot$data[,.(.N),by=.(parameter)]
+    updateSelectInput(session,"AotField", choices = as.character(vq$parameter))
+  })
+  #visualize aot
+  UpdateSelectedResult<-eventReactive(input$VisAot, {
+    
+    req(SRAot$DWS)
+    SearchCode<<-paste0("SRAot$data[parameter == '",input$AotField,"' & !is.na(value_raw),.(median(as.numeric(as.character(value_hrf)))),by = .(node_id)]")
+    SearchResult<<-eval(parse(text = SearchCode))
+    #join the data 2 the points proxy the leaflet
+    AotNodes_vis <<- merge(AotNodes,SearchResult,by.x = "node_id", by.y = "node_id")
+    RefreshMap()
+    
+    SearchResult
+    
+  })
+  output$visAot_Text <- DT::renderDataTable(UpdateSelectedResult())
+  # aot logic end ----
   output$working_map <- renderLeaflet({
     
     Chicagoshp <- readOGR(".","Chicago")
@@ -147,18 +286,18 @@ server = function(input, output){
     
     if(input$monthOrYear=='Yearly')
     {
-    data_point = paste("X",input$year,typee,"_yr" ,sep="")
-    working_map = tm_shape(Chicagoshp)+tm_borders(alpha=1)+
-    tm_shape(Merged)+ tm_dots(alpha =1, title=title,col = data_point, size = data_point,border.col="black",border.lwd=0.1,border.alpha=0.4, style = "quantile", palette = "Reds")
+      data_point = paste("X",input$year,typee,"_yr" ,sep="")
+      working_map = tm_shape(Chicagoshp)+tm_borders(alpha=1)+
+        tm_shape(Merged)+ tm_dots(alpha =1, title=title,col = data_point, size = data_point,border.col="black",border.lwd=0.1,border.alpha=0.4, style = "quantile", palette = "Reds")
     }
     else
     {
       title = paste(input$type,input$month,input$year, sep=" ")
       data_point = paste("X",input$year,"_",input$month,typee,"_mo" ,sep="")
       working_map = tm_shape(Chicagoshp)+tm_borders(alpha=1)+
-      tm_shape(MergedMonthly)+ tm_dots(alpha =1, title=title,col = data_point, size = data_point,border.col="black",border.lwd=0.1,border.alpha=0.4, style = "quantile", palette = "Reds")
+        tm_shape(MergedMonthly)+ tm_dots(alpha =1, title=title,col = data_point, size = data_point,border.col="black",border.lwd=0.1,border.alpha=0.4, style = "quantile", palette = "Reds")
     }
-   
+    
     tmap_leaflet(working_map)})
   
   
