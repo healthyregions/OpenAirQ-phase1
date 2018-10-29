@@ -173,7 +173,25 @@ ui <- dashboardPage(
                   DT::dataTableOutput("visAot_Text")
                 )
               )
+      ),
+      #tabitem road_emissions ----
+      tabItem(tabName = "road_emissions",
+              
+              fluidRow(
+                box(
+                  width = 4,
+                  selectInput(inputId="road_emit_type", 
+                              label="Choose type of data",
+                              c("Traffic Volume", "Road Lengths")
+                  )
+                ),
+                box(
+                  width = 8,
+                  leafletOutput("road_emissions_map")
+                )
+              )
       )
+      
     )
     
     
@@ -299,7 +317,51 @@ server = function(input, output,session){
     }
     
     tmap_leaflet(working_map)})
-  
+  # road_emissions output ----
+  output$road_emissions_map <- renderLeaflet({
+    trffc_vol <- readOGR(".", "Community_Areas_with_Traffic_Volumes")
+    road_length <- readOGR(".", "Chi_Road_Lengths")
+    
+    road_emission_data <- switch(input$road_emit_type, 
+                                 "Traffic Volume" = "trffc_vol", 
+                                 "Road Lengths" = "road_length")
+    
+    if(input$road_emit_type == "Traffic Volume")
+    {
+      road_col <- "Trffc_V"
+      road_emissions_map <- 
+        tm_shape(trffc_vol) + 
+        tm_fill(col= road_col, 
+                style = "jenks",
+                n = 5,
+                bolder.lwd = 0.1, 
+                bolder.alpha = 0.4, 
+                palette = "Reds", 
+                title = "Traffic Volume" ) +
+        tm_layout(
+          main.title = "Traffic Volume by Community Area of Chicago",
+          main.title.size = 1.2
+        )
+    }
+    if(input$road_emit_type == "Road Lengths")
+    {
+      road_col <- "rd_lngt"
+      road_emissions_map <- 
+        tm_shape(road_length) + 
+        tm_fill(col= road_col, 
+                style = "jenks",
+                n = 5,
+                bolder.lwd = 0.1,
+                bolder.alpha = 0.4, 
+                palette = "Reds", 
+                title = "Total Length of Road") +
+        tm_layout(
+          main.title = "Road Lengths by Community Area of Chicago",
+          main.title.size = 1.2
+        )
+    }
+    tmap_leaflet(road_emissions_map)
+  })
   
 }
 
