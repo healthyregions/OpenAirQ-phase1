@@ -41,6 +41,14 @@ ChicagoBoundary <- st_read("Chicago.shp")
 AotNodes_vis <- AotNodes
 Drawned <-1 #the drawned and intersected selection area. this might be infeasible for a multilayer case
 
+aod.yearly <- stack("Yearly_Aod_Stack_Reproj.tif") #Yearly AOD Data
+aod.overall <- raster("AOD_Average_4_Year_Reproj.tif") #4 year avg AOD
+aod.yearly.overall <- stack(aod.yearly, aod.overall) #Stack rasters
+names(aod.yearly.overall) <- c("X2014", "X2015", "X2016", "X2017", "Overall") 
+
+aod.breaks <- c(.10, .12, .14, .16, .18, .20, .22, .24, .26, .28) #Breaks for AOD data
+aod.pal <- colorNumeric(c("green", "yellow", "red", "purple"), aod.breaks, na.color = "transparent") #Palette for AOD
+
 
 #method ----
 #ReadAotData ----
@@ -99,6 +107,7 @@ ui <- dashboardPage(
       menuItem("Elevation", tabName = "elevation"),
       menuItem("Land-Cover", tabName = "land_cover"),
       menuItem("Land-Use", tabName = "land_use"),
+      menuItem("Aeorosol-Optical-Depth", tabName = "aod"),
       menuItem("NDVI", tabName = "ndvi"),
       menuItem("Point-Emissions", tabName = "point_emissions"),
       menuItem("Road-Emissions", tabName = "road_emissions"),
@@ -155,6 +164,33 @@ ui <- dashboardPage(
                 plotOutput("graph")
               )
       ),
+      #tabitem aod
+      tabItem(tabName = "aod",
+              
+              box(
+                width = 4,
+                selectInput(inputId = "aodyear", 
+                            label = "Year:",
+                            choices = c("2014" = "X2014", 
+                                        "2015" = "X2015", 
+                                        "2016" = "X2016", 
+                                        "2017" = "X2017", 
+                                        "Overall")),
+                
+                checkboxInput(inputId = "outline",
+                              label = "Show city boundaries?",
+                              value = FALSE)
+                
+              ),
+              box(
+                width = 8,
+                leafletOutput("aodmap")
+              )
+      ),
+      
+      
+      
+      
       #tabitem aot ----
       tabItem(tabName = "aot",
               fluidRow(
@@ -288,6 +324,44 @@ server = function(input, output,session){
   })
   output$visAot_Text <- DT::renderDataTable(UpdateSelectedResult())
   # aot logic end ----
+  
+  #AOD start
+  
+  #Check for outline checkbox and plot city outline if necessary
+  observe({
+    proxy <- leafletProxy("chicago")
+    
+    if (input$outline) {
+      proxy %>% addPolygons(data = ChicagoBoundary, color = "black", fill = FALSE)
+    }
+    else {
+      proxy %>% clearShapes()
+    }
+  })
+  #Generate AOD map
+  output$aodmap <- renderLeaflet({
+    a <- leaflet() %>% 
+      addTiles() %>% 
+      addRasterImage(aod.yearly.overall[[input$aodyear]], opacity = 0.7, colors = aod.pal) %>% 
+      addLegend(pal = aod.pal, values = values(aod.yearly.overall[[input$aodyear]]), title = "Aerosol Optical Depth")
+    
+    #Keep chicago outline rendered when year is changed 
+    if (input$outline) {
+      a %>% addPolygons(data = chi.map, color = "black", fill = FALSE)
+    }
+    else {
+      a 
+    }
+    
+  })
+  
+  #AOD End
+  
+  
+  
+  
+  
+  
   output$working_map <- renderLeaflet({
     
     Chicagoshp <- readOGR(".","Chicago")
