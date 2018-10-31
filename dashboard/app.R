@@ -7,7 +7,7 @@ library("tmap")
 library(sp)
 library(sf)
 library(shinydashboard)
-
+library(raster)
 #lib 
 library(mapedit)
 library(mapview)
