@@ -347,7 +347,7 @@ server = function(input, output,session){
     
     #Keep chicago outline rendered when year is changed 
     if (input$outline) {
-      a %>% addPolygons(data = chi.map, color = "black", fill = FALSE)
+      a %>% addPolygons(data = ChicagoBoundary, color = "black", fill = FALSE)
     }
     else {
       a 
