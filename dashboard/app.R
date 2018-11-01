@@ -8,7 +8,6 @@ library(sp)
 library(sf)
 library(shinydashboard)
 library(raster)
-#lib 
 library(mapedit)
 library(mapview)
 library(rlist)
@@ -97,28 +96,33 @@ ReadAotData<-function(ExtraDate,ThisWorkPath)
 
 #ui ----
 ui <- dashboardPage(
-  dashboardHeader(title = "Test Dashboard"),
+  dashboardHeader(title = "Open Air Chicago"),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Homepage", tabName = "homepage"),
-      menuItem("NOAA", tabName = "noaa"),
-      menuItem("Area-Emissions", tabName = "area_emissions"),
-      menuItem("Demographic-Data", tabName = "demographic_data"),
-      menuItem("Elevation", tabName = "elevation"),
-      menuItem("Land-Cover", tabName = "land_cover"),
-      menuItem("Land-Use", tabName = "land_use"),
-      menuItem("Aeorosol-Optical-Depth", tabName = "aod"),
-      menuItem("NDVI", tabName = "ndvi"),
-      menuItem("Point-Emissions", tabName = "point_emissions"),
-      menuItem("Road-Emissions", tabName = "road_emissions"),
-      menuItem("Aot", tabName = "aot")
+      menuItem("Home", tabName = "Home"),
+      menuItem("About", tabName = "About"),
+      menuItem("Pollution Measures",
+      menuSubItem("PM 2.5", uiOutput("pm")),
+      menuSubItem("Aeorosol-Optical-Depth", uiOutput("aod"))),
+      menuItem("Pollution Drivers",
+      menuSubItem("Weather", uiOutput("noaa")),
+      menuSubItem("Traffic", uiOutput("road_emissions"))),
+      menuItem("AoT", tabName = "aot")
     )
   ),
+
+
+
+
   dashboardBody(
     tabItems(
       #First tab content ----
-      tabItem(tabName = "homepage",
-              h1("CSDS Air Quality Analysis Application Homepage"),
+      tabItem(tabName = "Home",
+              h1("Home")
+      ),
+      #About
+      tabItem(tabName = "About",
+              h1("CSDS Air Quality Analysis Application"),
               h2("Center for Spatial Data Science"),
               br(),
               h3("Dashboard"),

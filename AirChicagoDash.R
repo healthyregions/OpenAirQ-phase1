@@ -1,6 +1,6 @@
 #AirChicagoDash
 
-setwd("~/Documents/code/airquality-master 2/workflows")
+setwd("~/code/airquality")
 
 library(shiny)
 #install.packages("shinydashboard")
