@@ -202,7 +202,9 @@ CreateINPresult<-function(){
 }
 
 InterpResultList<-CreateINPresult()#IinitializedEPA
-
+#test text in the storyboard
+testtext <- "When I wrote the following pages, or rather the bulk of them, I lived alone, in the woods, a mile from any neighbor, in a house which I had built myself, on the shore of Walden Pond, in Concord, Massachusetts, and earned my living by the labor of my hands only. I lived there two years and two months. At present I am a sojourner in civilized life again.
+I should not obtrude my affairs so much on the notice of my readers if very particular inquiries had not been made by my townsmen concerning my mode of life, which some would call impertinent, though they do not appear to me at all impertinent, but, considering the circumstances, very natural and pertinent. Some have asked what I got to eat; if I did not feel lonesome; if I was not afraid; and the like." 
 
 
 
@@ -339,7 +341,26 @@ ui <- dashboardPage(
               )
       ),
       tabItem(
-        "pm", uiOutput("MainFramePollution")
+        "pm", fluidPage(
+          fluidRow(
+            box(width = StoryBoardWidth,title = "This is the story box",
+                tags$p(testtext)),
+            box(width = MapBWidth, title = "This is the map box",
+                leafletOutput("MainMap"))
+          ),
+          fluidRow(
+            box(width = StoryBoardWidth,
+                sliderInput("EPAT", "EPA:",
+                            min = strptime("2015/01/15","%Y/%m/%d"), 
+                            max = strptime("2017/12/31","%Y/%m/%d"),
+                            value = strptime("2015/01/16","%Y/%m/%d"),
+                            timeFormat = "%Y/%m",
+                            step = as.difftime(30,units = "days"),
+                            animate = animationOptions(interval = 500)),
+                actionButton("IniEPA","Initialize the EPA DATA")
+            )
+          )
+        )
       )
       
     )
@@ -441,31 +462,7 @@ server = function(input, output,session){
   # aot logic end ----
   # pm logic -----
   # here is a trial of the uioutput
-  output$MainFramePollution<- renderUI({
-    if (input$tablist == "pm"){
-      fluidPage(
-        fluidRow(
-          box(width = StoryBoardWidth,title = "This is the story box",
-              tags$p(testtext)),
-          box(width = MapBWidth, title = "This is the map box",
-              leafletOutput("MainMap"))
-        ),
-        fluidRow(
-          box(width = StoryBoardWidth,
-              sliderInput("EPAT", "EPA:",
-                          min = strptime("2015/01/15","%Y/%m/%d"), 
-                          max = strptime("2017/12/31","%Y/%m/%d"),
-                          value = strptime("2015/01/16","%Y/%m/%d"),
-                          timeFormat = "%Y/%m",
-                          step = as.difftime(30,units = "days"),
-                          animate = animationOptions(interval = 500)),
-              actionButton("IniEPA","Initialize the EPA DATA")
-          )
-          # box(width = StoryBoard)
-        )
-      )
-    }
-  })
+ 
   
   observeEvent(input$EPAT,{
     #find and vis epa plot
@@ -480,7 +477,6 @@ server = function(input, output,session){
   
   observeEvent(input$IniEPA,{
     #initialize the epa data / creat plots
-   
   })
   output$MainMap <- renderLeaflet({
     leaflet(height = MapBHeight) %>% 
@@ -599,7 +595,5 @@ server = function(input, output,session){
   })
   
 }
-#test text
-testtext <- "When I wrote the following pages, or rather the bulk of them, I lived alone, in the woods, a mile from any neighbor, in a house which I had built myself, on the shore of Walden Pond, in Concord, Massachusetts, and earned my living by the labor of my hands only. I lived there two years and two months. At present I am a sojourner in civilized life again.
-I should not obtrude my affairs so much on the notice of my readers if very particular inquiries had not been made by my townsmen concerning my mode of life, which some would call impertinent, though they do not appear to me at all impertinent, but, considering the circumstances, very natural and pertinent. Some have asked what I got to eat; if I did not feel lonesome; if I was not afraid; and the like." 
+
 shinyApp(ui = ui, server=server)
