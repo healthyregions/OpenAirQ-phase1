@@ -24,6 +24,9 @@ library(tmap) #modern data visualizations
 library(data.table)
 library(RCurl)
 
+library(gstat) #kriging
+library(stringr) # extract date from the epa date
+
 
 # https://ladsweb.modaps.eosdis.nasa.gov/search/
 #read aircasting
@@ -33,12 +36,32 @@ library(RCurl)
 # tar<-GET("http://aircasting.org/api/averages.json?q[west]=-105.42674388525387&q[east]=-104.28347911474606&q[south]=39.530285217883865&q[north]=39.99792504639966&q[time_from]=1320&q[time_to]=1319&q[day_from]=0&q[day_to]=365&q[year_from]=2015&q[year_to]=2016&q[grid_size_x]=46.98081264108352&q[grid_size_y]=25&q[sensor_name]=AirBeam-PM&q[measurement_type]=Particulate+Matter&q[unit_symbol]=%C2%B5g/m%C2%B3")
 #content(tar)[[111]]$value
 
+#css
+SelectFillColor <- "#1A1A1A"
+SelectBoundColor <- "#000000"
+
+CircleFillColor <-"#1062DE"
+CircleBoundColor <- "#003333" 
+CircleTrans <- 0.9
+CirBoundTrans <- 0.2
+CircleRadius <- 3
+
+CircleHighLight.Color <- "#FF9955"
+
+StoryBoardWidth <-4
+MapBWidth <- (12 - StoryBoardWidth )
+MapBHeight <- 900
+
+BaseMapStyle <- "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+
 #initilization ----
 AotNodesNonspatial <- fread("data/nodes.csv") #readAotNodes
 AotNodes <- st_as_sf(AotNodesNonspatial, coords = c("lon", "lat"), crs = 4326, agr = "constant") #create points obj
 ChicagoBoundary <- st_read("Chicago.shp")
 AotNodes_vis <- AotNodes
 Drawned <-1 #the drawned and intersected selection area. this might be infeasible for a multilayer case
+
+
 
 aod.yearly <- stack("Yearly_Aod_Stack_Reproj.tif") #Yearly AOD Data
 aod.overall <- raster("AOD_Average_4_Year_Reproj.tif") #4 year avg AOD
@@ -93,34 +116,119 @@ ReadAotData<-function(ExtraDate,ThisWorkPath)
   return(pc)
 }
 
+#ReadEpaData ----
+#read the epa data from the project package sourced from 2018113
+ReadEpaData <- function()
+{
+   
+   readpath <- "./data-workflows/sensors/epa-sensors/"
+   readpath1 <- "data/"
+   filename <- "PM2.5MonthlyShapefile.shp"
+   if(file.exists(paste0(readpath1,filename)))
+     EPAdata <- readOGR(paste0(readpath1,filename))
+   else
+     EPAdata <- readOGR(paste0(readpath,filename))
+   return(EPAdata)
+}
+#generate Grid
+pt2grid <- function(ptframe,n) {
+  bb <- bbox(ptframe)  
+  ptcrs <- proj4string(ptframe)  
+  xrange <- abs(bb[1,1] - bb[1,2])  
+  yrange <- abs(bb[2,1] - bb[2,2])  
+  cs <- c(xrange/n,yrange/n)  
+  cc <- bb[,1] + (cs/2)  
+  dc <- c(n,n)  
+  x1 <- GridTopology(cellcentre.offset=cc,cellsize=cs,cells.dim=dc)  
+  x2 <- SpatialGrid(grid=x1,proj4string=CRS(ptcrs))
+  return(x2)
+}
+#Inter Time Series data
+Interp <- function(inputdatatable,timepoint,resl)
+{
+  datefield <- GetTimeStamp(year(timepoint),month(timepoint),"epa")
+  df <- as.data.frame(inputdatatable)
+  df <- as.data.frame(subset(df,(!is.na(df[[datefield]]))))
+  coordinates(df) <- df[,c("SITE_LO", "SITE_LA")]
+  proj4string(df) <- CRS("+init=epsg:4326")
+  vgm <- variogram(df[[datefield]] ~ 1, df)
+  sph<- fit.variogram(vgm, model=vgm("Sph"))
+  # plot(vgm, sph)
+  itpgrid <- pt2grid(df,resl)
+  projection(itpgrid) <- CRS("+init=epsg:4326")  
+  Itpr <- (krige(df[[datefield]] ~ 1,df,itpgrid, model=sph))
+  # va<-writeGDAL(Itpr, "corrected.tif", drivername="GTiff", type="Float32") 
+  return(Itpr)
+}
+GetTimeStamp <- function(year,month,type)
+{
+  # switch(type,
+  #        epa = (month==1?paste0("X",year,"_",month,"_MPC"):paste0("X",year,"_",month,"MPC"))
+  # )
+  if(type == "epa")
+  {
+    if(month==1)
+    {
+      return(paste0("X",year,"_",month,"_MPC"))
+    }
+    else
+    {
+      return(paste0("X",year,"_",month,"MPC"))
+    }
+  }
+}
+
+# EPADATA<-ReadEpaData()
+# plot(Interp(EPADATA,as.Date("2017-01-01"),100))
+
+CreateINPresult<-function(){
+  
+  EPADATA<<-ReadEpaData()
+  nl<-names(EPADATA)
+  i <- 1
+  
+  rawdate<-strsplit(str_extract(nl[i+11], "[0-9]+_[0-9]+"),'_')
+  thisdate<-as.Date(paste0(unlist(rawdate)[1],"-",unlist(rawdate)[2],"-01"))
+  InterpResultList <- data.table(date = c(thisdate), field = c(nl[i+11]),itpr = c(Interp(EPADATA,thisdate,100)))
+   
+  for(i in 2:(length(nl)-11))
+  {
+    rawdate<-strsplit(str_extract(nl[i+11], "[0-9]+_[0-9]+"),'_')
+    thisdate<-as.Date(paste0(unlist(rawdate)[1],"-",unlist(rawdate)[2],"-01"))
+    InterpResultList<-rbind(InterpResultList,data.table(date = c(thisdate), field = c(nl[i+11]),itpr = c(Interp(EPADATA,thisdate,100))))
+  }
+  return(InterpResultList)
+
+}
+
+InterpResultList<-CreateINPresult()#IinitializedEPA
+
+
+
 
 #ui ----
 ui <- dashboardPage(
   dashboardHeader(title = "Open Air Chicago"),
   dashboardSidebar(
-    sidebarMenu(
+    sidebarMenu(id = "tablist",
       menuItem("Home", tabName = "Home"),
       menuItem("About", tabName = "About"),
       menuItem("Pollution Measures",
-      menuSubItem("PM 2.5", uiOutput("pm")),
-      menuSubItem("Aeorosol-Optical-Depth", uiOutput("aod"))),
+      menuSubItem("PM 2.5", "pm"),
+      menuSubItem("Aeorosol-Optical-Depth", "aod")),
       menuItem("Pollution Drivers",
-      menuSubItem("Weather", uiOutput("noaa")),
-      menuSubItem("Traffic", uiOutput("road_emissions"))),
+      menuSubItem("Weather", "noaa"),
+      menuSubItem("Traffic", "road_emissions")),
       menuItem("AoT", tabName = "aot")
     )
   ),
-
-
-
-
   dashboardBody(
     tabItems(
       #First tab content ----
       tabItem(tabName = "Home",
               h1("Home")
       ),
-      #About
+      #About-----
       tabItem(tabName = "About",
               h1("CSDS Air Quality Analysis Application"),
               h2("Center for Spatial Data Science"),
@@ -216,7 +324,6 @@ ui <- dashboardPage(
       ),
       #tabitem road_emissions ----
       tabItem(tabName = "road_emissions",
-              
               fluidRow(
                 box(
                   width = 4,
@@ -230,6 +337,9 @@ ui <- dashboardPage(
                   leafletOutput("road_emissions_map")
                 )
               )
+      ),
+      tabItem(
+        "pm", uiOutput("MainFramePollution")
       )
       
     )
@@ -239,6 +349,7 @@ ui <- dashboardPage(
   )
   
 )
+
 
 #server ----
 server = function(input, output,session){
@@ -328,7 +439,58 @@ server = function(input, output,session){
   })
   output$visAot_Text <- DT::renderDataTable(UpdateSelectedResult())
   # aot logic end ----
+  # pm logic -----
+  # here is a trial of the uioutput
+  output$MainFramePollution<- renderUI({
+    if (input$tablist == "pm"){
+      fluidPage(
+        fluidRow(
+          box(width = StoryBoardWidth,title = "This is the story box",
+              tags$p(testtext)),
+          box(width = MapBWidth, title = "This is the map box",
+              leafletOutput("MainMap"))
+        ),
+        fluidRow(
+          box(width = StoryBoardWidth,
+              sliderInput("EPAT", "EPA:",
+                          min = strptime("2015/01/15","%Y/%m/%d"), 
+                          max = strptime("2017/12/31","%Y/%m/%d"),
+                          value = strptime("2015/01/16","%Y/%m/%d"),
+                          timeFormat = "%Y/%m",
+                          step = as.difftime(30,units = "days"),
+                          animate = animationOptions(interval = 500)),
+              actionButton("IniEPA","Initialize the EPA DATA")
+          )
+          # box(width = StoryBoard)
+        )
+      )
+    }
+  })
   
+  observeEvent(input$EPAT,{
+    #find and vis epa plot
+    nowdate <- as.Date(input$EPAT)
+    # req(InterpResultList)
+    p2<-InterpResultList[date == paste0(year(nowdate),"-",month(nowdate),"-01")]
+    # print(input$EPAT)
+    if(nrow(p2)>0)
+    leafletProxy("MainMap") %>%
+      addRasterImage(raster(p2$itpr[[1]]),opacity=0.2,layerId = "EPA")
+  })
+  
+  observeEvent(input$IniEPA,{
+    #initialize the epa data / creat plots
+   
+  })
+  output$MainMap <- renderLeaflet({
+    leaflet(height = MapBHeight) %>% 
+      addTiles(urlTemplate = BaseMapStyle) %>% 
+      setView(lng = -87.6298, lat = 41.8781, 9) 
+      
+  })
+  
+  
+  # pm logic end-----
   #AOD start
   
   #Check for outline checkbox and plot city outline if necessary
@@ -360,12 +522,7 @@ server = function(input, output,session){
   })
   
   #AOD End
-  
-  
-  
-  
-  
-  
+ 
   output$working_map <- renderLeaflet({
     
     Chicagoshp <- readOGR(".","Chicago")
@@ -442,6 +599,7 @@ server = function(input, output,session){
   })
   
 }
-
+#test text
+testtext <- "When I wrote the following pages, or rather the bulk of them, I lived alone, in the woods, a mile from any neighbor, in a house which I had built myself, on the shore of Walden Pond, in Concord, Massachusetts, and earned my living by the labor of my hands only. I lived there two years and two months. At present I am a sojourner in civilized life again.
+I should not obtrude my affairs so much on the notice of my readers if very particular inquiries had not been made by my townsmen concerning my mode of life, which some would call impertinent, though they do not appear to me at all impertinent, but, considering the circumstances, very natural and pertinent. Some have asked what I got to eat; if I did not feel lonesome; if I was not afraid; and the like." 
 shinyApp(ui = ui, server=server)
-
