@@ -295,7 +295,9 @@ ui <- dashboardPage(
                             timeFormat = "%Y/%m",
                             step = as.difftime(30,units = "days"),
                             animate = animationOptions(interval = 500)),
-                actionButton("IniEPA","Initialize the EPA DATA")
+                # actionButton("IniEPA","Initialize the EPA DATA"),
+                radioButtons("EPAYM","Average Time Window: (monthly/yearly):",c("Yearly"=1,"Monthly"=0)),
+                checkboxInput("EPASiteOn", "EPA Monitoring Station", value = FALSE, width = NULL)
             )
           )
         )
@@ -419,8 +421,15 @@ server = function(input, output,session){
 
     nowdate <- as.Date(input$EPAT)
     # req(InterpResultList)
+    if(input$EPAYM == 1)
+    {
+      p2<-InterpResultList[year(date) == year(nowdate) & year == input$EPAYM]
+    }
+    else
+    {
+      p2<-InterpResultList[date == paste0(year(nowdate),"-",month(nowdate),"-01") & year == input$EPAYM]
+    }
     
-    p2<-InterpResultList[date == paste0(year(nowdate),"-",month(nowdate),"-01") & year == 0]
     if(nrow(p2)==0)
     p2<-InterpResultList[date == "2015-02-01" & year == 0]
     p2$data[[1]]
@@ -432,13 +441,14 @@ server = function(input, output,session){
   })
   output$MainMap <- renderLeaflet({
   
-    leaflet() %>% 
+      leaflet() %>% 
       addTiles(urlTemplate = BaseMapStyle) %>% 
-      setView(lng = -87.6298, lat = 41.8781, 9) %>% 
+      setView(lng = -87.6298, lat = 41.8781, 8) %>% 
       addRasterImage(RefreshEPASurface(),opacity=0.5,layerId = "EPA", colors=EPAPM2_5.pal)%>%
       addLegend(pal = EPAPM2_5.pal,values = (1:33), title = "EPA PM2.5",layerId = "EPALegend") %>% 
-      addCircleMarkers(data=EPANode)
-    
+      addCircleMarkers(data=EPANode,opacity = ifelse(input$EPASiteOn,1,0),fillOpacity = ifelse(input$EPASiteOn,0.2,0))
+
+    # EPASiteOn  %>% 
       
   })
   
