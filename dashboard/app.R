@@ -48,23 +48,25 @@ CircleRadius <- 3
 
 CircleHighLight.Color <- "#FF9955"
 
-StoryBoardWidth <-4
+StoryBoardWidth <-7
 MapBWidth <- (12 - StoryBoardWidth )
-MapBHeight <- 900
+MapBHeight <- 450
 
 BaseMapStyle <- "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
 
 #datasetpath
 datapath <-"data/"
 #initilization ----
-AotNodesNonspatial <- fread("data/nodes.csv") #readAotNodes
+AotNodesNonspatial <- fread(paste0(datapath,"nodes.csv")) #readAotNodes
 AotNodes <- st_as_sf(AotNodesNonspatial, coords = c("lon", "lat"), crs = 4326, agr = "constant") #create points obj
 ChicagoBoundary <- st_read("Chicago.shp")
 AotNodes_vis <- AotNodes
 Drawned <-1 #the drawned and intersected selection area. this might be infeasible for a multilayer case
 
-
-
+EPANode <- st_read(paste0(datapath,"PM2.5YearlyShapefile1.shp"))
+EPAPM2_5.breaks <- c(1:10,12,15,35) #Breaks for EPAPM2_5
+EPAPM2_5.pal <- colorNumeric(c("#D73027", "#FC8D59", "#D9EF8B", "#FEE08B", "#91CF60", "#1A9850"), 
+                             EPAPM2_5.breaks, na.color = "transparent",reverse = T) #Palette for EPAPM2_5
 aod.yearly <- stack("Yearly_Aod_Stack_Reproj.tif") #Yearly AOD Data
 aod.overall <- raster("AOD_Average_4_Year_Reproj.tif") #4 year avg AOD
 aod.yearly.overall <- stack(aod.yearly, aod.overall) #Stack rasters
@@ -140,7 +142,6 @@ InterpResultList<-CreateINPresult()#IinitializedEPA
 #test text in the storyboard
 testtext <- "When I wrote the following pages, or rather the bulk of them, I lived alone, in the woods, a mile from any neighbor, in a house which I had built myself, on the shore of Walden Pond, in Concord, Massachusetts, and earned my living by the labor of my hands only. I lived there two years and two months. At present I am a sojourner in civilized life again.
 I should not obtrude my affairs so much on the notice of my readers if very particular inquiries had not been made by my townsmen concerning my mode of life, which some would call impertinent, though they do not appear to me at all impertinent, but, considering the circumstances, very natural and pertinent. Some have asked what I got to eat; if I did not feel lonesome; if I was not afraid; and the like." 
-
 
 
 #ui ----
@@ -279,9 +280,11 @@ ui <- dashboardPage(
         "pm", fluidPage(
           fluidRow(
             box(width = StoryBoardWidth,title = "This is the story box",
-                tags$p(testtext)),
+                tags$p(paste0(testtext,testtext,testtext))),
             box(width = MapBWidth, title = "This is the map box",
-                leafletOutput("MainMap"))
+                # tags$style(type="text/css",
+                #            "#MainMap.recalculating { opacity: 1.0 }"),
+                leafletOutput("MainMap",height = MapBHeight))
           ),
           fluidRow(
             box(width = StoryBoardWidth,
@@ -401,22 +404,41 @@ server = function(input, output,session){
   
   observeEvent(input$EPAT,{
     #find and vis epa plot
+    # nowdate <- as.Date(input$EPAT)
+    # # req(InterpResultList)
+    # p2<-InterpResultList[date == paste0(year(nowdate),"-",month(nowdate),"-01") & year == 0]
+    # # print(input$EPAT)
+    # if(nrow(p2)>0)
+    # leafletProxy("MainMap") %>%
+    #   addRasterImage(p2$data[[1]],opacity=0.5,layerId = "EPA", colors=EPAPM2_5.pal)%>%
+    #   addLegend(pal = EPAPM2_5.pal,values = (1:33), title = "EPA PM2.5",layerId = "EPALegend")
+      
+  })
+  
+  RefreshEPASurface <- reactive({
+
     nowdate <- as.Date(input$EPAT)
     # req(InterpResultList)
-    p2<-InterpResultList[date == paste0(year(nowdate),"-",month(nowdate),"-01")]
-    # print(input$EPAT)
-    if(nrow(p2)>0)
-    leafletProxy("MainMap") %>%
-      addRasterImage(raster(p2$itpr[[1]]),opacity=0.2,layerId = "EPA")
+    
+    p2<-InterpResultList[date == paste0(year(nowdate),"-",month(nowdate),"-01") & year == 0]
+    if(nrow(p2)==0)
+    p2<-InterpResultList[date == "2015-02-01" & year == 0]
+    p2$data[[1]]
+    
   })
   
   observeEvent(input$IniEPA,{
     #initialize the epa data / creat plots
   })
   output$MainMap <- renderLeaflet({
-    leaflet(height = MapBHeight) %>% 
+  
+    leaflet() %>% 
       addTiles(urlTemplate = BaseMapStyle) %>% 
-      setView(lng = -87.6298, lat = 41.8781, 9) 
+      setView(lng = -87.6298, lat = 41.8781, 9) %>% 
+      addRasterImage(RefreshEPASurface(),opacity=0.5,layerId = "EPA", colors=EPAPM2_5.pal)%>%
+      addLegend(pal = EPAPM2_5.pal,values = (1:33), title = "EPA PM2.5",layerId = "EPALegend") %>% 
+      addCircleMarkers(data=EPANode)
+    
       
   })
   
