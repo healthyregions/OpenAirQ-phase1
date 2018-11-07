@@ -11,7 +11,6 @@ library(raster)
 library(mapedit)
 library(mapview)
 library(rlist)
-library(ggplot2)
 library(DT)
 library(leaflet.extras)
 library(ggplot2)
@@ -23,6 +22,7 @@ library(tidyverse) # data wrangling
 library(tmap) #modern data visualizations
 library(data.table)
 library(RCurl)
+library(tiff)#readtiff
 
 library(gstat) #kriging
 library(stringr) # extract date from the epa date
@@ -54,6 +54,8 @@ MapBHeight <- 900
 
 BaseMapStyle <- "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
 
+#datasetpath
+datapath <-"data/"
 #initilization ----
 AotNodesNonspatial <- fread("data/nodes.csv") #readAotNodes
 AotNodes <- st_as_sf(AotNodesNonspatial, coords = c("lon", "lat"), crs = 4326, agr = "constant") #create points obj
@@ -117,88 +119,21 @@ ReadAotData<-function(ExtraDate,ThisWorkPath)
 }
 
 #ReadEpaData ----
-#read the epa data from the project package sourced from 2018113
-ReadEpaData <- function()
-{
-   
-   readpath <- "./data-workflows/sensors/epa-sensors/"
-   readpath1 <- "data/"
-   filename <- "PM2.5MonthlyShapefile.shp"
-   if(file.exists(paste0(readpath1,filename)))
-     EPAdata <- readOGR(paste0(readpath1,filename))
-   else
-     EPAdata <- readOGR(paste0(readpath,filename))
-   return(EPAdata)
-}
-#generate Grid
-pt2grid <- function(ptframe,n) {
-  bb <- bbox(ptframe)  
-  ptcrs <- proj4string(ptframe)  
-  xrange <- abs(bb[1,1] - bb[1,2])  
-  yrange <- abs(bb[2,1] - bb[2,2])  
-  cs <- c(xrange/n,yrange/n)  
-  cc <- bb[,1] + (cs/2)  
-  dc <- c(n,n)  
-  x1 <- GridTopology(cellcentre.offset=cc,cellsize=cs,cells.dim=dc)  
-  x2 <- SpatialGrid(grid=x1,proj4string=CRS(ptcrs))
-  return(x2)
-}
-#Inter Time Series data
-Interp <- function(inputdatatable,timepoint,resl)
-{
-  datefield <- GetTimeStamp(year(timepoint),month(timepoint),"epa")
-  df <- as.data.frame(inputdatatable)
-  df <- as.data.frame(subset(df,(!is.na(df[[datefield]]))))
-  coordinates(df) <- df[,c("SITE_LO", "SITE_LA")]
-  proj4string(df) <- CRS("+init=epsg:4326")
-  vgm <- variogram(df[[datefield]] ~ 1, df)
-  sph<- fit.variogram(vgm, model=vgm("Sph"))
-  # plot(vgm, sph)
-  itpgrid <- pt2grid(df,resl)
-  projection(itpgrid) <- CRS("+init=epsg:4326")  
-  Itpr <- (krige(df[[datefield]] ~ 1,df,itpgrid, model=sph))
-  # va<-writeGDAL(Itpr, "corrected.tif", drivername="GTiff", type="Float32") 
-  return(Itpr)
-}
-GetTimeStamp <- function(year,month,type)
-{
-  # switch(type,
-  #        epa = (month==1?paste0("X",year,"_",month,"_MPC"):paste0("X",year,"_",month,"MPC"))
-  # )
-  if(type == "epa")
-  {
-    if(month==1)
-    {
-      return(paste0("X",year,"_",month,"_MPC"))
-    }
-    else
-    {
-      return(paste0("X",year,"_",month,"MPC"))
-    }
-  }
-}
 
-# EPADATA<-ReadEpaData()
-# plot(Interp(EPADATA,as.Date("2017-01-01"),100))
 
 CreateINPresult<-function(){
   
-  EPADATA<<-ReadEpaData()
-  nl<-names(EPADATA)
-  i <- 1
-  
-  rawdate<-strsplit(str_extract(nl[i+11], "[0-9]+_[0-9]+"),'_')
-  thisdate<-as.Date(paste0(unlist(rawdate)[1],"-",unlist(rawdate)[2],"-01"))
-  InterpResultList <- data.table(date = c(thisdate), field = c(nl[i+11]),itpr = c(Interp(EPADATA,thisdate,100)))
-   
-  for(i in 2:(length(nl)-11))
-  {
-    rawdate<-strsplit(str_extract(nl[i+11], "[0-9]+_[0-9]+"),'_')
-    thisdate<-as.Date(paste0(unlist(rawdate)[1],"-",unlist(rawdate)[2],"-01"))
-    InterpResultList<-rbind(InterpResultList,data.table(date = c(thisdate), field = c(nl[i+11]),itpr = c(Interp(EPADATA,thisdate,100))))
+  FileNameList <- list.files(paste0(datapath,"EPA/")) #FileName List in EPA data set
+  rawdate<-strsplit(str_extract(FileNameList[1], "[0-9]+-[0-9]+-[0-9]+_[0-9]"),'_')
+  thisdate<-as.Date(unlist(rawdate)[1])
+  # year = 1 month = 0 rawdate[2] 
+  InterpResultList <- data.table(date = c(thisdate), year = (unlist(rawdate)[2]), data  = c(raster(paste0(datapath,"EPA/",FileNameList[1]))))
+  for(i in 2:length(FileNameList)){
+    rawdate<-strsplit(str_extract(FileNameList[i], "[0-9]+-[0-9]+-[0-9]+_[0-9]"),'_')
+    thisdate<-as.Date(unlist(rawdate)[1])
+    InterpResultList<-rbind(InterpResultList,data.table(date = c(thisdate), year = (unlist(rawdate)[2]),data  = c(raster(paste0(datapath,"EPA/",FileNameList[i])))))
   }
   return(InterpResultList)
-
 }
 
 InterpResultList<-CreateINPresult()#IinitializedEPA
