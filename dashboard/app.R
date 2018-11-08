@@ -36,6 +36,8 @@ library(stringr) # extract date from the epa date
 # tar<-GET("http://aircasting.org/api/averages.json?q[west]=-105.42674388525387&q[east]=-104.28347911474606&q[south]=39.530285217883865&q[north]=39.99792504639966&q[time_from]=1320&q[time_to]=1319&q[day_from]=0&q[day_to]=365&q[year_from]=2015&q[year_to]=2016&q[grid_size_x]=46.98081264108352&q[grid_size_y]=25&q[sensor_name]=AirBeam-PM&q[measurement_type]=Particulate+Matter&q[unit_symbol]=%C2%B5g/m%C2%B3")
 #content(tar)[[111]]$value
 
+
+
 #css
 SelectFillColor <- "#1A1A1A"
 SelectBoundColor <- "#000000"
@@ -157,7 +159,8 @@ ui <- dashboardPage(
       menuItem("Pollution Drivers",
       menuSubItem("Weather", "noaa"),
       menuSubItem("Traffic", "road_emissions")),
-      menuItem("AoT", tabName = "aot")
+      menuItem("AoT", tabName = "aot"),
+      menuItem("Demographic Data", tabName = "demographic")
     )
   ),
   dashboardBody(
@@ -257,6 +260,26 @@ ui <- dashboardPage(
                   ),
                   selectInput("AotField","AotField",c("Node_id","Value")),
                   DT::dataTableOutput("visAot_Text")
+                )
+              )
+      ),
+      #tabitem demographic_data ----
+      tabItem(tabName = "demographic",
+              fluidRow(
+                box(
+                  width = 4,
+                  selectInput(inputId ="demographic_type",
+                              label = "Choose demographic data",
+                              choices = c("Percent of Crowded Housing",
+                                "Percent of Households Below Poverty",
+                                "Percent Unemployed",
+                                "Percent Without a High School Diploma",
+                                "Per Capita Income",
+                                "Hardship Index"))
+                ),
+                box(
+                  width = 8,
+                  leafletOutput("demographic_map")
                 )
               )
       ),
@@ -515,6 +538,33 @@ server = function(input, output,session){
     }
     
     tmap_leaflet(working_map)})
+  output$demographic_map <- renderLeaflet({
+    demographic_data <- st_read("chicago_demographic.shp")
+    key <- c("Percent of Crowded Housing",
+             "Percent of Households Below Poverty",
+             "Percent Unemployed",
+             "Percent Without a High School Diploma",
+             "Per Capita Income",
+             "Hardship Index")
+    val = c("PERCENT_O",
+            "PERCENT_H",
+            "PERCENT_AG",
+            "PERCENT__1",
+            "PER_C",
+            "HARDS")
+    type.col = val[which(key==input$demographic_type)]
+    demographic_map <- 
+      tm_shape(demographic_data) +
+      tm_fill(col = type.col,
+              style = "quantile",
+              title = "test"
+              )  +
+      tm_borders() +
+      tm_layout(title = "Demographic Data by Community Area 2008-2012", title.position = c("right","bottom"))
+    tmap_leaflet(demographic_map)
+  }
+      
+  )
   # road_emissions output ----
   output$road_emissions_map <- renderLeaflet({
     trffc_vol <- readOGR(".", "Community_Areas_with_Traffic_Volumes")
