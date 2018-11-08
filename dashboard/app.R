@@ -570,13 +570,18 @@ server = function(input, output,session){
     trffc_vol <- readOGR(".", "Community_Areas_with_Traffic_Volumes")
     road_length <- readOGR(".", "Chi_Road_Lengths")
     
+    trffc_vol@data$Trffc_V_area <- 
+      trffc_vol@data$Trffc_V / trffc_vol@data$shape_r
+    road_length@data$rd_lngt_area <- 
+      road_length@data$rd_lngt / road_length@data$shape_r
+    
     road_emission_data <- switch(input$road_emit_type, 
                                  "Traffic Volume" = "trffc_vol", 
                                  "Road Lengths" = "road_length")
     
     if(input$road_emit_type == "Traffic Volume")
     {
-      road_col <- "Trffc_V"
+      road_col <- "Trffc_V_area"
       road_emissions_map <- 
         tm_shape(trffc_vol) + 
         tm_fill(col= road_col, 
@@ -585,15 +590,16 @@ server = function(input, output,session){
                 bolder.lwd = 0.1, 
                 bolder.alpha = 0.4, 
                 palette = "Reds", 
-                title = "Traffic Volume" ) +
+                title = "Traffic Volume per Square Foot" ) +
         tm_layout(
           main.title = "Traffic Volume by Community Area of Chicago",
           main.title.size = 1.2
-        )
+        ) +
+        tm_legend(position = c("LEFT", "BOTTOM") )
     }
     if(input$road_emit_type == "Road Lengths")
     {
-      road_col <- "rd_lngt"
+      road_col <- "rd_lngt_area"
       road_emissions_map <- 
         tm_shape(road_length) + 
         tm_fill(col= road_col, 
@@ -602,11 +608,12 @@ server = function(input, output,session){
                 bolder.lwd = 0.1,
                 bolder.alpha = 0.4, 
                 palette = "Reds", 
-                title = "Total Length of Road") +
+                title = "Total Length of Road per Square Foot") +
         tm_layout(
           main.title = "Road Lengths by Community Area of Chicago",
           main.title.size = 1.2
-        )
+        ) +
+        tm_legend(position = c("LEFT", "BOTTOM") )
     }
     tmap_leaflet(road_emissions_map)
   })
