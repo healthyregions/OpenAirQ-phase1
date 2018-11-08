@@ -276,7 +276,7 @@ ui <- dashboardPage(
                                 "Percent Without a High School Diploma",
                                 "Per Capita Income",
                                 "Hardship Index"))
-                ),
+                  ),
                 box(
                   width = 8,
                   leafletOutput("demographic_map")
