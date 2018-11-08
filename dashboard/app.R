@@ -61,7 +61,7 @@ datapath <-"data/"
 #initilization ----
 AotNodesNonspatial <- fread(paste0(datapath,"nodes.csv")) #readAotNodes
 AotNodes <- st_as_sf(AotNodesNonspatial, coords = c("lon", "lat"), crs = 4326, agr = "constant") #create points obj
-ChicagoBoundary <- st_read("Chicago.shp")
+ChicagoBoundary <- readOGR("Chicago.shp")
 AotNodes_vis <- AotNodes
 Drawned <-1 #the drawned and intersected selection area. this might be infeasible for a multilayer case
 
@@ -151,16 +151,16 @@ ui <- dashboardPage(
   dashboardHeader(title = "Open Air Chicago"),
   dashboardSidebar(
     sidebarMenu(id = "tablist",
-      menuItem("Home", tabName = "Home"),
-      menuItem("About", tabName = "About"),
-      menuItem("Pollution Measures",
-      menuSubItem("PM 2.5", "pm"),
-      menuSubItem("Aeorosol-Optical-Depth", "aod")),
-      menuItem("Pollution Drivers",
-      menuSubItem("Weather", "noaa"),
-      menuSubItem("Traffic", "road_emissions")),
-      menuItem("AoT", tabName = "aot"),
-      menuItem("Demographic Data", tabName = "demographic")
+                menuItem("Home", tabName = "Home"),
+                menuItem("About", tabName = "About"),
+                menuItem("Pollution Measures",
+                         menuSubItem("PM 2.5", "pm"),
+                         menuSubItem("Aeorosol-Optical-Depth", "aod")),
+                menuItem("Pollution Drivers",
+                         menuSubItem("Weather", "noaa"),
+                         menuSubItem("Traffic", "road_emissions")),
+                menuItem("AoT", tabName = "aot"),
+                menuItem("Demographic Data", tabName = "demographic")
     )
   ),
   dashboardBody(
@@ -271,12 +271,12 @@ ui <- dashboardPage(
                   selectInput(inputId ="demographic_type",
                               label = "Choose demographic data",
                               choices = c("Percent of Crowded Housing",
-                                "Percent of Households Below Poverty",
-                                "Percent Unemployed",
-                                "Percent Without a High School Diploma",
-                                "Per Capita Income",
-                                "Hardship Index"))
-                  ),
+                                          "Percent of Households Below Poverty",
+                                          "Percent Unemployed",
+                                          "Percent Without a High School Diploma",
+                                          "Per Capita Income",
+                                          "Hardship Index"))
+                ),
                 box(
                   width = 8,
                   leafletOutput("demographic_map")
@@ -363,10 +363,10 @@ server = function(input, output,session){
                   color = "#666",
                   # dashArray = "",
                   fillOpacity = 0.7),
-                  # bringToFront = TRUE),
+                # bringToFront = TRUE),
                 label = labels)%>%
     addFeatures(AotNodes)
-    
+  
   #addLayersControl(overlayGroups = c("draw"), options = layersControlOptions(collapsed = FALSE))
   drawn <- callModule(editMod, "editor", base_map)
   #brushing
@@ -384,7 +384,7 @@ server = function(input, output,session){
     qpal <- colorQuantile(
       palette = "Blues",
       domain = AotNodes_vis$V1)
-   
+    
     leafletProxy(ns("map"),data = AotNodes_vis) %>%
       addProviderTiles(providers$Stamen.TonerLite) %>% 
       removeControl(layerId = "L1") %>% #remove the original legend then add a new one
@@ -425,7 +425,7 @@ server = function(input, output,session){
   # aot logic end ----
   # pm logic -----
   # here is a trial of the uioutput
- 
+  
   
   observeEvent(input$EPAT,{
     #find and vis epa plot
@@ -437,11 +437,11 @@ server = function(input, output,session){
     # leafletProxy("MainMap") %>%
     #   addRasterImage(p2$data[[1]],opacity=0.5,layerId = "EPA", colors=EPAPM2_5.pal)%>%
     #   addLegend(pal = EPAPM2_5.pal,values = (1:33), title = "EPA PM2.5",layerId = "EPALegend")
-      
+    
   })
   
   RefreshEPASurface <- reactive({
-
+    
     nowdate <- as.Date(input$EPAT)
     # req(InterpResultList)
     if(input$EPAYM == 1)
@@ -454,7 +454,7 @@ server = function(input, output,session){
     }
     
     if(nrow(p2)==0)
-    p2<-InterpResultList[date == "2015-02-01" & year == 0]
+      p2<-InterpResultList[date == "2015-02-01" & year == 0]
     p2$data[[1]]
     
   })
@@ -463,16 +463,24 @@ server = function(input, output,session){
     #initialize the epa data / creat plots
   })
   output$MainMap <- renderLeaflet({
-  
-      leaflet() %>% 
+    
+    leaflet() %>% 
       addTiles(urlTemplate = BaseMapStyle) %>% 
       setView(lng = -87.6298, lat = 41.8781, 8) %>% 
+      addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.1, stroke = FALSE,
+                  highlight = highlightOptions(
+                    # weight = 5,
+                    color = "#666",
+                    # dashArray = "",
+                    fillOpacity = 0.7,
+                    bringToFront = TRUE),
+                  label = labels)%>%  
       addRasterImage(RefreshEPASurface(),opacity=0.5,layerId = "EPA", colors=EPAPM2_5.pal)%>%
       addLegend(pal = EPAPM2_5.pal,values = (1:33), title = "EPA PM2.5",layerId = "EPALegend") %>% 
       addCircleMarkers(data=EPANode,opacity = ifelse(input$EPASiteOn,1,0),fillOpacity = ifelse(input$EPASiteOn,0.2,0))
-
+    
     # EPASiteOn  %>% 
-      
+    
   })
   
   
@@ -508,7 +516,7 @@ server = function(input, output,session){
   })
   
   #AOD End
- 
+  
   output$working_map <- renderLeaflet({
     
     Chicagoshp <- readOGR(".","Chicago")
@@ -558,12 +566,12 @@ server = function(input, output,session){
       tm_fill(col = type.col,
               style = "quantile",
               title = "test"
-              )  +
+      )  +
       tm_borders() +
       tm_layout(title = "Demographic Data by Community Area 2008-2012", title.position = c("right","bottom"))
     tmap_leaflet(demographic_map)
   }
-      
+  
   )
   # road_emissions output ----
   output$road_emissions_map <- renderLeaflet({
