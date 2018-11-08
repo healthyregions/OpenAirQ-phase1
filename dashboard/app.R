@@ -167,7 +167,15 @@ ui <- dashboardPage(
     tabItems(
       #First tab content ----
       tabItem(tabName = "Home",
-              h1("Home")
+              fluidRow(
+                box(width = 7,
+                  uiOutput("HSB") #Homepae Stroy Board
+                ),
+                box(
+                  width = 5,
+                  leafletOutput("HLM",height = 700) #Homepage Leaflet Map
+                )
+              )
       ),
       #About-----
       tabItem(tabName = "About",
@@ -423,6 +431,39 @@ server = function(input, output,session){
   })
   output$visAot_Text <- DT::renderDataTable(UpdateSelectedResult())
   # aot logic end ----
+
+# Home Page logic ---------------------------------------------------------
+  output$HLM <- renderLeaflet({
+    leaflet() %>% 
+      addTiles(urlTemplate = BaseMapStyle) %>% 
+      flyTo(lng = -87.6298, lat = 41.8781, 10) %>% 
+      addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.1, stroke = FALSE,
+                  highlight = highlightOptions(
+                    color = "#666",
+                    fillOpacity = 0.7,
+                    bringToFront = TRUE),
+                  label = labels,group = 'pg',layerId = ~community)
+  })
+  observe({
+    click<-input$HLM_shape_click
+    if(is.null(click))
+      return()
+    # ChicagoBoundary
+    
+  })
+  HPR <- reactive({
+    click<-input$HLM_shape_click
+    if(is.null(click))
+      return("dal")
+    return(click$id)
+  })
+  output$HSB <- renderUI({
+    thisinut<-HPR()
+    thisui<-{box(
+      infoBox(thisinut,value = 5,subtitle = thisinut)
+    )}
+    thisui
+  })
   # pm logic -----
   # here is a trial of the uioutput
   
@@ -474,7 +515,7 @@ server = function(input, output,session){
                     # dashArray = "",
                     fillOpacity = 0.7,
                     bringToFront = TRUE),
-                  label = labels)%>%  
+                  label = labels,layerId = "ChicagoBoundary")%>%  
       addRasterImage(RefreshEPASurface(),opacity=0.5,layerId = "EPA", colors=EPAPM2_5.pal)%>%
       addLegend(pal = EPAPM2_5.pal,values = (1:33), title = "EPA PM2.5",layerId = "EPALegend") %>% 
       addCircleMarkers(data=EPANode,opacity = ifelse(input$EPASiteOn,1,0),fillOpacity = ifelse(input$EPASiteOn,0.2,0))
@@ -546,6 +587,7 @@ server = function(input, output,session){
     }
     
     tmap_leaflet(working_map)})
+  #ChicagoDemographicMap -----------
   output$demographic_map <- renderLeaflet({
     demographic_data <- st_read("chicago_demographic.shp")
     key <- c("Percent of Crowded Housing",
