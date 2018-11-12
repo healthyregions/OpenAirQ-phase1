@@ -76,7 +76,10 @@ names(aod.yearly.overall) <- c("X2014", "X2015", "X2016", "X2017", "Overall")
 
 aod.breaks <- c(.10, .12, .14, .16, .18, .20, .22, .24, .26, .28) #Breaks for AOD data
 aod.pal <- colorNumeric(c("green", "yellow", "red", "purple"), aod.breaks, na.color = "transparent") #Palette for AOD
-
+#story board
+RegionID <-1 # give a region id
+BestStory <-4 # number of story board create
+infTable<-as.data.frame(fread("data/Public_Health_Statistics-_Selected_public_health_indicators_by_Chicago_community_area.csv"))
 
 #method ----
 #ReadAotData ----
@@ -123,6 +126,54 @@ ReadAotData<-function(ExtraDate,ThisWorkPath)
 }
 
 #ReadEpaData ----
+
+# CreateTheStoryBoard -----------------------------------------------------
+
+rankmatrix <- as.data.frame(infTable)
+ncol<-NCOL(infTable)
+nrow<-NROW(infTable)
+for(i in 1:ncol){
+  ca <- rank(as.data.frame(infTable[,i]))
+  rankmatrix[,i] <- ca
+}
+
+
+#search function
+#input：
+# -table1 
+# -table2(the rank) 
+# -story syntax
+
+
+FindtheStory <-function(RegionID,BestStory,infTable){
+  nl<-names(infTable)
+  rankidtable <- matrix(nrow = 4,ncol =ncol,data = 1:4*ncol)
+  rankidtable[1,]<-c(1:ncol)
+  rankidtable[2,]<-as.matrix(rankmatrix[RegionID,]) # rank
+  rankidtable[3,]<-abs(as.matrix(rankmatrix[RegionID,])-nrow/2) #important level
+  rankidtable[4,]<-(as.matrix(rankmatrix[RegionID,]/nrow)) #precent
+  
+  #rank the most important issue in this region
+  va<-(rankidtable[,order(-rankidtable[3,])])
+  colname <- c("FieldName","Precentage","Value","Rank")
+  result <- data.frame(matrix(ncol = 4, nrow = 0))
+  colnames(result) <- colname
+  
+  for(si in 1: BestStory){
+    thisFiledID <- va[1,si]
+    result<-rbind(result,data.table(FieldName = nl[thisFiledID],Precentage = va[4,si], Rank = va[2,si],Value=infTable[RegionID,thisFiledID] ))
+  }
+  
+  return(result)
+}
+
+CreateDescription <- function(StoryItem,i){
+  #create a desciption given one story
+  #The field name is very high/low, which is the ** in chicago
+  return(paste0("The ",StoryItem$FieldName[i]," is very ",
+                ifelse(StoryItem$Precentage[i]>0.5,"high","low"),
+                ", which is ",StoryItem$Value[i]," (",as.integer(nrow - StoryItem$Rank[i]),"th) in Chicago"))}
+
 
 
 CreateINPresult<-function(){
@@ -455,6 +506,15 @@ server = function(input, output,session){
     click<-input$HLM_shape_click
     if(is.null(click))
       return("dal")
+    #find my id by name
+    regionid<- which(toupper(infTable$`Community Area Name`)==click$id)
+    
+    thisstory<-FindtheStory(RegionID = regionid,infTable = infTable,BestStory = 5)
+    for(i in 1:5){
+      print(CreateDescription(StoryItem = thisstory,i = i))}
+    
+    #search for the story
+    #create story one by one 
     return(click$id)
   })
   output$HSB <- renderUI({
