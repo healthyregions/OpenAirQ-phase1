@@ -69,13 +69,22 @@ EPANode <- st_read(paste0(datapath,"PM2.5YearlyShapefile1.shp"))
 EPAPM2_5.breaks <- c(1:10,12,15,35) #Breaks for EPAPM2_5
 EPAPM2_5.pal <- colorNumeric(c("#D73027", "#FC8D59", "#D9EF8B", "#FEE08B", "#91CF60", "#1A9850"), 
                              EPAPM2_5.breaks, na.color = "transparent",reverse = T) #Palette for EPAPM2_5
-aod.yearly <- stack("Yearly_Aod_Stack_Reproj.tif") #Yearly AOD Data
-aod.overall <- raster("AOD_Average_4_Year_Reproj.tif") #4 year avg AOD
-aod.yearly.overall <- stack(aod.yearly, aod.overall) #Stack rasters
-names(aod.yearly.overall) <- c("X2014", "X2015", "X2016", "X2017", "Overall") 
 
-aod.breaks <- c(.10, .12, .14, .16, .18, .20, .22, .24, .26, .28) #Breaks for AOD data
-aod.pal <- colorNumeric(c("green", "yellow", "red", "purple"), aod.breaks, na.color = "transparent") #Palette for AOD
+aod.yearly <- stack("Yearly_Aod_Stack_Reproj.tif") #Yearly AOD Data
+names(aod.yearly) <- c("2014", "2015", "2016", "2017") 
+
+aod.monthly.names <- read.csv("aod.monthly.names.csv")
+aod.monthly <- stack("AOD_Monthly_Avgs.tif")
+
+names(aod.monthly) <- aod.monthly.names$x
+
+monthly.breaks <- seq(from = 0, to = 1, 0.1) #Breaks for AOD data
+monthly.aod.pal <- colorNumeric(c("green", "yellow", "red", "purple"), monthly.breaks, na.color = "transparent") #Palette for AOD
+
+yearly.breaks <- seq(from = 0.1, to = 0.3, 0.02) #Breaks for AOD data
+yearly.aod.pal <- colorNumeric(c("green", "yellow", "red", "purple"), yearly.breaks, na.color = "transparent") #Palette for AOD
+
+
 #story board
 RegionID <-1 # give a region id
 BestStory <- 6 # number of story board create
@@ -278,26 +287,54 @@ ui <- dashboardPage(
       ),
       #tabitem aod
       tabItem(tabName = "aod",
-              
               box(
                 width = 4,
-                selectInput(inputId = "aodyear", 
-                            label = "Year:",
-                            choices = c("2014" = "X2014", 
-                                        "2015" = "X2015", 
-                                        "2016" = "X2016", 
-                                        "2017" = "X2017", 
-                                        "Overall")),
+                selectInput(inputId = "selecttime",
+                            label = "Yearly or Monthly Averages?",
+                            choices = c("Yearly",
+                                        "Monthly"))
+              ),
+              box(
+                width = 4,
+                conditionalPanel(condition = "input.selecttime == 'Yearly'", 
+                sliderInput("aodyear", "Select Year:",
+                            min = strptime("2014/01/04","%Y/%m/%d"), 
+                            max = strptime("2018/09/18","%Y/%m/%d"),
+                            value = strptime("2014/01/04","%Y/%m/%d"),
+                            timeFormat = "%Y/%m",
+                            step = as.difftime(365, units = "days"),
+                            animate = animationOptions(interval = 500)),
                 
                 checkboxInput(inputId = "outline",
                               label = "Show city boundaries?",
                               value = FALSE)
-                
+                ),
+                conditionalPanel(condition = "input.selecttime == 'Monthly'", 
+                                 sliderInput("aodmonth", "Select Month:",
+                                             min = strptime("2014/01/01","%Y/%m/%d"), 
+                                             max = strptime("2018/09/18","%Y/%m/%d"),
+                                             value = strptime("2014/01/01","%Y/%m/%d"),
+                                             timeFormat = "%Y/%m",
+                                             step = as.difftime(30 ,units = "days"),
+                                             animate = animationOptions(interval = 500)),
+                                 
+                                 checkboxInput(inputId = "outline",
+                                               label = "Show city boundaries?",
+                                               value = FALSE)
+                )
               ),
-              box(
-                width = 8,
-                leafletOutput("aodmap")
+              conditionalPanel(condition = "input.selecttime == 'Yearly'",
+                               box(
+                                 width = 8,
+                                 leafletOutput("aodmapyearly")
+                               )),
+              conditionalPanel(condition = "input.selecttime == 'Monthly'",
+                               box(
+                                 width = 8,
+                                 leafletOutput("aodmapmonthly")
+                               )
               )
+              
       ),
       
       
@@ -606,11 +643,46 @@ server = function(input, output,session){
     }
   })
   #Generate AOD map
-  output$aodmap <- renderLeaflet({
+  output$aodmapyearly <- renderLeaflet({
+    in.timeyr <- input$aodyear
+    in.time <- as.POSIXct(in.timeyr, origin="1970-01-01")
+    yr <- year(in.time)
+    selected.yr <- paste("X", yr, sep = "")
+    
+    yr.names <- names(aod.yearly)
+    selected.yr <- which(yr.names == selected.yr)
+    
     a <- leaflet() %>% 
       addTiles() %>% 
-      addRasterImage(aod.yearly.overall[[input$aodyear]], opacity = 0.7, colors = aod.pal) %>% 
-      addLegend(pal = aod.pal, values = values(aod.yearly.overall[[input$aodyear]]), title = "Aerosol Optical Depth")
+      addRasterImage(aod.yearly[[selected.yr]], opacity = 0.7, colors = yearly.aod.pal) %>% 
+      leaflet::addLegend(pal = yearly.aod.pal, values = values(aod.yearly[[selected.yr]]))
+    
+    #Keep chicago outline rendered when year is changed 
+    if (input$outline) {
+       a %>% 
+        addPolygons(data = ChicagoBoundary, color = "black", fill = FALSE)
+    }
+    else {
+      a
+    }
+    
+  })
+
+  output$aodmapmonthly <- renderLeaflet({
+    
+    in.timemo <- input$aodmonth
+    in.timemo <- as.POSIXct(in.timemo, origin="1970-01-01")
+    mo <- lubridate::month(in.timemo)
+    yr <- year(in.timemo)
+    selected.mo <- paste(mo, yr, sep = "")
+    selected.mo <- paste("X", selected.mo, sep = "")
+    mo.names <- names(aod.monthly)
+    selected.mo.index <- which(mo.names == selected.mo)
+    
+    a <- leaflet() %>% 
+      addTiles() %>% 
+      addRasterImage(aod.monthly[[selected.mo.index]], opacity = 0.7, colors = monthly.aod.pal) %>% 
+      leaflet::addLegend(pal = monthly.aod.pal, values = values(aod.monthly[[selected.mo.index]]))
     
     #Keep chicago outline rendered when year is changed 
     if (input$outline) {
@@ -733,7 +805,7 @@ server = function(input, output,session){
     }
     tmap_leaflet(road_emissions_map)
   })
-  
+
 }
 
 shinyApp(ui = ui, server=server)
