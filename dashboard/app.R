@@ -78,7 +78,7 @@ aod.breaks <- c(.10, .12, .14, .16, .18, .20, .22, .24, .26, .28) #Breaks for AO
 aod.pal <- colorNumeric(c("green", "yellow", "red", "purple"), aod.breaks, na.color = "transparent") #Palette for AOD
 #story board
 RegionID <-1 # give a region id
-BestStory <-4 # number of story board create
+BestStory <- 6 # number of story board create
 infTable<-as.data.frame(fread("data/Public_Health_Statistics-_Selected_public_health_indicators_by_Chicago_community_area.csv"))
 
 #method ----
@@ -505,23 +505,29 @@ server = function(input, output,session){
   HPR <- reactive({
     click<-input$HLM_shape_click
     if(is.null(click))
-      return("dal")
+       click$id <- "Hyde Park"
     #find my id by name
-    regionid<- which(toupper(infTable$`Community Area Name`)==click$id)
+    regionid<- which(toupper(infTable$`Community Area Name`)==toupper(click$id))
     
-    thisstory<-FindtheStory(RegionID = regionid,infTable = infTable,BestStory = 5)
-    for(i in 1:5){
-      print(CreateDescription(StoryItem = thisstory,i = i))}
+    thisstory<-FindtheStory(RegionID = regionid,infTable = infTable,BestStory = BestStory)
+    # thisstory$longstory <- NULL
+    for(i in 1:BestStory){
+      thisstory$longstory[i]<-CreateDescription(StoryItem = thisstory,i = i)}
     
     #search for the story
     #create story one by one 
-    return(click$id)
+    return(thisstory)
   })
   output$HSB <- renderUI({
     thisinut<-HPR()
-    thisui<-{box(
-      infoBox(thisinut,value = 5,subtitle = thisinut)
-    )}
+    thisui<-{
+      c(infoBox(thisinut$FieldName[1],value = thisinut$Value[1],subtitle =  thisinut$longstory[1]),
+        infoBox(thisinut$FieldName[2],value = thisinut$Value[2],subtitle =  thisinut$longstory[2]),
+          infoBox(thisinut$FieldName[3],value = thisinut$Value[3],subtitle =  thisinut$longstory[3]),
+          infoBox(thisinut$FieldName[4],value = thisinut$Value[4],subtitle =  thisinut$longstory[4]),
+          infoBox(thisinut$FieldName[5],value = thisinut$Value[5],subtitle =  thisinut$longstory[5]),
+          infoBox(thisinut$FieldName[6],value = thisinut$Value[6],subtitle =  thisinut$longstory[6]))
+     }
     thisui
   })
   # pm logic -----
