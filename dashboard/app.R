@@ -72,6 +72,10 @@ EPAPM2_5.pal <- colorNumeric(c("#D73027", "#FC8D59", "#D9EF8B", "#FEE08B", "#91C
 
 aod.yearly <- stack("Yearly_Aod_Stack_Reproj.tif") #Yearly AOD Data
 names(aod.yearly) <- c("2014", "2015", "2016", "2017") 
+aod.average <- raster("AOD_Average_4_Year_Reproj.tif")
+
+#Manually fix faulty value
+values(aod.average)[which(values(aod.average) == 0)] <- NA
 
 aod.monthly.names <- read.csv("aod.monthly.names.csv")
 aod.monthly <- stack("AOD_Monthly_Avgs.tif")
@@ -290,12 +294,12 @@ ui <- dashboardPage(
               box(
                 width = 4,
                 selectInput(inputId = "selecttime",
-                            label = "Yearly or Monthly Averages?",
-                            choices = c("Yearly",
+                            label = "Overall, Yearly, or Monthly Averages?",
+                            choices = c("Overall", "Yearly",
                                         "Monthly"))
               ),
               box(
-                width = 4,
+                width = 8,
                 conditionalPanel(condition = "input.selecttime == 'Yearly'", 
                 sliderInput("aodyear", "Select Year:",
                             min = strptime("2014/01/04","%Y/%m/%d"), 
@@ -303,11 +307,7 @@ ui <- dashboardPage(
                             value = strptime("2014/01/04","%Y/%m/%d"),
                             timeFormat = "%Y/%m",
                             step = as.difftime(365, units = "days"),
-                            animate = animationOptions(interval = 500)),
-                
-                checkboxInput(inputId = "outline",
-                              label = "Show city boundaries?",
-                              value = FALSE)
+                            animate = animationOptions(interval = 500))
                 ),
                 conditionalPanel(condition = "input.selecttime == 'Monthly'", 
                                  sliderInput("aodmonth", "Select Month:",
@@ -316,12 +316,8 @@ ui <- dashboardPage(
                                              value = strptime("2014/01/01","%Y/%m/%d"),
                                              timeFormat = "%Y/%m",
                                              step = as.difftime(30 ,units = "days"),
-                                             animate = animationOptions(interval = 500)),
+                                             animate = animationOptions(interval = 500))
                                  
-                                 checkboxInput(inputId = "outline",
-                                               label = "Show city boundaries?",
-                                               value = FALSE)
-                )
               ),
               conditionalPanel(condition = "input.selecttime == 'Yearly'",
                                box(
@@ -332,12 +328,14 @@ ui <- dashboardPage(
                                box(
                                  width = 8,
                                  leafletOutput("aodmapmonthly")
-                               )
-              )
+                               )),
+              conditionalPanel(condition = "input.selecttime == 'Overall'",
+                               box(
+                                 width = 8,
+                                 leafletOutput("aodmapoverall")
+                               ))
               
-      ),
-      
-      
+      )),
       
       
       #tabitem aot ----
@@ -631,17 +629,6 @@ server = function(input, output,session){
   # pm logic end-----
   #AOD start
   
-  #Check for outline checkbox and plot city outline if necessary
-  observe({
-    proxy <- leafletProxy("chicago")
-    
-    if (input$outline) {
-      proxy %>% addPolygons(data = ChicagoBoundary, color = "black", fill = FALSE)
-    }
-    else {
-      proxy %>% clearShapes()
-    }
-  })
   #Generate AOD map
   output$aodmapyearly <- renderLeaflet({
     in.timeyr <- input$aodyear
@@ -655,17 +642,16 @@ server = function(input, output,session){
     a <- leaflet() %>% 
       addTiles() %>% 
       addRasterImage(aod.yearly[[selected.yr]], opacity = 0.7, colors = yearly.aod.pal) %>% 
-      leaflet::addLegend(pal = yearly.aod.pal, values = values(aod.yearly[[selected.yr]]))
-    
-    #Keep chicago outline rendered when year is changed 
-    if (input$outline) {
-       a %>% 
-        addPolygons(data = ChicagoBoundary, color = "black", fill = FALSE)
-    }
-    else {
-      a
-    }
-    
+      leaflet::addLegend(pal = yearly.aod.pal, values = values(aod.yearly[[selected.yr]])) %>% 
+      addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.01, stroke = FALSE,
+                  highlight = highlightOptions(
+                    # weight = 5,
+                    color = "#666",
+                    # dashArray = "",
+                    fillOpacity = 0.3),
+                  # bringToFront = TRUE),
+                  label = labels)
+
   })
 
   output$aodmapmonthly <- renderLeaflet({
@@ -682,17 +668,33 @@ server = function(input, output,session){
     a <- leaflet() %>% 
       addTiles() %>% 
       addRasterImage(aod.monthly[[selected.mo.index]], opacity = 0.7, colors = monthly.aod.pal) %>% 
-      leaflet::addLegend(pal = monthly.aod.pal, values = values(aod.monthly[[selected.mo.index]]))
-    
-    #Keep chicago outline rendered when year is changed 
-    if (input$outline) {
-      a %>% addPolygons(data = ChicagoBoundary, color = "black", fill = FALSE)
-    }
-    else {
-      a 
-    }
+      leaflet::addLegend(pal = monthly.aod.pal, values = values(aod.monthly[[selected.mo.index]])) %>% 
+      addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.01, stroke = FALSE,
+                  highlight = highlightOptions(
+                    # weight = 5,
+                    color = "#666",
+                    # dashArray = "",
+                    fillOpacity = 0.3),
+                  # bringToFront = TRUE),
+                  label = labels)
     
   })
+  
+  output$aodmapoverall <- renderLeaflet({
+    a <- leaflet() %>% 
+      addTiles() %>% 
+      addRasterImage(aod.average, opacity = 0.7, colors = yearly.aod.pal) %>% 
+      leaflet::addLegend(pal = yearly.aod.pal, values = values(aod.average)) %>% 
+      addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.01, stroke = FALSE,
+                  highlight = highlightOptions(
+                    # weight = 5,
+                    color = "#666",
+                    # dashArray = "",
+                    fillOpacity = 0.3),
+                  # bringToFront = TRUE),
+                  label = labels)
+  })
+    
   
   #AOD End
   
