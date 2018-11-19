@@ -1,0 +1,31 @@
+Name of attributes,Group,Sub-group,Unit,Subtitle,Color,Color2,Icon,Editor,Remark,FieldName
+Traffic Volume,PollutionSource,AreaEmission,count per square foot,,,#A9A9A9,,,"These two are ""Road Emission""",
+Road Length,PollutionSource,AreaEmission,km per square foot,,,#A9A9A9,,,"These two are ""Road Emission""",
+Point Emission,PollutionSource,PointEmission,,,,#A9A9A9,,,Currently NOAA and Road/Point Emission/Demographics are gettting merged.,
+Birth Rate,Demography,Demography,%,&&,light-blue,#A9A9A9,glyphicon-user,Eric,N.A.,Birth Rate
+General Fertility Rate,Demography,Demography,%,&&,light-blue,#A9A9A9,glyphicon-user,Eric,N.A.,General Fertility Rate
+Low Birth Weight,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Low Birth Weight
+Prenatal Care Beginning in First Trimester,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Prenatal Care Beginning in First Trimester
+Preterm Births,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Preterm Births
+Teen Birth Rate,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Teen Birth Rate
+Assault (Homicide),Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Assault (Homicide)
+Breast cancer in females,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Breast cancer in females
+Cancer (All Sites),Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Cancer (All Sites)
+Colorectal Cancer,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Colorectal Cancer
+Diabetes-related,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Diabetes-related
+Firearm-related,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Firearm-related
+Infant Mortality Rate,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Infant Mortality Rate
+Lung Cancer,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Lung Cancer
+Prostate Cancer in Males,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Prostate Cancer in Males
+Stroke (Cerebrovascular Disease),Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Stroke (Cerebrovascular Disease)
+Childhood Blood Lead Level Screening,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Childhood Blood Lead Level Screening
+Childhood Lead Poisoning,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Childhood Lead Poisoning
+Gonorrhea in Females,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Gonorrhea in Females
+Gonorrhea in Males,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Gonorrhea in Males
+Tuberculosis,Health,Health,%,&&,orange,#A9A9A9,glyphicon-heart-empty,Eric,N.A.,Tuberculosis
+Below Poverty Level,Demography,Demography,%,&&,light-blue,#A9A9A9,glyphicon-user,Eric,N.A.,Below Poverty Level
+Crowded Housing,Demography,Demography,%,&&,light-blue,#A9A9A9,glyphicon-user,Eric,N.A.,Crowded Housing
+Dependency,Demography,Demography,%,&&,light-blue,#A9A9A9,glyphicon-user,Eric,N.A.,Dependency
+No High School Diploma,Demography,Demography,%,&&,light-blue,#A9A9A9,glyphicon-user,Eric,N.A.,No High School Diploma
+Per Capita Income,Demography,Demography,%,&&,light-blue,#A9A9A9,glyphicon-user,Eric,N.A.,Per Capita Income
+Unemployment,Demography,Demography,%,&&,light-blue,#A9A9A9,glyphicon-user,Eric,N.A.,Unemployment
