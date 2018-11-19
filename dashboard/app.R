@@ -95,7 +95,7 @@ yearly.aod.pal <- colorNumeric(c("green", "yellow", "red", "purple"), yearly.bre
 #story board
 RegionID <-1 # give a region id
 BestStory_n <- 6 # number of story board create
-infTable<-as.data.frame(fread("data/Public_Health_Statistics-_Selected_public_health_indicators_by_Chicago_community_area.csv"))
+infTable<-as.data.frame(fread("data/merged_datatable.csv"))
 MSB <-fread("data/Dynamic_Generate_InforBox.csv",fill = F)
 
 CPTC <- T #If compare two counties
@@ -106,7 +106,8 @@ CPTC.originstory <- ""
 
 #Jion the infTable
 JoinedSHP <- infTable
-JoinedSHP$CN <- toupper(infTable$`Community Area Name`)
+CN <- "CN"
+JoinedSHP$CN <- toupper(infTable[[CN]])
 ChicagoBoundary <- st_as_sf(merge(ChicagoBoundary,JoinedSHP,by.y = "CN", by.x = "community"))
 
 
@@ -595,11 +596,11 @@ server = function(input, output,session){
     
     
     
-    regionid<- which(toupper(infTable$`Community Area Name`)==toupper(click$id))
+    regionid<- which(toupper(infTable[[CN]])==toupper(click$id))
     
     thisstory<-FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix)
     # thisstory$longstory <- NULL
-    wholestory<-GenrateStoryBoards(thisstory,infTable$`Community Area Name`,ChicagoBoundary.NROW,MSB)
+    wholestory<-GenrateStoryBoards(thisstory,`Community Area Name`,ChicagoBoundary.NROW,MSB)
     # for(i in 1:BestStory){
     #   thisstory$longstory[i]<-CreateDescription(StoryItem = thisstory,i = i)}
     
