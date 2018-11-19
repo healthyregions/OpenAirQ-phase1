@@ -28,6 +28,8 @@ library(gstat) #kriging
 library(stringr) # extract date from the epa date
 
 
+
+source("src/AirQ_Storyboard.R")
 # https://ladsweb.modaps.eosdis.nasa.gov/search/
 #read aircasting
 #https://github.com/HabitatMap/AirCasting/blob/master/doc/api.md
@@ -62,6 +64,7 @@ datapath <-"data/"
 AotNodesNonspatial <- fread(paste0(datapath,"nodes.csv")) #readAotNodes
 AotNodes <- st_as_sf(AotNodesNonspatial, coords = c("lon", "lat"), crs = 4326, agr = "constant") #create points obj
 ChicagoBoundary <- readOGR("Chicago.shp")
+ChicagoBoundary.NROW<-NROW(ChicagoBoundary)
 AotNodes_vis <- AotNodes
 Drawned <-1 #the drawned and intersected selection area. this might be infeasible for a multilayer case
 
@@ -91,8 +94,9 @@ yearly.aod.pal <- colorNumeric(c("green", "yellow", "red", "purple"), yearly.bre
 
 #story board
 RegionID <-1 # give a region id
-BestStory <- 6 # number of story board create
+BestStory_n <- 6 # number of story board create
 infTable<-as.data.frame(fread("data/Public_Health_Statistics-_Selected_public_health_indicators_by_Chicago_community_area.csv"))
+MSB <-fread("data/Dynamic_Generate_InforBox.csv",fill = F)
 
 #method ----
 #ReadAotData ----
@@ -150,45 +154,6 @@ for(i in 1:ncol){
   rankmatrix[,i] <- ca
 }
 
-
-#search function
-#input：
-# -table1 
-# -table2(the rank) 
-# -story syntax
-
-
-FindtheStory <-function(RegionID,BestStory,infTable){
-  nl<-names(infTable)
-  rankidtable <- matrix(nrow = 4,ncol =ncol,data = 1:4*ncol)
-  rankidtable[1,]<-c(1:ncol)
-  rankidtable[2,]<-as.matrix(rankmatrix[RegionID,]) # rank
-  rankidtable[3,]<-abs(as.matrix(rankmatrix[RegionID,])-nrow/2) #important level
-  rankidtable[4,]<-(as.matrix(rankmatrix[RegionID,]/nrow)) #precent
-  
-  #rank the most important issue in this region
-  va<-(rankidtable[,order(-rankidtable[3,])])
-  colname <- c("FieldName","Precentage","Value","Rank")
-  result <- data.frame(matrix(ncol = 4, nrow = 0))
-  colnames(result) <- colname
-  
-  for(si in 1: BestStory){
-    thisFiledID <- va[1,si]
-    result<-rbind(result,data.table(FieldName = nl[thisFiledID],Precentage = va[4,si], Rank = va[2,si],Value=infTable[RegionID,thisFiledID] ))
-  }
-  
-  return(result)
-}
-
-CreateDescription <- function(StoryItem,i){
-  #create a desciption given one story
-  #The field name is very high/low, which is the ** in chicago
-  return(paste0("The ",StoryItem$FieldName[i]," is very ",
-                ifelse(StoryItem$Precentage[i]>0.5,"high","low"),
-                ", which is ",StoryItem$Value[i]," (",as.integer(nrow - StoryItem$Rank[i]),"th) in Chicago"))}
-
-
-
 CreateINPresult<-function(){
   
   FileNameList <- list.files(paste0(datapath,"EPA/")) #FileName List in EPA data set
@@ -228,14 +193,30 @@ ui <- dashboardPage(
     )
   ),
   dashboardBody(
+    tags$head(tags$style(
+      HTML('
+           .info-box {height: 45px;  margin : 0in; float: left; border: 0px;} 
+           .info-box-icon {height: 100%; line-height: 100%; padding-top: 20px } 
+           #homerow * {background-color:rgba(255,0,0,0); border-top:0px}
+           #homerow *  {padding-left:0px}
+           .info-box-content {padding: 0px;}
+           .leaflet-control-container {border-top:2px;}
+           #inf {padding: 2px; }
+           #inf > * {padding: 4px; }
+           #inf box-body {padding: 2px; width:100%;}
+           
+           '))),
     tabItems(
       #First tab content ----
       tabItem(tabName = "Home",
-              fluidRow(
-                box(width = 7,
-                  uiOutput("HSB") #Homepae Stroy Board
+              fixedRow(id = "homerow",
+               column(id = "inf", width = 7,
+                  # uiOutput("HSB") #Homepae Stroy Board
+                  infoBoxOutput("inf1",width = 12),
+                  infoBoxOutput("inf2",width = 12),
+                  infoBoxOutput("inf3",width = 12)
                 ),
-                box(
+                column(
                   width = 5,
                   leafletOutput("HLM",height = 700) #Homepage Leaflet Map
                 )
@@ -544,27 +525,39 @@ server = function(input, output,session){
     #find my id by name
     regionid<- which(toupper(infTable$`Community Area Name`)==toupper(click$id))
     
-    thisstory<-FindtheStory(RegionID = regionid,infTable = infTable,BestStory = BestStory)
+    thisstory<-FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix)
     # thisstory$longstory <- NULL
-    for(i in 1:BestStory){
-      thisstory$longstory[i]<-CreateDescription(StoryItem = thisstory,i = i)}
+    wholestory<-GenrateStoryBoards(thisstory,infTable$`Community Area Name`,ChicagoBoundary.NROW,MSB)
+    # for(i in 1:BestStory){
+    #   thisstory$longstory[i]<-CreateDescription(StoryItem = thisstory,i = i)}
     
     #search for the story
     #create story one by one 
-    return(thisstory)
+    return(wholestory)
   })
-  output$HSB <- renderUI({
+  output$inf1 <- renderInfoBox({
     thisinut<-HPR()
-    thisui<-{
-      c(infoBox(thisinut$FieldName[1],value = thisinut$Value[1],subtitle =  thisinut$longstory[1]),
-        infoBox(thisinut$FieldName[2],value = thisinut$Value[2],subtitle =  thisinut$longstory[2]),
-          infoBox(thisinut$FieldName[3],value = thisinut$Value[3],subtitle =  thisinut$longstory[3]),
-          infoBox(thisinut$FieldName[4],value = thisinut$Value[4],subtitle =  thisinut$longstory[4]),
-          infoBox(thisinut$FieldName[5],value = thisinut$Value[5],subtitle =  thisinut$longstory[5]),
-          infoBox(thisinut$FieldName[6],value = thisinut$Value[6],subtitle =  thisinut$longstory[6]))
-     }
-    thisui
+    infoBox(thisinut$FieldName[1],value = thisinut$Value[1],subtitle =  thisinut$Subtitle[1],icon = AirQGetIcon(thisinut$Icon[1]),color = thisinut$Color[1],fill = T)
   })
+  output$inf2 <- renderInfoBox({
+    thisinut<-HPR()
+    infoBox(thisinut$FieldName[2],value = thisinut$Value[2],subtitle =  thisinut$Subtitle[2],icon = AirQGetIcon(thisinut$Icon[2]),color = thisinut$Color[2],fill = T)
+  })
+  output$inf3 <- renderInfoBox({
+    thisinut<-HPR()
+    infoBox(thisinut$FieldName[3],value = thisinut$Value[3],subtitle =  thisinut$Subtitle[3],icon = AirQGetIcon(thisinut$Icon[3]),color = thisinut$Color[3],fill = T)
+  })
+  
+  # output$HSB <- renderUI({
+  #   thisinut<-HPR()
+  #   infoBox(thisinut$FieldName[1],value = thisinut$Value[1],subtitle =  thisinut$Subtitle[1],icon = AirQGetIcon(thisinut$Icon[1]),color = thisinut$Color[1],fill = T),
+  #       infoBox(thisinut$FieldName[2],value = thisinut$Value[2],subtitle =  thisinut$Subtitle[2],icon = AirQGetIcon(thisinut$Icon[2]),color = thisinut$Color[2],fill = T),
+  #         infoBox(thisinut$FieldName[3],value = thisinut$Value[3],subtitle =  thisinut$Subtitle[3],icon = AirQGetIcon(thisinut$Icon[3]),color = thisinut$Color[3],fill = T),
+  #         infoBox(thisinut$FieldName[4],value = thisinut$Value[4],subtitle =  thisinut$Subtitle[4],icon = AirQGetIcon(thisinut$Icon[4]),color = thisinut$Color[4],fill = T),
+  #         infoBox(thisinut$FieldName[5],value = thisinut$Value[5],subtitle =  thisinut$Subtitle[5],icon = AirQGetIcon(thisinut$Icon[5]),color = thisinut$Color[5],fill = T),
+  #         infoBox(thisinut$FieldName[6],value = thisinut$Value[6],subtitle =  thisinut$Subtitle[6],icon = AirQGetIcon(thisinut$Icon[6]),color = thisinut$Color[6],fill = T)
+  #   
+  # })
   # pm logic -----
   # here is a trial of the uioutput
   
