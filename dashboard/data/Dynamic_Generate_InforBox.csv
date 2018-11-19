@@ -29,3 +29,6 @@ Dependency,Demography,Demography,%,&&,light-blue,#A9A9A9,glyphicon-user,Eric,N.A
 No High School Diploma,Demography,Demography,%,&&,light-blue,#A9A9A9,glyphicon-user,Eric,N.A.,No High School Diploma
 Per Capita Income,Demography,Demography,%,&&,light-blue,#A9A9A9,glyphicon-user,Eric,N.A.,Per Capita Income
 Unemployment,Demography,Demography,%,&&,light-blue,#A9A9A9,glyphicon-user,Eric,N.A.,Unemployment
+Hardship Index,Health,Health,%,&&,orange,#A9A9A10,glyphicon-heart-empty,Eric,N.A.,HARDS
+Aod (4-year avg.),Health,Health,%,&&,orange,#A9A9A11,glyphicon-heart-empty,Eric,N.A.,aod
+PM 2.5 (2017 EPA),Health,Health,%,&&,orange,#A9A9A12,glyphicon-heart-empty,Eric,N.A.,epa
