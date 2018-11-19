@@ -98,6 +98,12 @@ BestStory_n <- 6 # number of story board create
 infTable<-as.data.frame(fread("data/Public_Health_Statistics-_Selected_public_health_indicators_by_Chicago_community_area.csv"))
 MSB <-fread("data/Dynamic_Generate_InforBox.csv",fill = F)
 
+CPTC <- T #If compare two counties
+CPTC.name <-""
+CPTC.namecompared <-""
+CPTC.originstory <- ""
+
+
 #Jion the infTable
 JoinedSHP <- infTable
 JoinedSHP$CN <- toupper(infTable$`Community Area Name`)
@@ -212,17 +218,28 @@ ui <- dashboardPage(
            #inf {padding: 2px; }
            #inf > * {padding: 4px; }
            #inf box-body {padding: 2px; width:100%;}
-           
+           #sinf > * {padding: 4px}
+           #sinf  {padding: 0px}
+           #CN {padding: 0px; background-color: rgba(255,0,0,0); text-align: center; 
+                border-color: rgba(255,0,0,0); margin-bottom:0px}
            '))),
     tabItems(
       #First tab content ----
       tabItem(tabName = "Home",
+              checkboxInput("CPTCB",label = "Community Name",value = T),
+              
               fixedRow(id = "homerow",
                column(id = "inf", width = 7,
                   # uiOutput("HSB") #Homepae Stroy Board
-                  infoBoxOutput("inf1",width = 12),
-                  infoBoxOutput("inf2",width = 12),
-                  infoBoxOutput("inf3",width = 12)
+                  
+                                   infoBoxOutput("inf1",width = 12),
+                                   infoBoxOutput("inf2",width = 12),
+                                   infoBoxOutput("inf3",width = 12),
+                                   verbatimTextOutput("CN"),
+                  conditionalPanel(id = "sinf", condition = "input.CPTCB", 
+                                   infoBoxOutput("inf4",width = 12),
+                                   infoBoxOutput("inf5",width = 12),
+                                   infoBoxOutput("inf6",width = 12))
                 ),
                 column(
                   width = 5,
@@ -508,6 +525,14 @@ server = function(input, output,session){
   # aot logic end ----
 
 # Home Page logic ---------------------------------------------------------
+  
+  observe({
+    # print(input$CPTCB)
+    CPTC <<- input$CPTCB
+    output$CN <-  renderText({ ifelse(CPTC,
+                                      paste0("⬆️",CPTC.name,"  V.S.  ",CPTC.namecompared,"⬇️"),
+                                      CPTC.name)})
+  })
   output$HLM <- renderLeaflet({
     p<-leaflet() %>% 
       addTiles(urlTemplate = BaseMapStyle) %>% 
@@ -551,7 +576,25 @@ server = function(input, output,session){
     click<-input$HLM_shape_click
     if(is.null(click))
        click$id <- "Hyde Park"
+    
+    # if(CPTC){
+    #   CPTC.name <<- click$id
+    #   output$CN <-  renderText({ CPTC.name  })
+    # }
     #find my id by name
+    if(!CPTC|CPTC.originstory==""){
+      CPTC.name <<- click$id
+    }
+    CPTC.namecompared <<- click$id
+    output$CN <-  renderText({ ifelse(CPTC,
+                                      paste0("⬆️",CPTC.name,"  V.S.  ",CPTC.namecompared,"⬇️"),
+                                      CPTC.name)})
+    
+     
+    
+    
+    
+    
     regionid<- which(toupper(infTable$`Community Area Name`)==toupper(click$id))
     
     thisstory<-FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix)
@@ -565,16 +608,54 @@ server = function(input, output,session){
     return(wholestory)
   })
   output$inf1 <- renderInfoBox({
-    thisinut<-HPR()
-    infoBox(thisinut$FieldName[1],value = thisinut$Value[1],subtitle =  thisinut$Subtitle[1],icon = AirQGetIcon(thisinut$Icon[1]),color = thisinut$Color[1],fill = T)
+    CreateInfbox(1)
   })
   output$inf2 <- renderInfoBox({
-    thisinut<-HPR()
-    infoBox(thisinut$FieldName[2],value = thisinut$Value[2],subtitle =  thisinut$Subtitle[2],icon = AirQGetIcon(thisinut$Icon[2]),color = thisinut$Color[2],fill = T)
+    CreateInfbox(2)
   })
   output$inf3 <- renderInfoBox({
+    CreateInfbox(3)
+  })
+  
+  CreateInfbox <- function(id){
+    second<-ifelse(is.null(input$CPTC.checkbox),F,input$CPTC.checkbox)
     thisinut<-HPR()
-    infoBox(thisinut$FieldName[3],value = thisinut$Value[3],subtitle =  thisinut$Subtitle[3],icon = AirQGetIcon(thisinut$Icon[3]),color = thisinut$Color[3],fill = T)
+    if(!CPTC|CPTC.originstory==""){
+      CPTC.originstory<<-thisinut
+    }
+    
+    if(id>3){
+      id <- id-3
+      INFB<-infoBox(thisinut$FieldName[id],
+                    value = thisinut$Value[id],
+                    subtitle =  thisinut$Subtitle[id],
+                    icon = AirQGetIcon(thisinut$Icon[id]),
+                    color = thisinut$Color[id],
+                    fill = T,
+                    width = 12)
+    }else{
+      INFB<-infoBox(CPTC.originstory$FieldName[id],
+              value = CPTC.originstory$Value[id],
+              subtitle =  CPTC.originstory$Subtitle[id],
+              icon = AirQGetIcon(CPTC.originstory$Icon[id]),
+              color = CPTC.originstory$Color[id],
+              fill = T,
+              width = 12)
+      
+    }
+    return(INFB)
+
+  }
+  output$inf4 <- renderInfoBox({
+    CreateInfbox(4)
+  })
+  
+  output$inf5 <- renderInfoBox({
+    CreateInfbox(5)
+  })
+  
+  output$inf6 <- renderInfoBox({
+    CreateInfbox(6)
   })
   
   # pm logic -----
