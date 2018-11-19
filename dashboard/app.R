@@ -98,6 +98,12 @@ BestStory_n <- 6 # number of story board create
 infTable<-as.data.frame(fread("data/Public_Health_Statistics-_Selected_public_health_indicators_by_Chicago_community_area.csv"))
 MSB <-fread("data/Dynamic_Generate_InforBox.csv",fill = F)
 
+#Jion the infTable
+JoinedSHP <- infTable
+JoinedSHP$CN <- toupper(infTable$`Community Area Name`)
+ChicagoBoundary <- st_as_sf(merge(ChicagoBoundary,JoinedSHP,by.y = "CN", by.x = "community"))
+
+
 #method ----
 #ReadAotData ----
 ReadAotData<-function(ExtraDate,ThisWorkPath)
@@ -197,9 +203,11 @@ ui <- dashboardPage(
       HTML('
            .info-box {height: 45px;  margin : 0in; float: left; border: 0px;} 
            .info-box-icon {height: 100%; line-height: 100%; padding-top: 20px } 
-           #homerow * {background-color:rgba(255,0,0,0); border-top:0px}
+           #inf * {background-color:rgba(255,0,0,0); border-top:0px}
            #homerow *  {padding-left:0px}
            .info-box-content {padding: 0px;}
+           .info-box-content > p {padding :1px;}
+           .info-box-number {font-size: 26px; padding-top:2px; padding-bottom:1px}
            .leaflet-control-container {border-top:2px;}
            #inf {padding: 2px; }
            #inf > * {padding: 4px; }
@@ -501,22 +509,43 @@ server = function(input, output,session){
 
 # Home Page logic ---------------------------------------------------------
   output$HLM <- renderLeaflet({
-    leaflet() %>% 
+    p<-leaflet() %>% 
       addTiles(urlTemplate = BaseMapStyle) %>% 
-      flyTo(lng = -87.6298, lat = 41.8781, 10) %>% 
-      addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.1, stroke = FALSE,
-                  highlight = highlightOptions(
-                    color = "#666",
-                    fillOpacity = 0.7,
-                    bringToFront = TRUE),
-                  label = labels,group = 'pg',layerId = ~community)
+      flyTo(lng = -87.6298, lat = 41.8781, 10) 
+    # APPENDMAP()
+    p
+  
   })
+  APPENDMAP <-function(){
+    thispal <-AirQ_PAL(domain = ChicagoBoundary$Unemployment)
+    leafletProxy('HLM')%>% 
+      addPolygons(data = ChicagoBoundary,
+                  color = "#008080",
+                  opacity = 0.4,
+                  fillColor = thispal(ChicagoBoundary$Unemployment),
+                  weight = 1,
+                  smoothFactor = 0.9,
+                  fillOpacity  = 0.2, stroke = T,
+                  highlight = highlightOptions(
+                    fillColor = "#FF8C00",
+                    fillOpacity = 1,
+                    bringToFront = TRUE,
+                    sendToBack = T),
+                  label = labels,group = 'pg',layerId = ~community)
+  }
   observe({
     click<-input$HLM_shape_click
     if(is.null(click))
       return()
     # ChicagoBoundary
-    
+  })
+  observe({
+    zoom<-input$HLM_zoom
+    if(!is.null(zoom)){
+      if(zoom >6)
+      APPENDMAP()
+    }
+      
   })
   HPR <- reactive({
     click<-input$HLM_shape_click
@@ -548,16 +577,6 @@ server = function(input, output,session){
     infoBox(thisinut$FieldName[3],value = thisinut$Value[3],subtitle =  thisinut$Subtitle[3],icon = AirQGetIcon(thisinut$Icon[3]),color = thisinut$Color[3],fill = T)
   })
   
-  # output$HSB <- renderUI({
-  #   thisinut<-HPR()
-  #   infoBox(thisinut$FieldName[1],value = thisinut$Value[1],subtitle =  thisinut$Subtitle[1],icon = AirQGetIcon(thisinut$Icon[1]),color = thisinut$Color[1],fill = T),
-  #       infoBox(thisinut$FieldName[2],value = thisinut$Value[2],subtitle =  thisinut$Subtitle[2],icon = AirQGetIcon(thisinut$Icon[2]),color = thisinut$Color[2],fill = T),
-  #         infoBox(thisinut$FieldName[3],value = thisinut$Value[3],subtitle =  thisinut$Subtitle[3],icon = AirQGetIcon(thisinut$Icon[3]),color = thisinut$Color[3],fill = T),
-  #         infoBox(thisinut$FieldName[4],value = thisinut$Value[4],subtitle =  thisinut$Subtitle[4],icon = AirQGetIcon(thisinut$Icon[4]),color = thisinut$Color[4],fill = T),
-  #         infoBox(thisinut$FieldName[5],value = thisinut$Value[5],subtitle =  thisinut$Subtitle[5],icon = AirQGetIcon(thisinut$Icon[5]),color = thisinut$Color[5],fill = T),
-  #         infoBox(thisinut$FieldName[6],value = thisinut$Value[6],subtitle =  thisinut$Subtitle[6],icon = AirQGetIcon(thisinut$Icon[6]),color = thisinut$Color[6],fill = T)
-  #   
-  # })
   # pm logic -----
   # here is a trial of the uioutput
   
