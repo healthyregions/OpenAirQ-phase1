@@ -39,7 +39,7 @@ source("src/AirQ_Storyboard.R")
 #content(tar)[[111]]$value
 
 
-health <- st_read("HealthIndicators.shp")
+health <- st_read("data/HealthIndicators.shp")
 
 
 #css
@@ -65,7 +65,7 @@ datapath <-"data/"
 #initilization ----
 AotNodesNonspatial <- fread(paste0(datapath,"nodes.csv")) #readAotNodes
 AotNodes <- st_as_sf(AotNodesNonspatial, coords = c("lon", "lat"), crs = 4326, agr = "constant") #create points obj
-ChicagoBoundary <- readOGR("Chicago.shp")
+ChicagoBoundary <- readOGR("./data/Chicago.shp")
 ChicagoBoundary.NROW<-NROW(ChicagoBoundary)
 AotNodes_vis <- AotNodes
 Drawned <-1 #the drawned and intersected selection area. this might be infeasible for a multilayer case
@@ -75,15 +75,15 @@ EPAPM2_5.breaks <- c(1:10,12,15,35) #Breaks for EPAPM2_5
 EPAPM2_5.pal <- colorNumeric(c("#D73027", "#FC8D59", "#D9EF8B", "#FEE08B", "#91CF60", "#1A9850"), 
                              EPAPM2_5.breaks, na.color = "transparent",reverse = T) #Palette for EPAPM2_5
 
-aod.yearly <- stack("Yearly_Aod_Stack_Reproj.tif") #Yearly AOD Data
+aod.yearly <- stack("./data/Yearly_Aod_Stack_Reproj.tif") #Yearly AOD Data
 names(aod.yearly) <- c("2014", "2015", "2016", "2017") 
-aod.average <- raster("AOD_Average_4_Year_Reproj.tif")
+aod.average <- raster("./data/AOD_Average_4_Year_Reproj.tif")
 
 #Manually fix faulty value
 values(aod.average)[which(values(aod.average) == 0)] <- NA
 
-aod.monthly.names <- read.csv("aod.monthly.names.csv")
-aod.monthly <- stack("AOD_Monthly_Avgs.tif")
+aod.monthly.names <- read.csv("./data/aod.monthly.names.csv")
+aod.monthly <- stack("./data/AOD_Monthly_Avgs.tif")
 
 names(aod.monthly) <- aod.monthly.names$x
 
@@ -819,10 +819,10 @@ server = function(input, output,session){
   
   output$working_map <- renderLeaflet({
     
-    Chicagoshp <- readOGR(".","Chicago")
-    PointsShp<- readOGR(".", "NOAASensorsShp")
-    Data = read.csv('NOAA_master_yearly.csv')
-    DataMonthly = read.csv('NOAA_master_monthly_final.csv')
+    Chicagoshp <- readOGR("./data","Chicago")
+    PointsShp<- readOGR("./data", "NOAASensorsShp")
+    Data = read.csv('./data/NOAA_master_yearly.csv')
+    DataMonthly = read.csv('./data/NOAA_master_monthly_final.csv')
     Merged = merge(PointsShp, Data, by.x='STATION', by.y='STATION')
     MergedMonthly = merge(PointsShp, DataMonthly, by.x='STATION', by.y='STATION' )
     title = paste(input$type,input$year, sep=" ")
@@ -901,8 +901,8 @@ server = function(input, output,session){
   })
   # road_emissions output ----
   output$road_emissions_map <- renderLeaflet({
-    trffc_vol <- readOGR(".", "Community_Areas_with_Traffic_Volumes")
-    road_length <- readOGR(".", "Chi_Road_Lengths")
+    trffc_vol <- readOGR("./data", "Community_Areas_with_Traffic_Volumes")
+    road_length <- readOGR("./data", "Chi_Road_Lengths")
     
     trffc_vol@data$Trffc_V_area <- 
       trffc_vol@data$Trffc_V / trffc_vol@data$shape_r
