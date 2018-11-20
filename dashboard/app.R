@@ -39,6 +39,8 @@ source("src/AirQ_Storyboard.R")
 #content(tar)[[111]]$value
 
 
+health <- st_read("HealthIndicators.shp")
+
 
 #css
 SelectFillColor <- "#1A1A1A"
@@ -202,7 +204,8 @@ ui <- dashboardPage(
                          menuSubItem("Weather", "noaa"),
                          menuSubItem("Traffic", "road_emissions")),
                 menuItem("AoT", tabName = "aot"),
-                menuItem("Demographic Data", tabName = "demographic")
+                menuItem("Demographic Data", tabName = "demographic"),
+                menuItem("Public Health", tabName = "health")
     )
   ),
   dashboardBody(
@@ -384,6 +387,28 @@ ui <- dashboardPage(
                 )
               )
       ),
+      #tabitem public health
+      tabItem(tabName = "health",
+              fluidRow(
+                box(
+                  width = 4,
+                  selectInput(inputId = "health_type",
+                              label = "Choose Public Health Data",
+                              choices = c("Birth Rate",
+                                          "Low Birth Rate",
+                                          "Teen Birth Rate",
+                                          "Lung Cancer",
+                                          "Cancer",
+                                          "Tuberculosis"
+                                          ))
+                ),
+                box(
+                  width = 8,
+                  leafletOutput("health_map")
+                )
+              )
+      ),
+        
       #tabitem road_emissions ----
       tabItem(tabName = "road_emissions",
               fluidRow(
@@ -846,9 +871,34 @@ server = function(input, output,session){
       tm_borders() +
       tm_layout(title = "Demographic Data by Community Area 2008-2012", title.position = c("right","bottom"))
     tmap_leaflet(demographic_map)
-  }
-  
-  )
+  })
+  #Chicago health map
+  output$health_map <- renderLeaflet({
+    health_data <- st_read("HealthIndicators.shp")
+    key <- c("Birth Rate",
+             "Low Birth Rate",
+             "Teen Birth Rate",
+             "Lung Cancer",
+             "Cancer",
+             "Tuberculosis"
+             )
+    val = c("BirthRate",
+            "LowBi_ight",
+            "TeenB_Rate",
+            "LungCancer",
+            "Cance_ites",
+            "Tuber_osis")
+    type.col1 = val[which(key==input$health_type)]
+    health_map <- 
+      tm_shape(health_data) +
+      tm_fill(col = type.col1,
+              style = "quantile",
+              title = input$health_type
+      )  +
+      tm_borders() +
+      tm_layout(title = "Chicago Public Health", title.position = c("right","bottom"))
+    tmap_leaflet(health_map)
+  })
   # road_emissions output ----
   output$road_emissions_map <- renderLeaflet({
     trffc_vol <- readOGR(".", "Community_Areas_with_Traffic_Volumes")
@@ -905,3 +955,4 @@ server = function(input, output,session){
 }
 
 shinyApp(ui = ui, server=server)
+
