@@ -39,8 +39,6 @@ source("src/AirQ_Storyboard.R")
 #content(tar)[[111]]$value
 
 
-health <- st_read("data/HealthIndicators.shp")
-
 
 #css
 SelectFillColor <- "#1A1A1A"
@@ -65,7 +63,7 @@ datapath <-"data/"
 #initilization ----
 AotNodesNonspatial <- fread(paste0(datapath,"nodes.csv")) #readAotNodes
 AotNodes <- st_as_sf(AotNodesNonspatial, coords = c("lon", "lat"), crs = 4326, agr = "constant") #create points obj
-ChicagoBoundary <- readOGR("./data/Chicago.shp")
+ChicagoBoundary <- readOGR("Chicago.shp")
 ChicagoBoundary.NROW<-NROW(ChicagoBoundary)
 AotNodes_vis <- AotNodes
 Drawned <-1 #the drawned and intersected selection area. this might be infeasible for a multilayer case
@@ -75,15 +73,15 @@ EPAPM2_5.breaks <- c(1:10,12,15,35) #Breaks for EPAPM2_5
 EPAPM2_5.pal <- colorNumeric(c("#D73027", "#FC8D59", "#D9EF8B", "#FEE08B", "#91CF60", "#1A9850"), 
                              EPAPM2_5.breaks, na.color = "transparent",reverse = T) #Palette for EPAPM2_5
 
-aod.yearly <- stack("./data/Yearly_Aod_Stack_Reproj.tif") #Yearly AOD Data
+aod.yearly <- stack("Yearly_Aod_Stack_Reproj.tif") #Yearly AOD Data
 names(aod.yearly) <- c("2014", "2015", "2016", "2017") 
-aod.average <- raster("./data/AOD_Average_4_Year_Reproj.tif")
+aod.average <- raster("AOD_Average_4_Year_Reproj.tif")
 
 #Manually fix faulty value
 values(aod.average)[which(values(aod.average) == 0)] <- NA
 
-aod.monthly.names <- read.csv("./data/aod.monthly.names.csv")
-aod.monthly <- stack("./data/AOD_Monthly_Avgs.tif")
+aod.monthly.names <- read.csv("aod.monthly.names.csv")
+aod.monthly <- stack("AOD_Monthly_Avgs.tif")
 
 names(aod.monthly) <- aod.monthly.names$x
 
@@ -162,10 +160,13 @@ ReadAotData<-function(ExtraDate,ThisWorkPath)
 # CreateTheStoryBoard -----------------------------------------------------
 
 rankmatrix <- as.data.frame(infTable)
+ninfTable <- sapply(infTable, as.numeric)
 ncol<-NCOL(infTable)
 nrow<-NROW(infTable)
 for(i in 1:ncol){
-  ca <- rank(as.data.frame(infTable[,i]))
+  ca <- rank(as.data.frame(ninfTable[,i]))
+  # if(length())
+  ca[which(ninfTable[,i] %in% NA)] <- NA
   rankmatrix[,i] <- ca
 }
 
@@ -204,8 +205,7 @@ ui <- dashboardPage(
                          menuSubItem("Weather", "noaa"),
                          menuSubItem("Traffic", "road_emissions")),
                 menuItem("AoT", tabName = "aot"),
-                menuItem("Demographic Data", tabName = "demographic"),
-                menuItem("Public Health", tabName = "health")
+                menuItem("Demographic Data", tabName = "demographic")
     )
   ),
   dashboardBody(
@@ -230,7 +230,7 @@ ui <- dashboardPage(
     tabItems(
       #First tab content ----
       tabItem(tabName = "Home",
-              checkboxInput("CPTCB",label = "Community Name",value = T),
+              checkboxInput("CPTCB",label = "cross community comparison",value = T),
               
               fixedRow(id = "homerow",
                column(id = "inf", width = 7,
@@ -387,28 +387,6 @@ ui <- dashboardPage(
                 )
               )
       ),
-      #tabitem public health
-      tabItem(tabName = "health",
-              fluidRow(
-                box(
-                  width = 4,
-                  selectInput(inputId = "health_type",
-                              label = "Choose Public Health Data",
-                              choices = c("Birth Rate",
-                                          "Low Birth Rate",
-                                          "Teen Birth Rate",
-                                          "Lung Cancer",
-                                          "Cancer",
-                                          "Tuberculosis"
-                                          ))
-                ),
-                box(
-                  width = 8,
-                  leafletOutput("health_map")
-                )
-              )
-      ),
-        
       #tabitem road_emissions ----
       tabItem(tabName = "road_emissions",
               fluidRow(
@@ -819,10 +797,10 @@ server = function(input, output,session){
   
   output$working_map <- renderLeaflet({
     
-    Chicagoshp <- readOGR("./data","Chicago")
-    PointsShp<- readOGR("./data", "NOAASensorsShp")
-    Data = read.csv('./data/NOAA_master_yearly.csv')
-    DataMonthly = read.csv('./data/NOAA_master_monthly_final.csv')
+    Chicagoshp <- readOGR(".","Chicago")
+    PointsShp<- readOGR(".", "NOAASensorsShp")
+    Data = read.csv('NOAA_master_yearly.csv')
+    DataMonthly = read.csv('NOAA_master_monthly_final.csv')
     Merged = merge(PointsShp, Data, by.x='STATION', by.y='STATION')
     MergedMonthly = merge(PointsShp, DataMonthly, by.x='STATION', by.y='STATION' )
     title = paste(input$type,input$year, sep=" ")
@@ -848,7 +826,7 @@ server = function(input, output,session){
     tmap_leaflet(working_map)})
   #ChicagoDemographicMap -----------
   output$demographic_map <- renderLeaflet({
-    demographic_data <- st_read("data/chicago_demographic.shp")
+    demographic_data <- st_read("chicago_demographic.shp")
     key <- c("Percent of Crowded Housing",
              "Percent of Households Below Poverty",
              "Percent Unemployed",
@@ -871,38 +849,13 @@ server = function(input, output,session){
       tm_borders() +
       tm_layout(title = "Demographic Data by Community Area 2008-2012", title.position = c("right","bottom"))
     tmap_leaflet(demographic_map)
-  })
-  #Chicago health map
-  output$health_map <- renderLeaflet({
-    health_data <- st_read("data/HealthIndicators.shp")
-    key <- c("Birth Rate",
-             "Low Birth Rate",
-             "Teen Birth Rate",
-             "Lung Cancer",
-             "Cancer",
-             "Tuberculosis"
-             )
-    val = c("BirthRate",
-            "LowBi_ight",
-            "TeenB_Rate",
-            "LungCancer",
-            "Cance_ites",
-            "Tuber_osis")
-    type.col1 = val[which(key==input$health_type)]
-    health_map <- 
-      tm_shape(health_data) +
-      tm_fill(col = type.col1,
-              style = "quantile",
-              title = input$health_type
-      )  +
-      tm_borders() +
-      tm_layout(title = "Chicago Public Health", title.position = c("right","bottom"))
-    tmap_leaflet(health_map)
-  })
+  }
+  
+  )
   # road_emissions output ----
   output$road_emissions_map <- renderLeaflet({
-    trffc_vol <- readOGR("./data", "Community_Areas_with_Traffic_Volumes")
-    road_length <- readOGR("./data", "Chi_Road_Lengths")
+    trffc_vol <- readOGR(".", "Community_Areas_with_Traffic_Volumes")
+    road_length <- readOGR(".", "Chi_Road_Lengths")
     
     trffc_vol@data$Trffc_V_area <- 
       trffc_vol@data$Trffc_V / trffc_vol@data$shape_r
@@ -955,4 +908,3 @@ server = function(input, output,session){
 }
 
 shinyApp(ui = ui, server=server)
-
