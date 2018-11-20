@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+    <title>NOAASensorsLatLon</title>
+    <layers>
+        <layer>
+            <datasource>
+                <type>ESRI Shapefile</type>
+                <path>NOAASensorsShp.shp</path>
+            </datasource>
+            <layername>NOAASensorsLatLon</layername>
+            <title/>
+            <variable_order>
+                <time_ids>
+                    <id>time 0</id>
+                </time_ids>
+                <var>field_1</var>
+                <var>STATION</var>
+                <var>lat</var>
+                <var>long</var>
+            </variable_order>
+            <custom_classifications/>
+            <weights_entries/>
+            <default_vars/>
+        </layer>
+    </layers>
+</project>
