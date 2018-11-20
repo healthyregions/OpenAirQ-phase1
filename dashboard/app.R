@@ -848,7 +848,7 @@ server = function(input, output,session){
     tmap_leaflet(working_map)})
   #ChicagoDemographicMap -----------
   output$demographic_map <- renderLeaflet({
-    demographic_data <- st_read("chicago_demographic.shp")
+    demographic_data <- st_read("data/chicago_demographic.shp")
     key <- c("Percent of Crowded Housing",
              "Percent of Households Below Poverty",
              "Percent Unemployed",
@@ -874,7 +874,7 @@ server = function(input, output,session){
   })
   #Chicago health map
   output$health_map <- renderLeaflet({
-    health_data <- st_read("HealthIndicators.shp")
+    health_data <- st_read("data/HealthIndicators.shp")
     key <- c("Birth Rate",
              "Low Birth Rate",
              "Teen Birth Rate",
