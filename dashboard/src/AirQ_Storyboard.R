@@ -26,12 +26,13 @@ GenrateStoryBoards <-function(Beststory,CommunityName,totalregion,MSB){
     
     if(length(FieldIndex)!=0){
       FieldIndex <- FieldIndex[1] #In case we have more than one result
-
       
-      result<-rbind(result,data.table(
+    Thisprect <- ifelse(MSB$isPositive[FieldIndex]=="T",Beststory$Precentage[i],1-Beststory$Precentage[i]) 
+    Thiscolor <- ifelse(Thisprect>0.66,"lime",ifelse(Thisprect>0.33,"olive","orange"))
+    result<-rbind(result,data.table(
         StoryboardName = MSB$`Name of attributes`[FieldIndex], 
         Precentage = Beststory$Precentage[i], Value = Beststory$Value[i], Rank = Beststory$Rank[i], 
-        Icon = MSB$Icon[FieldIndex], Color = MSB$Color[FieldIndex], Color2 = MSB$Color2[FieldIndex], 
+        Icon = MSB$Icon[FieldIndex], Color = Thiscolor, Color2 = MSB$Color2[FieldIndex], 
         Subtitle = CreateDescription(StoryItem = Beststory,i = i,totalregion = totalregion)))
     }
   }
@@ -78,3 +79,8 @@ AirQGetIcon <- function(Icontext){
     Icon <- icon(Icontext)}
   return(Icon)
 }
+
+  AirQ_PAL <-function(domain,palette = "Blues", bin = NULL ){
+  return(colorQuantile(palette, domain = domain))
+}
+
