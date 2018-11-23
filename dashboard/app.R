@@ -100,7 +100,7 @@ BestStory_n <- 6 # number of story board create
 infTable<-as.data.frame(fread("data/merged_datatable.csv"))
 MSB <-fread("data/Dynamic_Generate_InforBox.csv",fill = F)
 
-CPTC <- T #If compare two counties
+CPTC <- F #If compare two counties
 CPTC.name <-""
 CPTC.namecompared <-""
 CPTC.originstory <- ""
@@ -188,9 +188,7 @@ CreateINPresult<-function(){
 }
 
 InterpResultList<-CreateINPresult()#IinitializedEPA
-#test text in the storyboard
-testtext <- "When I wrote the following pages, or rather the bulk of them, I lived alone, in the woods, a mile from any neighbor, in a house which I had built myself, on the shore of Walden Pond, in Concord, Massachusetts, and earned my living by the labor of my hands only. I lived there two years and two months. At present I am a sojourner in civilized life again.
-I should not obtrude my affairs so much on the notice of my readers if very particular inquiries had not been made by my townsmen concerning my mode of life, which some would call impertinent, though they do not appear to me at all impertinent, but, considering the circumstances, very natural and pertinent. Some have asked what I got to eat; if I did not feel lonesome; if I was not afraid; and the like." 
+
 
 
 #ui ----
@@ -216,7 +214,7 @@ ui <- dashboardPage(
       HTML('
            @keyframes example {
               from {border-radius: 0px;}
-              to {border-radius: 30px;}
+              to {border-radius: 30px;background-color:white;color:rgba(50,50,50,0.5);}
            }
            .info-box {height: 45px;  margin : 0in; float: left; border: 0px;} 
            .info-box:hover {
@@ -229,39 +227,46 @@ ui <- dashboardPage(
            }
            .info-box-icon {height: 100%; line-height: 100%; padding-top: 20px }
            .bg-lime {background-color:#00ff80!important; }
-           #inf * {background-color:rgba(255,0,0,0); border-top:0px}
+           #inf *,#sinf * {background-color:rgba(255,0,0,0); border-top:0px}
            #homerow *  {padding-left:0px}
            .info-box-content {padding: 0px;}
-           .info-box-content > p {padding :1px;}
+           .info-box-content > p {padding :1px; }
            .info-box-number {font-size: 26px; padding-top:2px; padding-bottom:1px}
            .leaflet-control-container {border-top:2px;}
-           #inf {padding: 2px; }
+           #inf {padding: 2px; padding-rigt:2px}
            #inf > * {padding: 4px; }
            #inf box-body {padding: 2px; width:100%;}
            #sinf > * {padding: 4px}
            #sinf  {padding: 0px}
            #CN {padding: 0px; background-color: rgba(255,0,0,0); text-align: center; 
                 border-color: rgba(255,0,0,0); margin-bottom:0px}
+           #InfPannel {padding: 0px ; border-radius: 30px;}
+           #InfPannel > * {padding-left: 6px; padding-right: 0px}
+           #MapPannel > * {padding-left: 0px; padding-right: 0px}
+           #MainContent .box {border-top:0px; padding-left: 3px; padding-right: 2px}
            '))),
     tabItems(
       #First tab content ----
       tabItem(tabName = "Home",
-              checkboxInput("CPTCB",label = "cross community comparison",value = T),
-              
-              fixedRow(id = "homerow",
-               column(id = "inf", width = 7,
-                  # uiOutput("HSB") #Homepae Stroy Board
-                  
-                                   infoBoxOutput("inf1",width = 12),
-                                   infoBoxOutput("inf2",width = 12),
-                                   infoBoxOutput("inf3",width = 12),
-                                   verbatimTextOutput("CN"),
-                  conditionalPanel(id = "sinf", condition = "input.CPTCB", 
-                                   infoBoxOutput("inf4",width = 12),
-                                   infoBoxOutput("inf5",width = 12),
-                                   infoBoxOutput("inf6",width = 12))
-                ),
-                column(
+              fixedRow(id = "titlerow", width = 12, 
+                          column(width = 4, checkboxInput("CPTCB", 
+                              label = "cross community comparison",
+                              value = F)),
+                          column(width = 8,verbatimTextOutput("CN"))),
+              fixedRow(id = "homerow",column(id = "inf", width = 12,
+                                             # uiOutput("HSB") #Homepae Stroy Board
+                                             infoBoxOutput("inf1",width = 4),
+                                             infoBoxOutput("inf2",width = 4),
+                                             infoBoxOutput("inf3",width = 4))),
+              fixedRow(id = "MainContent",
+               column(id = "InfPannel", width = 7,
+                      box(id = "Homepage-infp-plotly", width = 12,
+                          plotlyOutput("MainInfPlot"),height = 900),
+                      conditionalPanel(id = "sinf", condition = "input.CPTCB", 
+                                       infoBoxOutput("inf4",width = 12),
+                                       infoBoxOutput("inf5",width = 12),
+                                       infoBoxOutput("inf6",width = 12))),
+                column(id = "MapPannel",
                   width = 5,
                   leafletOutput("HLM",height = 700) #Homepage Leaflet Map
                 )
@@ -567,7 +572,35 @@ server = function(input, output,session){
   # aot logic end ----
 
 # Home Page logic ---------------------------------------------------------
+  output$MainInfPlot <- renderPlotly({
+    thisnut <- HPR()
+    #name of the community 
+    CPTC.namecompared
+    ExtractOneRow <- infTable[regionid,]
+    #plot a fixed informatin for one given community ordered as:
+    #-h
+    #air pollution pm2.5 aod
+    #road emission ??
+    #covariate - elevate greeness temperture rainfall
+    IFT <- infTable
+    fixb_epa <- "epa"
+    fixb_aod <- "aod"
+    fixb_bar_color <- 'rgba(38, 24, 74, 0.8)'
+    fixb_bar_color2 <- 'rgba(248, 248, 249)'
+    fieldsn <- 9
+     plots<-lapply(1:fieldsn,function(i){
+      fixb_epa <- names(infTable)[i+15]
+      plot_ly(ExtractOneRow,type = 'bar',orientation = 'h',
+                  marker = list(color = fixb_bar_color,
+                                line = list(color = fixb_bar_color2, width = 0.1)),
+              x = ~ get(fixb_epa) , y = fixb_epa ) %>% 
+        layout(showlegend = FALSE, height = 400,
+               xaxis = list(range = c(0, max(infTable[[fixb_epa]],na.rm = T))))
+      # plotly_vec[i] <- p1
+    })
   
+    subplot(plots,nrows = fieldsn,shareX = T,margin =  0.0)
+  })
   observe({
     # print(input$CPTCB)
     CPTC <<- input$CPTCB
@@ -638,7 +671,7 @@ server = function(input, output,session){
     
     # click$id<-replace(click$id,'\'','')
     click$id<-ifelse(click$id == "OHARE","O'Hare",click$id)
-    regionid<- which(toupper(infTable[[CN]])==toupper(click$id))
+    regionid<<- which(toupper(infTable[[CN]])==toupper(click$id))
     
     thisstory<-FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix)
     # thisstory$longstory <- NULL
