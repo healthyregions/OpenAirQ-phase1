@@ -244,6 +244,8 @@ ui <- dashboardPage(
            #InfPannel > * {padding-left: 6px; padding-right: 0px}
            #MapPannel > * {padding-left: 0px; padding-right: 0px}
            #MainContent .box {border-top:0px; padding-left: 3px; padding-right: 2px}
+           #Homepage-infp-plotly {padding: 0 0 0 15px}
+           #InfPannel * {background-color: rgba(255,255,255,0)}
            '))),
     tabItems(
       #First tab content ----
@@ -261,7 +263,7 @@ ui <- dashboardPage(
               fixedRow(id = "MainContent",
                column(id = "InfPannel", width = 7,
                       box(id = "Homepage-infp-plotly", width = 12,
-                          plotlyOutput("MainInfPlot"),height = 900),
+                          plotlyOutput("MainInfPlot")),
                       conditionalPanel(id = "sinf", condition = "input.CPTCB", 
                                        infoBoxOutput("inf4",width = 12),
                                        infoBoxOutput("inf5",width = 12),
@@ -588,18 +590,50 @@ server = function(input, output,session){
     fixb_bar_color <- 'rgba(38, 24, 74, 0.8)'
     fixb_bar_color2 <- 'rgba(248, 248, 249)'
     fieldsn <- 9
-     plots<-lapply(1:fieldsn,function(i){
-      fixb_epa <- names(infTable)[i+15]
-      plot_ly(ExtractOneRow,type = 'bar',orientation = 'h',
-                  marker = list(color = fixb_bar_color,
-                                line = list(color = fixb_bar_color2, width = 0.1)),
-              x = ~ get(fixb_epa) , y = fixb_epa ) %>% 
-        layout(showlegend = FALSE, height = 400,
-               xaxis = list(range = c(0, max(infTable[[fixb_epa]],na.rm = T))))
-      # plotly_vec[i] <- p1
-    })
-  
-    subplot(plots,nrows = fieldsn,shareX = T,margin =  0.0)
+    
+    qpal <- colorQuantile(
+      palette = "Blues",
+      domain = c(0,1))
+    
+    p<-plot_ly(ExtractOneRow,color = "red", alpha = 0.5)
+    m <- list(
+      l = 160,
+      r = 10,
+      b = 100,
+      t = 100,
+      pad = 0
+    )
+    for(i in 1:fieldsn){
+      thisid <- i+22
+      positive<-MSB$isPositive[which(MSB$FieldName ==fixb_epa )]
+      fixb_epa <- names(infTable)[thisid]
+      fixb_max <- max(infTable[[fixb_epa]],na.rm = T)
+      fixb_avg <- mean(infTable[[fixb_epa]],na.rm = T)/fixb_max
+      thisx <- ifelse(is.na(ExtractOneRow[[fixb_epa]]/fixb_max)
+                      ,0,ExtractOneRow[[fixb_epa]]/fixb_max)
+      fixb_bar_color <- ifelse((thisx>fixb_avg&&positive=="T") |(thisx<fixb_avg&&positive=="F" ),
+                               "#00ff80","orange")
+      fixb_bar_color2 <- fixb_bar_color
+      p<-add_bars(p,
+                orientation = 'h', textposition = 'auto',
+                name = fixb_epa,
+                # text = "aaa", hoverinf = 'text',
+                width = 0.4,
+                marker = list(color = fixb_bar_color,
+                              line = list(color = fixb_bar_color2)),
+                x = thisx , y = fixb_epa)
+      p<-add_annotations(p,"City", x = fixb_avg , y = fixb_epa, ax =0, arrowwidth = 0.5,
+                         showarrow = T,arrowhead = 4, ay = -20, arrowsize = 0.5, yshift = -8,
+                         font = list(color = '#264E86',
+                                     family = 'sans serif',
+                                     size = 7))
+    }
+    p<-p %>% layout(showlegend = F, bargap = 0.3, margin = m, 
+                    barnorm = "", barmode = "group",
+                    xaxis = list(type = "linear",zeroline = F, showline = F,showgrid = F,showticklabels = F), 
+                    yaxis = list(type = "category", color = "grey50"))
+    p
+    # subplot(plots,nrows = fieldsn,shareX = T,margin =  0.02)
   })
   observe({
     # print(input$CPTCB)
