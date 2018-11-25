@@ -3,6 +3,12 @@
 # -this function create a storyboard's icon color subtitle fieldname and value
 # given a fieldname proposed by the click on one community area
 library('stringi')
+
+#test text in the storyboard
+testtext <<- "When I wrote the following pages, or rather the bulk of them, I lived alone, in the woods, a mile from any neighbor, in a house which I had built myself, on the shore of Walden Pond, in Concord, Massachusetts, and earned my living by the labor of my hands only. I lived there two years and two months. At present I am a sojourner in civilized life again.
+I should not obtrude my affairs so much on the notice of my readers if very particular inquiries had not been made by my townsmen concerning my mode of life, which some would call impertinent, though they do not appear to me at all impertinent, but, considering the circumstances, very natural and pertinent. Some have asked what I got to eat; if I did not feel lonesome; if I was not afraid; and the like." 
+
+
 GenrateStoryBoards <-function(Beststory,CommunityName,totalregion,MSB){
   
   #Beststory is the story generated based on the numbers
@@ -31,23 +37,23 @@ GenrateStoryBoards <-function(Beststory,CommunityName,totalregion,MSB){
     Thiscolor <- ifelse(Thisprect>0.66,"lime",ifelse(Thisprect>0.33,"olive","orange"))
     result<-rbind(result,data.table(
         StoryboardName = MSB$`Name of attributes`[FieldIndex], 
-        Precentage = Beststory$Precentage[i], Value = Beststory$Value[i], Rank = Beststory$Rank[i], 
+        Precentage = Beststory$Precentage[i], Value = format(Beststory$Value[i],digits = 2,nsmall = 2), Rank = Beststory$Rank[i], 
         Icon = MSB$Icon[FieldIndex], Color = Thiscolor, Color2 = MSB$Color2[FieldIndex], 
-        Subtitle = CreateDescription(StoryItem = Beststory,i = i,totalregion = totalregion)))
+        Subtitle = MSB$`Name of attributes`[FieldIndex]))
     }
   }
   return(result)
   ## = name = value = subtitle =icon = color
-  
+  # CreateDescription(StoryItem = Beststory,i = i,totalregion = totalregion,fieldname =MSB$`Name of attributes`[FieldIndex])
   
 }
 
-CreateDescription <- function(StoryItem,i,totalregion){
+CreateDescription <- function(StoryItem,i,totalregion,fieldname){
   #create a desciption given one story
   #The field name is very high/low, which is the ** in chicago
-  return(paste0("The ",StoryItem$FieldName[i]," is very ",
+  return(paste0("The ",fieldname," is very ",
                 ifelse(StoryItem$Precentage[i]>0.5,"high","low"),
-                ", which is ",StoryItem$Value[i]," (",as.integer(totalregion - StoryItem$Rank[i]),"th) in Chicago"))}
+                ", which is ", format(StoryItem$Value[i],digits = 2,nsmall = 2)," (",as.integer(totalregion - StoryItem$Rank[i]+1),"th) in Chicago"))}
 
 
 FindtheStory <-function(regionid,BestStory_n,infTable,ncol,nrow,rankmatrix){
