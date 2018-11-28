@@ -17,7 +17,8 @@ GenrateStoryBoards <-function(Beststory,CommunityName,totalregion,MSB){
   #test the existence of the meta data sheet
   
   #set the column name of the result table
-  colname <- c("StoryboardName","Precentage","Value","Rank","Icon","Color","Color2","Subtitle")
+  colname <- c("StoryboardName","Precentage",
+               "Value","Rank","Icon","Color","Color2","Subtitle","unit")
   result <- data.frame(matrix(ncol = length(colname), nrow = 0))
   FieldIndex <- 1
   colnames(result) <- colname
@@ -37,9 +38,13 @@ GenrateStoryBoards <-function(Beststory,CommunityName,totalregion,MSB){
     Thiscolor <- ifelse(Thisprect>0.66,"lime",ifelse(Thisprect>0.33,"olive","orange"))
     result<-rbind(result,data.table(
         StoryboardName = MSB$`Name of attributes`[FieldIndex], 
-        Precentage = Beststory$Precentage[i], Value = format(Beststory$Value[i],digits = 2,nsmall = 2), Rank = Beststory$Rank[i], 
-        Icon = MSB$Icon[FieldIndex], Color = Thiscolor, Color2 = MSB$Color2[FieldIndex], 
-        Subtitle = MSB$`Name of attributes`[FieldIndex]))
+        Precentage = Beststory$Precentage[i], 
+        Value = format(Beststory$Value[i],digits = 2,nsmall = 2), 
+        Rank = Beststory$Rank[i], 
+        Icon = MSB$Icon[FieldIndex], 
+        Color = Thiscolor, Color2 = MSB$Color2[FieldIndex], 
+        Subtitle = MSB$`Name of attributes`[FieldIndex],
+        unit = MSB$Unit[FieldIndex]))
     }
   }
   return(result)
