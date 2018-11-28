@@ -24,6 +24,7 @@ library(data.table)
 library(RCurl)
 library(tiff)#readtiff
 
+library(shinyBS) #tooltips
 library(gstat) #kriging
 library(stringr) # extract date from the epa date
 
@@ -104,7 +105,7 @@ CPTC <- F #If compare two counties
 CPTC.name <-""
 CPTC.namecompared <-""
 CPTC.originstory <- ""
-
+storyname <-""
 
 #Jion the infTable
 JoinedSHP <- infTable
@@ -214,16 +215,27 @@ ui <- dashboardPage(
       HTML('
            @keyframes example {
               from {border-radius: 0px;}
-              to {border-radius: 30px;background-color:white;color:rgba(50,50,50,0.5);}
+              to {border-radius: 20px;background-color:white;color:rgba(50,50,50,0.5);}
            }
+           @keyframes slide-up {
+            0% {
+              opacity: 0;
+              transform: translateY(20px);
+              }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+              }
+            }
            .info-box {height: 45px;  margin : 0in; float: left; border: 0px;} 
            .info-box:hover {
                  animation: example;
                  animation-name: example;
                  animation-duration: 1s;
-                 animation-timing-function：ease-in-out;
+                 animation-timing-function: ease-in-out;
                  animation-fill-mode: forwards;
                  -webkit-animation-fill-mode: forwards;
+                 
            }
            .info-box-icon {height: 100%; line-height: 100%; padding-top: 20px }
            .bg-lime {background-color:#00ff80!important; }
@@ -237,7 +249,7 @@ ui <- dashboardPage(
            #inf > * {padding: 4px; }
            #inf box-body {padding: 2px; width:100%;}
            #sinf > * {padding: 4px}
-           #sinf  {padding: 0px}
+           #sinf  {padding: 0px;animation: slide-up 1s ease-in-out;}
            #CN {padding: 0px; background-color: rgba(255,0,0,0); text-align: center; 
                 border-color: rgba(255,0,0,0); margin-bottom:0px}
            #InfPannel {padding: 0px ; border-radius: 30px;}
@@ -245,7 +257,7 @@ ui <- dashboardPage(
            #MapPannel > * {padding-left: 0px; padding-right: 0px}
            #MainContent .box {border-top:0px; padding-left: 3px; padding-right: 2px}
            #Homepage-infp-plotly {padding: 0 0 0 15px}
-           #InfPannel * {background-color: rgba(255,255,255,0)}
+           
            '))),
     tabItems(
       #First tab content ----
@@ -260,14 +272,16 @@ ui <- dashboardPage(
                                              infoBoxOutput("inf1",width = 4),
                                              infoBoxOutput("inf2",width = 4),
                                              infoBoxOutput("inf3",width = 4))),
+              fixedRow(id = "comparedrow",  
+                       conditionalPanel(id = "sinf", condition = "input.CPTCB", 
+                                                  infoBoxOutput("inf4",width = 4),
+                                                  infoBoxOutput("inf5",width = 4),
+                                                  infoBoxOutput("inf6",width = 4))),
               fixedRow(id = "MainContent",
                column(id = "InfPannel", width = 7,
                       box(id = "Homepage-infp-plotly", width = 12,
-                          plotlyOutput("MainInfPlot")),
-                      conditionalPanel(id = "sinf", condition = "input.CPTCB", 
-                                       infoBoxOutput("inf4",width = 12),
-                                       infoBoxOutput("inf5",width = 12),
-                                       infoBoxOutput("inf6",width = 12))),
+                          plotlyOutput("MainInfPlot"))
+                     ),
                 column(id = "MapPannel",
                   width = 5,
                   leafletOutput("HLM",height = 700) #Homepage Leaflet Map
@@ -599,8 +613,8 @@ server = function(input, output,session){
     m <- list(
       l = 160,
       r = 10,
-      b = 100,
-      t = 100,
+      b = 10,
+      t = 40,
       pad = 0
     )
     for(i in 1:fieldsn){
@@ -615,10 +629,10 @@ server = function(input, output,session){
                                "#00ff80","orange")
       fixb_bar_color2 <- fixb_bar_color
       p<-add_bars(p,
-                orientation = 'h', textposition = 'auto',
+                orientation = 'h',
                 name = fixb_epa,
-                # text = "aaa", hoverinf = 'text',
                 width = 0.4,
+                text = (ExtractOneRow[[fixb_epa]]),  hoverinfo = 'text',
                 marker = list(color = fixb_bar_color,
                               line = list(color = fixb_bar_color2)),
                 x = thisx , y = fixb_epa)
@@ -630,7 +644,8 @@ server = function(input, output,session){
     }
     p<-p %>% layout(showlegend = F, bargap = 0.3, margin = m, 
                     barnorm = "", barmode = "group",
-                    xaxis = list(type = "linear",zeroline = F, showline = F,showgrid = F,showticklabels = F), 
+                    xaxis = list(type = "linear",zeroline = F, 
+                                 showline = F,showgrid = F,showticklabels = F), 
                     yaxis = list(type = "category", color = "grey50"))
     p
     # subplot(plots,nrows = fieldsn,shareX = T,margin =  0.02)
@@ -707,9 +722,13 @@ server = function(input, output,session){
     click$id<-ifelse(click$id == "OHARE","O'Hare",click$id)
     regionid<<- which(toupper(infTable[[CN]])==toupper(click$id))
     
-    thisstory<-FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix)
+    # storyname<<-FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix)
     # thisstory$longstory <- NULL
-    wholestory<-GenrateStoryBoards(thisstory,`Community Area Name`,ChicagoBoundary.NROW,MSB)
+    # if(!CPTC||storyname==""){
+      storyname<<-FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix)
+    # }
+    
+    wholestory<-GenrateStoryBoards(storyname,`Community Area Name`,ChicagoBoundary.NROW,MSB)
     # for(i in 1:BestStory){
     #   thisstory$longstory[i]<-CreateDescription(StoryItem = thisstory,i = i)}
     
@@ -719,6 +738,7 @@ server = function(input, output,session){
   })
   output$inf1 <- renderInfoBox({
     CreateInfbox(1)
+    
   })
   output$inf2 <- renderInfoBox({
     CreateInfbox(2)
@@ -733,19 +753,19 @@ server = function(input, output,session){
     if(!CPTC||CPTC.originstory==""){
       CPTC.originstory<<-thisinut
     }
-    
     if(id>3){
       id <- id-3
       INFB<-infoBox(thisinut$FieldName[id],
-                    value = thisinut$Value[id],
+                    value = paste0(thisinut$Value[id],thisinut$unit[id]),
                     subtitle =  thisinut$Subtitle[id],
                     icon = AirQGetIcon(thisinut$Icon[id]),
                     color = thisinut$Color[id],
                     fill = T,
-                    width = 12)
+                    width = 12
+                    )
     }else{
       INFB<-infoBox(CPTC.originstory$FieldName[id],
-              value = CPTC.originstory$Value[id],
+              value = paste0(CPTC.originstory$Value[id],CPTC.originstory$unit[id]),
               subtitle =  CPTC.originstory$Subtitle[id],
               icon = AirQGetIcon(CPTC.originstory$Icon[id]),
               color = CPTC.originstory$Color[id],
@@ -753,6 +773,7 @@ server = function(input, output,session){
               width = 12)
       
     }
+    
     return(INFB)
 
   }
