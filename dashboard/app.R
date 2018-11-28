@@ -106,6 +106,8 @@ CPTC.name <-""
 CPTC.namecompared <-""
 CPTC.originstory <- ""
 storyname <-""
+CPTC.regionid <-""
+CPTC.rankidtable <-""
 
 #Jion the infTable
 JoinedSHP <- infTable
@@ -247,7 +249,7 @@ ui <- dashboardPage(
            .leaflet-control-container {border-top:2px;}
            #inf {padding: 2px; padding-rigt:2px}
            #inf > * {padding: 4px; }
-           #inf box-body {padding: 2px; width:100%;}
+           #inf box-body {padding: 0px; width:100%;}
            #sinf > * {padding: 4px}
            #sinf  {padding: 0px;animation: slide-up 1s ease-in-out;}
            #CN {padding: 0px; background-color: rgba(255,0,0,0); text-align: center; 
@@ -257,7 +259,7 @@ ui <- dashboardPage(
            #MapPannel > * {padding-left: 0px; padding-right: 0px}
            #MainContent .box {border-top:0px; padding-left: 3px; padding-right: 2px}
            #Homepage-infp-plotly {padding: 0 0 0 15px}
-           
+           #comparedrow {margin-bottom: 5px; padding: 0 2px 0 2px}
            '))),
     tabItems(
       #First tab content ----
@@ -621,8 +623,10 @@ server = function(input, output,session){
       thisid <- i+22
       positive<-MSB$isPositive[which(MSB$FieldName ==fixb_epa )]
       fixb_epa <- names(infTable)[thisid]
+      fixb_name <- MSB$`Name of attributes`[which(MSB$FieldName ==fixb_epa )]
       fixb_max <- max(infTable[[fixb_epa]],na.rm = T)
       fixb_avg <- mean(infTable[[fixb_epa]],na.rm = T)/fixb_max
+      
       thisx <- ifelse(is.na(ExtractOneRow[[fixb_epa]]/fixb_max)
                       ,0,ExtractOneRow[[fixb_epa]]/fixb_max)
       fixb_bar_color <- ifelse((thisx>fixb_avg&&positive=="T") |(thisx<fixb_avg&&positive=="F" ),
@@ -630,20 +634,41 @@ server = function(input, output,session){
       fixb_bar_color2 <- fixb_bar_color
       p<-add_bars(p,
                 orientation = 'h',
-                name = fixb_epa,
-                width = 0.4,
+                name = CPTC.name,
+                width = 0.2,
                 text = (ExtractOneRow[[fixb_epa]]),  hoverinfo = 'text',
                 marker = list(color = fixb_bar_color,
                               line = list(color = fixb_bar_color2)),
-                x = thisx , y = fixb_epa)
-      p<-add_annotations(p,"City", x = fixb_avg , y = fixb_epa, ax =0, arrowwidth = 0.5,
+                x = thisx , y = fixb_name)
+      p<-add_annotations(p,"City", x = fixb_avg , y = fixb_name, ax =0, arrowwidth = 1,arrowcolor = "#B0E0E6",
                          showarrow = T,arrowhead = 4, ay = -20, arrowsize = 0.5, yshift = -8,
                          font = list(color = '#264E86',
-                                     family = 'sans serif',
-                                     size = 7))
+                                     family = 'arial',
+                                     size = 7),
+                         arrowside = 'none', bordercolor = "grey50")
+      if(CPTC){
+        RExtractOneRow <- infTable[CPTC.regionid,]
+        fixb_compared <- ifelse(is.na(RExtractOneRow[[fixb_epa]]/fixb_max)
+                                         ,0,RExtractOneRow[[fixb_epa]]/fixb_max)
+        p<-add_annotations(p,CPTC.name, x = fixb_compared , y = fixb_name, ax =0, arrowwidth = 1,arrowcolor = "#B0E0E6",
+                           showarrow = T,arrowhead = 4, ay = -24, arrowsize = 0.5, yshift = -8,
+                           font = list(color = '#264E86',
+                                       family = 'Arial',
+                                       size = 7),
+                           arrowside = 'none',
+                           yanchor = "bottom")
+        # p<-add_bars(p,
+        #             orientation = 'h',
+        #             name = CPTC.namecompared,
+        #             width = 0.2,
+        #             text = (RExtractOneRow[[fixb_epa]]),  hoverinfo = 'text',
+        #             marker = list(color = "grey50",
+        #                           line = list(color = "grey50")),
+        #             x = fixb_compared , y = fixb_epa)
+      }
     }
     p<-p %>% layout(showlegend = F, bargap = 0.3, margin = m, 
-                    barnorm = "", barmode = "group",
+                    barmode = "group",
                     xaxis = list(type = "linear",zeroline = F, 
                                  showline = F,showgrid = F,showticklabels = F), 
                     yaxis = list(type = "category", color = "grey50"))
@@ -721,11 +746,16 @@ server = function(input, output,session){
     # click$id<-replace(click$id,'\'','')
     click$id<-ifelse(click$id == "OHARE","O'Hare",click$id)
     regionid<<- which(toupper(infTable[[CN]])==toupper(click$id))
-    
+    if(!CPTC||CPTC.regionid ==""){
+      CPTC.regionid <<-regionid 
+    }
     # storyname<<-FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix)
     # thisstory$longstory <- NULL
     # if(!CPTC||storyname==""){
-      storyname<<-FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix)
+      resultstory <- FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix,CPTC,CPTC.rankidtable)
+      storyname<<-resultstory$result
+      
+      CPTC.rankidtable <<-resultstory$CPTC.rankidtable 
     # }
     
     wholestory<-GenrateStoryBoards(storyname,`Community Area Name`,ChicagoBoundary.NROW,MSB)
