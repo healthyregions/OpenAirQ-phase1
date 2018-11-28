@@ -61,7 +61,7 @@ CreateDescription <- function(StoryItem,i,totalregion,fieldname){
                 ", which is ", format(StoryItem$Value[i],digits = 2,nsmall = 2)," (",as.integer(totalregion - StoryItem$Rank[i]+1),"th) in Chicago"))}
 
 
-FindtheStory <-function(regionid,BestStory_n,infTable,ncol,nrow,rankmatrix){
+FindtheStory <-function(regionid,BestStory_n,infTable,ncol,nrow,rankmatrix,CPTC,CPTC.rankidtable){
   nl<-names(infTable)
   rankidtable <- matrix(nrow = 4,ncol = ncol,data = 1:4*ncol)
   rankidtable[1,]<-c(1:ncol)
@@ -70,7 +70,18 @@ FindtheStory <-function(regionid,BestStory_n,infTable,ncol,nrow,rankmatrix){
   rankidtable[4,]<-(as.matrix(rankmatrix[regionid,]/nrow)) #precent
   rankidtable[3,1:2] <- 0 # igorn the id and name
   #rank the most important issue in this region
+  
   va<-(rankidtable[,order(-rankidtable[3,])])
+  if(!CPTC||CPTC.rankidtable==""){
+    CPTC.rankidtable <- rankidtable #if does compare
+    print("aaa")
+    print(rankidtable)
+    print("ccc")
+    print(CPTC.rankidtable)
+  }else{
+    va<-(rankidtable[,order(-CPTC.rankidtable[3,])])
+    print("bbb")
+  }
   colname <- c("FieldName","Precentage","Value","Rank")
   result <- data.frame(matrix(ncol = 4, nrow = 0))
   colnames(result) <- colname
@@ -80,7 +91,7 @@ FindtheStory <-function(regionid,BestStory_n,infTable,ncol,nrow,rankmatrix){
     result<-rbind(result,data.table(FieldName = nl[thisFiledID],Precentage = va[4,si], Rank = va[2,si],Value=infTable[regionid,thisFiledID] ))
   }
 
-  return(result)
+  return(list(result =result, CPTC.rankidtable = CPTC.rankidtable))
 }
 
 AirQGetIcon <- function(Icontext){
