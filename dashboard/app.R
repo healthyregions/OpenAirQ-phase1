@@ -221,7 +221,7 @@ ui <- dashboardPage(
                  animation: example;
                  animation-name: example;
                  animation-duration: 1s;
-                 animation-timing-function：ease-in-out；
+                 animation-timing-function：ease-in-out;
                  animation-fill-mode: forwards;
                  -webkit-animation-fill-mode: forwards;
            }
