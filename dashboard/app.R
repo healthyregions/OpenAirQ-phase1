@@ -109,6 +109,9 @@ storyname <-""
 CPTC.regionid <-""
 CPTC.rankidtable <-""
 
+thisarrowcolor <-	rgb(0.5,0.5,0.5,0.5)
+
+
 #Jion the infTable
 JoinedSHP <- infTable
 CN <- "CN"
@@ -241,10 +244,11 @@ ui <- dashboardPage(
            }
            .info-box-icon {height: 100%; line-height: 100%; padding-top: 20px }
            .bg-lime {background-color:#00ff80!important; }
+           .bg-olive {background-color:	#FFD700!important; }
            #inf *,#sinf * {background-color:rgba(255,0,0,0); border-top:0px}
            #homerow *  {padding-left:0px}
            .info-box-content {padding: 0px;}
-           .info-box-content > p {padding :1px; }
+           .info-box-content > p {padding :1px; font-size: 16px;}
            .info-box-number {font-size: 26px; padding-top:2px; padding-bottom:1px}
            .leaflet-control-container {border-top:2px;}
            #inf {padding: 2px; padding-rigt:2px}
@@ -282,7 +286,7 @@ ui <- dashboardPage(
               fixedRow(id = "MainContent",
                column(id = "InfPannel", width = 7,
                       box(id = "Homepage-infp-plotly", width = 12,
-                          plotlyOutput("MainInfPlot"))
+                          plotlyOutput("MainInfPlot",height = 500))
                      ),
                 column(id = "MapPannel",
                   width = 5,
@@ -611,12 +615,12 @@ server = function(input, output,session){
       palette = "Blues",
       domain = c(0,1))
     
-    p<-plot_ly(ExtractOneRow,color = "red", alpha = 0.5)
+    p<-plot_ly(ExtractOneRow,color = "red", alpha = 0.5,height = 500)
     m <- list(
       l = 160,
       r = 10,
       b = 10,
-      t = 40,
+      t = 60,
       pad = 0
     )
     for(i in 1:fieldsn){
@@ -640,21 +644,21 @@ server = function(input, output,session){
                 marker = list(color = fixb_bar_color,
                               line = list(color = fixb_bar_color2)),
                 x = thisx , y = fixb_name)
-      p<-add_annotations(p,"City", x = fixb_avg , y = fixb_name, ax =0, arrowwidth = 1,arrowcolor = "#B0E0E6",
-                         showarrow = T,arrowhead = 4, ay = -20, arrowsize = 0.5, yshift = -8,
+      p<-add_annotations(p,"City", x = fixb_avg , y = fixb_name, ax =0, arrowwidth = 1,arrowcolor = thisarrowcolor,
+                         showarrow = T,arrowhead = 4, ay = -23, arrowsize = 0.5, yshift = -7.5,
                          font = list(color = '#264E86',
                                      family = 'arial',
-                                     size = 7),
+                                     size = 12),
                          arrowside = 'none', bordercolor = "grey50")
       if(CPTC){
         RExtractOneRow <- infTable[CPTC.regionid,]
         fixb_compared <- ifelse(is.na(RExtractOneRow[[fixb_epa]]/fixb_max)
                                          ,0,RExtractOneRow[[fixb_epa]]/fixb_max)
-        p<-add_annotations(p,CPTC.name, x = fixb_compared , y = fixb_name, ax =0, arrowwidth = 1,arrowcolor = "#B0E0E6",
+        p<-add_annotations(p,CPTC.name, x = fixb_compared , y = fixb_name, ax =0, arrowwidth = 1,arrowcolor = thisarrowcolor,
                            showarrow = T,arrowhead = 4, ay = -24, arrowsize = 0.5, yshift = -8,
                            font = list(color = '#264E86',
                                        family = 'Arial',
-                                       size = 7),
+                                       size = 12),
                            arrowside = 'none',
                            yanchor = "bottom")
         # p<-add_bars(p,
@@ -667,8 +671,8 @@ server = function(input, output,session){
         #             x = fixb_compared , y = fixb_epa)
       }
     }
-    p<-p %>% layout(showlegend = F, bargap = 0.3, margin = m, 
-                    barmode = "group",
+    p<-p %>% layout(showlegend = F, bargap = 0.7, margin = m, 
+                    barmode = "group", bargroupgap = 2,
                     xaxis = list(type = "linear",zeroline = F, 
                                  showline = F,showgrid = F,showticklabels = F), 
                     yaxis = list(type = "category", color = "grey50"))
