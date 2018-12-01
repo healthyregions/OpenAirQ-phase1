@@ -109,9 +109,6 @@ storyname <-""
 CPTC.regionid <-""
 CPTC.rankidtable <-""
 
-thisarrowcolor <-	rgb(0.5,0.5,0.5,0.5)
-
-
 #Jion the infTable
 JoinedSHP <- infTable
 CN <- "CN"
@@ -244,11 +241,10 @@ ui <- dashboardPage(
            }
            .info-box-icon {height: 100%; line-height: 100%; padding-top: 20px }
            .bg-lime {background-color:#00ff80!important; }
-           .bg-olive {background-color:	#FFD700!important; }
            #inf *,#sinf * {background-color:rgba(255,0,0,0); border-top:0px}
            #homerow *  {padding-left:0px}
            .info-box-content {padding: 0px;}
-           .info-box-content > p {padding :1px; font-size: 16px;}
+           .info-box-content > p {padding :1px; }
            .info-box-number {font-size: 26px; padding-top:2px; padding-bottom:1px}
            .leaflet-control-container {border-top:2px;}
            #inf {padding: 2px; padding-rigt:2px}
@@ -286,7 +282,7 @@ ui <- dashboardPage(
               fixedRow(id = "MainContent",
                column(id = "InfPannel", width = 7,
                       box(id = "Homepage-infp-plotly", width = 12,
-                          plotlyOutput("MainInfPlot",height = 500))
+                          plotlyOutput("MainInfPlot"))
                      ),
                 column(id = "MapPannel",
                   width = 5,
@@ -615,12 +611,12 @@ server = function(input, output,session){
       palette = "Blues",
       domain = c(0,1))
     
-    p<-plot_ly(ExtractOneRow,color = "red", alpha = 0.5,height = 500)
+    p<-plot_ly(ExtractOneRow,color = "red", alpha = 0.5)
     m <- list(
       l = 160,
       r = 10,
       b = 10,
-      t = 60,
+      t = 40,
       pad = 0
     )
     for(i in 1:fieldsn){
@@ -644,21 +640,21 @@ server = function(input, output,session){
                 marker = list(color = fixb_bar_color,
                               line = list(color = fixb_bar_color2)),
                 x = thisx , y = fixb_name)
-      p<-add_annotations(p,"City", x = fixb_avg , y = fixb_name, ax =0, arrowwidth = 1,arrowcolor = thisarrowcolor,
-                         showarrow = T,arrowhead = 4, ay = -23, arrowsize = 0.5, yshift = -7.5,
+      p<-add_annotations(p,"City", x = fixb_avg , y = fixb_name, ax =0, arrowwidth = 1,arrowcolor = "#B0E0E6",
+                         showarrow = T,arrowhead = 4, ay = -20, arrowsize = 0.5, yshift = -8,
                          font = list(color = '#264E86',
                                      family = 'arial',
-                                     size = 12),
+                                     size = 7),
                          arrowside = 'none', bordercolor = "grey50")
       if(CPTC){
         RExtractOneRow <- infTable[CPTC.regionid,]
         fixb_compared <- ifelse(is.na(RExtractOneRow[[fixb_epa]]/fixb_max)
                                          ,0,RExtractOneRow[[fixb_epa]]/fixb_max)
-        p<-add_annotations(p,CPTC.name, x = fixb_compared , y = fixb_name, ax =0, arrowwidth = 1,arrowcolor = thisarrowcolor,
+        p<-add_annotations(p,CPTC.name, x = fixb_compared , y = fixb_name, ax =0, arrowwidth = 1,arrowcolor = "#B0E0E6",
                            showarrow = T,arrowhead = 4, ay = -24, arrowsize = 0.5, yshift = -8,
                            font = list(color = '#264E86',
                                        family = 'Arial',
-                                       size = 12),
+                                       size = 7),
                            arrowside = 'none',
                            yanchor = "bottom")
         # p<-add_bars(p,
@@ -671,8 +667,8 @@ server = function(input, output,session){
         #             x = fixb_compared , y = fixb_epa)
       }
     }
-    p<-p %>% layout(showlegend = F, bargap = 0.7, margin = m, 
-                    barmode = "group", bargroupgap = 2,
+    p<-p %>% layout(showlegend = F, bargap = 0.3, margin = m, 
+                    barmode = "group",
                     xaxis = list(type = "linear",zeroline = F, 
                                  showline = F,showgrid = F,showticklabels = F), 
                     yaxis = list(type = "category", color = "grey50"))
@@ -1049,6 +1045,9 @@ server = function(input, output,session){
     road_length@data$rd_lngt_area <- 
       road_length@data$rd_lngt / road_length@data$shape_r
     
+    trffc_vol@data <- select(trffc_vol@data, -perimtr)
+    road_length@data <- select(road_length@data, -perimtr)
+    
     road_emission_data <- switch(input$road_emit_type, 
                                  "Traffic Volume" = "trffc_vol", 
                                  "Road Lengths" = "road_length")
@@ -1058,6 +1057,7 @@ server = function(input, output,session){
       road_col <- "Trffc_V_area"
       road_emissions_map <- 
         tm_shape(trffc_vol) + 
+        tm_borders(alpha = 0.4) +
         tm_fill(col= road_col, 
                 style = "jenks",
                 n = 5,
@@ -1069,13 +1069,14 @@ server = function(input, output,session){
           main.title = "Traffic Volume by Community Area of Chicago",
           main.title.size = 1.2
         ) +
-        tm_legend(position = c("LEFT", "BOTTOM") )
+        tm_view(view.legend.position = c("left", "bottom"))
     }
     if(input$road_emit_type == "Road Lengths")
     {
       road_col <- "rd_lngt_area"
       road_emissions_map <- 
         tm_shape(road_length) + 
+        tm_borders(alpha = 0.4) +
         tm_fill(col= road_col, 
                 style = "jenks",
                 n = 5,
@@ -1087,7 +1088,7 @@ server = function(input, output,session){
           main.title = "Road Lengths by Community Area of Chicago",
           main.title.size = 1.2
         ) +
-        tm_legend(position = c("LEFT", "BOTTOM") )
+        tm_view(view.legend.position = c("left", "bottom"))
     }
     tmap_leaflet(road_emissions_map)
   })
