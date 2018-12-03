@@ -27,7 +27,8 @@ library(tiff)#readtiff
 library(shinyBS) #tooltips
 library(gstat) #kriging
 library(stringr) # extract date from the epa date
-
+library(shinyWidgets) #ui used in epa panel
+library(shinydashboardPlus) #some ui
 
 
 source("src/AirQ_Storyboard.R")
@@ -95,7 +96,7 @@ yearly.breaks <- seq(from = 0.1, to = 0.3, 0.02) #Breaks for AOD data
 yearly.aod.pal <- colorNumeric(c("green", "yellow", "red", "purple"), yearly.breaks, na.color = "transparent") #Palette for AOD
 
 
-#story board
+#story board predefinied variables -------------
 RegionID <-1 # give a region id
 BestStory_n <- 6 # number of story board create
 infTable<-as.data.frame(fread("data/merged_datatable.csv"))
@@ -108,6 +109,12 @@ CPTC.originstory <- ""
 storyname <-""
 CPTC.regionid <-""
 CPTC.rankidtable <-""
+
+thisarrowcolor <-	rgb(0.5,0.5,0.5,0.5)
+
+# Air pollution table epa -------------------------------------------------
+epa_panel.airpollutiontype <- c("CO","Pb","NO2","Ozone","PM10","PM2.5","SO2")#type of air pollution
+
 
 #Jion the infTable
 JoinedSHP <- infTable
@@ -160,6 +167,70 @@ ReadAotData<-function(ExtraDate,ThisWorkPath)
   return(pc)
 }
 
+#InputEpaDatato3dSURFACE ----
+# Interpolate Surface -----------------------------------------------------
+
+#gstat::idw()
+epasource<-list.files("data/EPA/",pattern = "*.csv")
+epadata<-list()
+for(i in 1: length(epasource)){
+  epadata[[i]]<-CreateAirPollutantPointDataSet(paste0("data/EPA/",epasource[i]))
+}
+
+epr <- epadata[[i]]
+framesnumber <- 100 #prepared frame in a epa surface
+measuregrid <- as.matrix(epr[,c("lat","lon")])
+
+
+cbox <- c(42.116887,41.570783,-87.424981,-88.030087) #chicago box
+ndim <- c(20,20)
+x <- seq(cbox[2],cbox[1],by=(cbox[1]-cbox[2])/ndim[1])
+y <- seq(cbox[4],cbox[3],by=(cbox[3]-cbox[4])/ndim[2])
+# grid <- as.matrix(expand.grid(x=x, y=y))
+# dis_matrix<-1/sqrt(cdist(measuregrid, grid))
+# distancematrix <- (dis_matrix)/rep(rowSums(dis_matrix),nrow(grid))
+
+tdata <- epr[,2:(ncol(epr)-2)]
+for(i in 1:ncol(tdata)){
+  tdata[is.na(tdata[,i]),i] <- mean(tdata[,i], na.rm = TRUE)
+}
+
+# interppoint <- t(t(as.matrix(distancematrix))%*%as.matrix(tdata))
+# interppoint <- t(as.matrix(tdata))%*%as.matrix(distancematrix)
+
+# tdata <- epr[,2:(ncol(epr))]
+# for(i in 1:ncol(tdata)){
+#   tdata[is.na(tdata[,i]),i] <- mean(tdata[,i], na.rm = TRUE)
+# }
+
+
+frame <- 1:framesnumber
+z.si <- list()
+x.si<-list()
+y.si<-list()
+# saveGIF({
+#   for(ik in 1:framesnumber){
+#     spline_interpolated <- interp(epr$lon, epr$lat, tdata[,ik],
+#                                   xo=y,
+#                                   yo=x,
+#                                   linear = FALSE, extrap = TRUE)
+#     x.si <- spline_interpolated$x
+#     y.si <- (spline_interpolated$y)
+#     z.si <- as.matrix(spline_interpolated$z)
+#     persp(x.si, y.si, z.si, theta = 45 , phi = 35, expand = 0.4, col = "lightblue")
+#     # plot_ly(x = x.si, y = y.si, z = z.si) %>% add_contour()
+#   }
+# }, interval = 0.1, ani.width = 550, ani.height = 550)
+for(ik in 1:framesnumber){
+  spline_interpolated <- interp(epr$lon, epr$lat, tdata[,ik],
+                                xo=y,
+                                yo=x,
+                                linear = FALSE, extrap = TRUE)
+  x.si[[ik]] <- spline_interpolated$x
+  y.si[[ik]] <- (spline_interpolated$y)
+  z.si[[ik]] <- as.matrix(spline_interpolated$z)
+  # plot_ly(x = x.si, y = y.si, z = z.si) %>% add_contour()
+}
 #ReadEpaData ----
 
 # CreateTheStoryBoard -----------------------------------------------------
@@ -177,7 +248,7 @@ for(i in 1:ncol){
 
 CreateINPresult<-function(){
   
-  FileNameList <- list.files(paste0(datapath,"EPA/")) #FileName List in EPA data set
+  FileNameList <- list.files(paste0(datapath,"EPA/"),pattern = "*.tif") #FileName List in EPA data set
   rawdate<-strsplit(str_extract(FileNameList[1], "[0-9]+-[0-9]+-[0-9]+_[0-9]"),'_')
   thisdate<-as.Date(unlist(rawdate)[1])
   # year = 1 month = 0 rawdate[2] 
@@ -202,6 +273,7 @@ ui <- dashboardPage(
                 menuItem("Home", tabName = "Home"),
                 menuItem("About", tabName = "About"),
                 menuItem("Pollution Measures",
+                         menuSubItem("Air Pollution - EPA","epa_panel"),
                          menuSubItem("PM 2.5", "pm"),
                          menuSubItem("Aeorosol-Optical-Depth", "aod")),
                 menuItem("Pollution Drivers",
@@ -215,36 +287,37 @@ ui <- dashboardPage(
   dashboardBody(
     tags$head(tags$style(
       HTML('
-           @keyframes example {
+            @keyframes example {
               from {border-radius: 0px;}
-              to {border-radius: 20px;background-color:white;color:rgba(50,50,50,0.5);}
+           to {border-radius: 20px;background-color:white;color:rgba(50,50,50,0.5);}
            }
            @keyframes slide-up {
-            0% {
-              opacity: 0;
-              transform: translateY(20px);
-              }
-            100% {
-              opacity: 1;
-              transform: translateY(0);
-              }
-            }
+           0% {
+           opacity: 0;
+           transform: translateY(20px);
+           }
+           100% {
+           opacity: 1;
+           transform: translateY(0);
+           }
+           }
            .info-box {height: 45px;  margin : 0in; float: left; border: 0px;} 
            .info-box:hover {
-                 animation: example;
-                 animation-name: example;
-                 animation-duration: 1s;
-                 animation-timing-function: ease-in-out;
-                 animation-fill-mode: forwards;
-                 -webkit-animation-fill-mode: forwards;
-                 
+           animation: example;
+           animation-name: example;
+           animation-duration: 1s;
+           animation-timing-function: ease-in-out;
+           animation-fill-mode: forwards;
+           -webkit-animation-fill-mode: forwards;
+           
            }
            .info-box-icon {height: 100%; line-height: 100%; padding-top: 20px }
            .bg-lime {background-color:#00ff80!important; }
+           .bg-olive {background-color:	#FFD700!important; }
            #inf *,#sinf * {background-color:rgba(255,0,0,0); border-top:0px}
            #homerow *  {padding-left:0px}
            .info-box-content {padding: 0px;}
-           .info-box-content > p {padding :1px; }
+           .info-box-content > p {padding :1px; font-size: 16px;}
            .info-box-number {font-size: 26px; padding-top:2px; padding-bottom:1px}
            .leaflet-control-container {border-top:2px;}
            #inf {padding: 2px; padding-rigt:2px}
@@ -253,13 +326,14 @@ ui <- dashboardPage(
            #sinf > * {padding: 4px}
            #sinf  {padding: 0px;animation: slide-up 1s ease-in-out;}
            #CN {padding: 0px; background-color: rgba(255,0,0,0); text-align: center; 
-                border-color: rgba(255,0,0,0); margin-bottom:0px}
+           border-color: rgba(255,0,0,0); margin-bottom:0px}
            #InfPannel {padding: 0px ; border-radius: 30px;}
            #InfPannel > * {padding-left: 6px; padding-right: 0px}
            #MapPannel > * {padding-left: 0px; padding-right: 0px}
            #MainContent .box {border-top:0px; padding-left: 3px; padding-right: 2px}
            #Homepage-infp-plotly {padding: 0 0 0 15px}
            #comparedrow {margin-bottom: 5px; padding: 0 2px 0 2px}
+           #epa_panel_page *  {padding-left: 0; padding-right: 0 margin-left: 2px; margin-right:2px}
            '))),
     tabItems(
       #First tab content ----
@@ -464,6 +538,8 @@ ui <- dashboardPage(
                 )
               )
       ),
+
+# pm tab ------------------------------------------------------------------
       tabItem(
         "pm", fluidPage(
           fluidRow(
@@ -489,7 +565,42 @@ ui <- dashboardPage(
             )
           )
         )
-      )
+      ),
+
+# epa_panel ---------------------------------------------------------------
+tabItem("epa_panel",fluidPage(id = "epa_panel_page",
+                              column(width = 1, 
+                                     checkboxGroupButtons(inputId = "epa_panel_checkbox",
+                                                          direction = "vertical",
+                                                          label = "Air Pollutants",
+                                                          width = 6,
+                                                          choices = epa_panel.airpollutiontype)),
+                              column(width = 11,
+                                     fluidRow("epa_panel_global",background = "aqua",
+                                              column(width= 8,
+                                                     plotlyOutput("epa_trace"),
+                                                     radioGroupButtons(inputId = "epa_trace_radio",
+                                                                       label = "Air Pollutants",
+                                                                       width = 6,
+                                                                       choices = epa_panel.airpollutiontype,
+                                                                       choiceValues = 1:length(epa_panel.airpollutiontype)),
+                                                     plotlyOutput("epa_panel_global_plotly",height = 700),
+                                                     sliderInput("epa_panel_time","epa time",min = 1, max = 100,1)),
+                                              column(width = 4,
+                                                     tabBox(width = 12,
+                                                            tabPanel(title = "Pie",
+                                                                     h1("epa_panel_global_tab1_box")),
+                                                            tabPanel(title = "Surface", h1("epa_panel_global_tab2_box")),
+                                                            tabPanel(title = "Stat.", h1("epa_panel_global_tab3_box")))
+                                              )
+                                              
+                                     ),
+                                     fluidRow(
+                                       box("epa_panel_local",background = "orange", width = 12)
+                                     ))
+                              
+))
+
       
     )
     
@@ -588,6 +699,20 @@ server = function(input, output,session){
   })
   output$visAot_Text <- DT::renderDataTable(UpdateSelectedResult())
   # aot logic end ----
+  # EPA PANEL LOGIC ---------------------------------------------------------
+  output$epa_panel_global_plotly <- renderPlotly({
+    plot_ly(x = x.si[[input$epa_panel_time]], y = y.si[[input$epa_panel_time]], z = ~z.si[[input$epa_panel_time]]) %>% add_surface()
+  })
+  output$epa_trace <- renderPlotly({
+    index <- which(input$epa_trace_radio == c("CO","Pb","NO2","Ozone","PM10","PM2.5","SO2"))
+    epa_date <- as.Date(names(epadata[[index]])[2:(ncol(epadata[[index]])-2)],format = "%d/%m/%Y")
+    p<-plot_ly(x = epa_date, type = 'scatter', mode = 'lines+markers') 
+    for(i in 1:nrow(epadata[[index]])){
+      p %>% add_trace(y = epadata[[index]][i,2:(ncol(epadata[[index]])-2)], mode = 'lines+markers',
+                      name = epadata[[index]][i,1])
+    }
+    p
+  })
 
 # Home Page logic ---------------------------------------------------------
   output$MainInfPlot <- renderPlotly({
