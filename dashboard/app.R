@@ -273,15 +273,16 @@ ui <- dashboardPage(
                 menuItem("Home", tabName = "Home"),
                 menuItem("About", tabName = "About"),
                 menuItem("Pollution Measures",
-                         menuSubItem("Air Pollution - EPA","epa_panel"),
                          menuSubItem("PM 2.5", "pm"),
-                         menuSubItem("Aeorosol-Optical-Depth", "aod")),
+                         menuSubItem("Aeorosol Optical Depth", "aod")),
                 menuItem("Pollution Drivers",
                          menuSubItem("Weather", "noaa"),
                          menuSubItem("Traffic", "road_emissions")),
-                menuItem("AoT", tabName = "aot"),
-                menuItem("Demographic Data", tabName = "demographic"),
-                menuItem("Public Health", tabName = "health")
+                menuItem("Population Measures",
+                         menuSubItem("Demographic Data", tabName = "demographic"),
+                         menuSubItem("Public Health", tabName = "health")),
+                menuSubItem("Explore Array of Things", tabName = "aot"),
+                menuSubItem("Explore EPA Stations","epa_panel")
     )
   ),
   dashboardBody(
@@ -366,8 +367,9 @@ ui <- dashboardPage(
       ),
       #About-----
       tabItem(tabName = "About",
-              h1("CSDS Air Quality Analysis Application"),
-              h2("Center for Spatial Data Science"),
+              h1("About Open Air Chicago"),
+              br(),
+              p("This project is"),
               br(),
               h3("Dashboard"),
               p(),
