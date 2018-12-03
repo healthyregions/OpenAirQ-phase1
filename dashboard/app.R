@@ -431,6 +431,7 @@ ui <- dashboardPage(
               p("Aerosol optical depth is a measure of the extinction of the solar beam by dust 
                 and haze. In other words, particles in the atmosphere (dust, smoke, pollution) 
                 can block sunlight by absorbing or by scattering light."),
+              br(),
               h4("Data Source"),
               p("We use data directly from NASA. The Moderate Resolution Imaging Spectroradiometer 
                 (MODIS) satellite provides daily global coverage, but the 10 km resolution of its 
@@ -463,12 +464,12 @@ ui <- dashboardPage(
               ),
               conditionalPanel(condition = "input.selecttime == 'Yearly'",
                                box(
-                                 width = 8,
+                                 width = 8, height = 600,
                                  leafletOutput("aodmapyearly")
                                )),
               conditionalPanel(condition = "input.selecttime == 'Monthly'",
                                box(
-                                 width = 8,
+                                 width = 8, height = 600,
                                  leafletOutput("aodmapmonthly")
                                )),
               conditionalPanel(condition = "input.selecttime == 'Overall'",
@@ -1233,8 +1234,7 @@ server = function(input, output,session){
         tm_layout(
           main.title = "Traffic Volume by Community Area of Chicago",
           main.title.size = 1.2
-        ) +
-        tm_view(view.legend.position = c("left", "bottom"))
+        )
     }
     if(input$road_emit_type == "Road Lengths")
     {
@@ -1252,8 +1252,7 @@ server = function(input, output,session){
         tm_layout(
           main.title = "Road Lengths by Community Area of Chicago",
           main.title.size = 1.2
-        ) +
-        tm_view(view.legend.position = c("left", "bottom"))
+        )
     }
     tmap_leaflet(road_emissions_map)
   })
