@@ -369,27 +369,15 @@ ui <- dashboardPage(
       ),
       #About-----
       tabItem(tabName = "About",
-              h1("About Open Air Chicago"),
-              br(),
-              p("This project is"),
-              br(),
-              h3("Dashboard"),
-              p(),
-              h3("Data"),
-              p(),
-              h4("Monitoring Data"),
-              h4("Aerosol Optical Depth (AOD) Data"),
-              h4("Covariate Data"),
-              h3("Analysis"),
-              p()
-              
-      ),
+        img(src='AirQAbout.png', height = 800, align = "center")),
+
       #tabitem noaa ----
       tabItem(tabName = "noaa",
               
               fluidRow(
                 box(
                   width = 4,
+                  h1("Meteorological Data"),
                   selectInput(inputId="type", label="Choose type of data",c('Temperature Min', 'Temperature Max', 'Precipitation','Sensor locations')),
                   sliderInput(inputId="year",label = "Choose a year",
                               value = 2012, min=2012,max=2018),
@@ -398,19 +386,21 @@ ui <- dashboardPage(
                     condition = "input.monthOrYear == 'Monthly'",
                     
                     sliderInput(inputId="month",label = "Choose a month",
-                                value = 1, min=1,max=12),
-                    
-                    selectInput("var", 
-                                label = "Choose a medical condition:",
-                                choices = c("Asthma Cases",
-                                            "Diabetes Cases",
-                                            "Depression Cases"),
-                                selected = "Asthma Cases") 
-                  ) ),
-                box(
-                  width = 8,
-                  leafletOutput("working_map")
-                )
+                                value = 1, min=1,max=12)),
+                  br(),
+                  h4("About AOD"),
+                  p("Temperature and preciptation both impact short and longterm air pollution trends,
+                   and together consitute long-term climate patterns"),
+                  br(),
+                  h4("Data Source"),
+                  p("This data is from NOAA.")
+                    ),
+
+
+                  box(
+                    width = 8,
+                    leafletOutput("working_map", width = 800, height = 600)
+                  )
               ),
               fluidRow(
                 plotOutput("graph")
@@ -516,7 +506,7 @@ ui <- dashboardPage(
                 ),
                 box(
                   width = 8,
-                  leafletOutput("demographic_map")
+                  leafletOutput("demographic_map",width = 800, height = 600)
                 )
               )
       ),
@@ -537,7 +527,7 @@ ui <- dashboardPage(
                 ),
                 box(
                   width = 8,
-                  leafletOutput("health_map")
+                  leafletOutput("health_map",width = 800, height = 600)
                 )
               )
       ),
@@ -547,6 +537,7 @@ ui <- dashboardPage(
               fluidRow(
                 box(
                   width = 4,
+                  h1("Road Emissions"),
                   selectInput(inputId="road_emit_type", 
                               label="Choose type of data",
                               c("Traffic Volume", "Road Lengths")
@@ -554,7 +545,7 @@ ui <- dashboardPage(
                 ),
                 box(
                   width = 8,
-                  leafletOutput("road_emissions_map")
+                  leafletOutput("road_emissions_map", width = 800, height = 600)
                 )
               )
       ),
@@ -650,8 +641,12 @@ tabItem("epa_panel",fluidPage(id = "epa_panel_page",
 
 #server ----
 server = function(input, output,session){
+
   # aot logic ----
   ns <- NS("editor")# set namespace
+
+
+
   labels <- sprintf(
     "<strong>%s</strong><br/>%g Area",
     ChicagoBoundary$community, ChicagoBoundary$shape_area
@@ -1061,6 +1056,7 @@ server = function(input, output,session){
     
     a <- leaflet() %>% 
       addTiles(urlTemplate = BaseMapStyle) %>% 
+      setView(lng = -87.6298, lat = 41.8781, 11) %>% 
       addRasterImage(aod.yearly[[selected.yr]], opacity = 0.7, colors = yearly.aod.pal) %>% 
       leaflet::addLegend(pal = yearly.aod.pal, values = values(aod.yearly[[selected.yr]])) %>% 
       addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.01, stroke = FALSE,
@@ -1087,6 +1083,7 @@ server = function(input, output,session){
     
     a <- leaflet() %>% 
       addTiles(urlTemplate = BaseMapStyle) %>% 
+      setView(lng = -87.6298, lat = 41.8781, 11) %>% 
       addRasterImage(aod.monthly[[selected.mo.index]], opacity = 0.7, colors = monthly.aod.pal) %>% 
       leaflet::addLegend(pal = monthly.aod.pal, values = values(aod.monthly[[selected.mo.index]])) %>% 
       addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.01, stroke = FALSE,
@@ -1103,6 +1100,7 @@ server = function(input, output,session){
   output$aodmapoverall <- renderLeaflet({
     a <- leaflet() %>% 
       addTiles(urlTemplate = BaseMapStyle) %>% 
+      setView(lng = -87.6298, lat = 41.8781, 11) %>% 
       addRasterImage(aod.average, opacity = 0.7, colors = yearly.aod.pal) %>% 
       leaflet::addLegend(pal = yearly.aod.pal, values = values(aod.average)) %>% 
       addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.01, stroke = FALSE,
