@@ -419,11 +419,26 @@ ui <- dashboardPage(
       #tabitem aod
       tabItem(tabName = "aod",
               box(
+                h1("Aerosol Optical Depth (AOD)"),
                 width = 4,
                 selectInput(inputId = "selecttime",
                             label = "Overall, Yearly, or Monthly Averages?",
                             choices = c("Overall", "Yearly",
-                                        "Monthly"))
+                                        "Monthly")),
+
+              br(),
+              h4("About AOD"),
+              p("Aerosol optical depth is a measure of the extinction of the solar beam by dust 
+                and haze. In other words, particles in the atmosphere (dust, smoke, pollution) 
+                can block sunlight by absorbing or by scattering light."),
+              h4("Data Source"),
+              p("We use data directly from NASA. The Moderate Resolution Imaging Spectroradiometer 
+                (MODIS) satellite provides daily global coverage, but the 10 km resolution of its 
+                aerosol optical depth (AOD) product is not suitable for studying spatial variability 
+                f aerosols in urban areas. Recently, a new Multi-Angle Implementation of Atmospheric 
+                Correction (MAIAC) algorithm was developed for MODIS which provides AOD at 1 km 
+                resolution.")
+
               ),
               box(
                 width = 8,
@@ -458,7 +473,7 @@ ui <- dashboardPage(
                                )),
               conditionalPanel(condition = "input.selecttime == 'Overall'",
                                box(
-                                 width = 8,
+                                 width = 8, height = 600,
                                  leafletOutput("aodmapoverall")
                                ))
               
@@ -550,13 +565,25 @@ ui <- dashboardPage(
           fluidRow(
             box(
               width = 4,
-              title = "Particulate Matter <2.5",
+              h1("PM 2.5"),
               radioButtons("EPAYM","Average Time Window: (monthly/yearly):",c("Yearly"=0,"Monthly"=1)),
-              checkboxInput("EPASiteOn", "EPA Monitoring Station", value = TRUE, width = NULL),
-               "PM2.5 refers to atmospheric particulate matter (PM) that have a diameter of less than 
-              2.5 micrometers, which is about 3% the diameter of a human hair. PM2.5 measures in the air here are collected from Air Quality System (AQS) data, which contains 
+              checkboxInput("EPASiteOn", "Show EPA Monitoring Station", value = TRUE, width = NULL),
+              br(),
+               h4("About PM 2.5"),
+               p("PM2.5 refers to atmospheric particulate matter (PM) that have a diameter of less than 
+              2.5 micrometers, which is about 3% the diameter of a human hair. PM2.5 are deadly because 
+              their particles are so small that they are inhaled and trapped more deeply in the lungs and 
+              bloodstream, posing significant health risks to the respiratory and cardiovascular systems 
+              including aggravated asthma, decreased lung function, nonfatal heart attacks etc."),
+              p("Susceptible groups with pre-existing lung or heart disease, as well as elderly people and 
+              children, are particularly vulnerable. Based on known health effects, both short-term (24-hour) and long-term (annual mean) guidelines 
+              are recommended by the World Health Organisation. These are 10 µg/m3 annual mean, and 25 µg/m3 
+              24-hour mean."),
+              br(),
+              h4("Data Source"),
+              p("PM2.5 measures in the air here are collected from Air Quality System (AQS) data, which contains 
               representative ambient air pollution data across different states collected by federal, state, 
-              local, and tribal air pollution control agencies from over thousands of monitors."           
+              local, and tribal air pollution control agencies from over thousands of monitors. Stations in this area are from the EPA.")           
 
               ),
             
@@ -571,21 +598,6 @@ ui <- dashboardPage(
                 # tags$style(type="text/css",
                 #            "#MainMap.recalculating { opacity: 1.0 }"),
                 leafletOutput("MainMap",height = MapBHeight))
-          ),
-          fluidRow(
-            box(width = 12, title = "About PM 2.5",
-                "PM2.5 are deadly because 
-              their particles are so small that they are inhaled and trapped more deeply in the lungs and 
-              bloodstream, posing significant health risks to the respiratory and cardiovascular systems 
-              including aggravated asthma, decreased lung function, nonfatal heart attacks etc.
-
-              Susceptible groups with pre-existing lung or heart disease, as well as elderly people and 
-              children, are particularly vulnerable.
-
-              Based on known health effects, both short-term (24-hour) and long-term (annual mean) guidelines 
-              are recommended by the World Health Organisation. These are 10 µg/m3 annual mean, and 25 µg/m3 
-              24-hour mean."
-            )
           )
 
         )
