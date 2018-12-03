@@ -456,7 +456,7 @@ ui <- dashboardPage(
                                  sliderInput("aodmonth", "Select Month:",
                                              min = strptime("2014/01/01","%Y/%m/%d"), 
                                              max = strptime("2018/09/18","%Y/%m/%d"),
-                                             value = strptime("2014/01/01","%Y/%m/%d"),
+                                             value = strptime("2015/06/15","%Y/%m/%d"),
                                              timeFormat = "%Y/%m",
                                              step = as.difftime(30 ,units = "days"),
                                              animate = animationOptions(interval = 500))
@@ -465,17 +465,17 @@ ui <- dashboardPage(
               conditionalPanel(condition = "input.selecttime == 'Yearly'",
                                box(
                                  width = 8, height = 600,
-                                 leafletOutput("aodmapyearly")
+                                 leafletOutput("aodmapyearly", width = 800, height = MapBHeight)
                                )),
               conditionalPanel(condition = "input.selecttime == 'Monthly'",
                                box(
                                  width = 8, height = 600,
-                                 leafletOutput("aodmapmonthly")
+                                 leafletOutput("aodmapmonthly",width = 800, height = MapBHeight)
                                )),
               conditionalPanel(condition = "input.selecttime == 'Overall'",
                                box(
                                  width = 8, height = 600,
-                                 leafletOutput("aodmapoverall")
+                                 leafletOutput("aodmapoverall",width = 800, height = MapBHeight)
                                ))
               
       )),
@@ -1060,7 +1060,7 @@ server = function(input, output,session){
     selected.yr <- which(yr.names == selected.yr)
     
     a <- leaflet() %>% 
-      addTiles() %>% 
+      addTiles(urlTemplate = BaseMapStyle) %>% 
       addRasterImage(aod.yearly[[selected.yr]], opacity = 0.7, colors = yearly.aod.pal) %>% 
       leaflet::addLegend(pal = yearly.aod.pal, values = values(aod.yearly[[selected.yr]])) %>% 
       addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.01, stroke = FALSE,
@@ -1086,7 +1086,7 @@ server = function(input, output,session){
     selected.mo.index <- which(mo.names == selected.mo)
     
     a <- leaflet() %>% 
-      addTiles() %>% 
+      addTiles(urlTemplate = BaseMapStyle) %>% 
       addRasterImage(aod.monthly[[selected.mo.index]], opacity = 0.7, colors = monthly.aod.pal) %>% 
       leaflet::addLegend(pal = monthly.aod.pal, values = values(aod.monthly[[selected.mo.index]])) %>% 
       addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.01, stroke = FALSE,
@@ -1102,7 +1102,7 @@ server = function(input, output,session){
   
   output$aodmapoverall <- renderLeaflet({
     a <- leaflet() %>% 
-      addTiles() %>% 
+      addTiles(urlTemplate = BaseMapStyle) %>% 
       addRasterImage(aod.average, opacity = 0.7, colors = yearly.aod.pal) %>% 
       leaflet::addLegend(pal = yearly.aod.pal, values = values(aod.average)) %>% 
       addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.01, stroke = FALSE,
