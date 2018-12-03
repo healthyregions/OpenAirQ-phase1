@@ -58,16 +58,18 @@ CircleHighLight.Color <- "#FF9955"
 
 StoryBoardWidth <-7
 MapBWidth <- (12 - StoryBoardWidth )
-MapBHeight <- 450
+MapBHeight <- 600
 
 BaseMapStyle <- "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
 
 #datasetpath
 datapath <-"data/"
+
 #initilization ----
 AotNodesNonspatial <- fread(paste0(datapath,"nodes.csv")) #readAotNodes
 AotNodes <- st_as_sf(AotNodesNonspatial, coords = c("lon", "lat"), crs = 4326, agr = "constant") #create points obj
 ChicagoBoundary <- readOGR("./data/Chicago.shp")
+
 ChicagoBoundary.NROW<-NROW(ChicagoBoundary)
 AotNodes_vis <- AotNodes
 Drawned <-1 #the drawned and intersected selection area. this might be infeasible for a multilayer case
@@ -544,28 +546,48 @@ ui <- dashboardPage(
 # pm tab ------------------------------------------------------------------
       tabItem(
         "pm", fluidPage(
+
           fluidRow(
-            box(width = StoryBoardWidth,title = "This is the story box",
-                tags$p(paste0(testtext,testtext,testtext))),
-            box(width = MapBWidth, title = "This is the map box",
+            box(
+              width = 4,
+              title = "Particulate Matter <2.5",
+              radioButtons("EPAYM","Average Time Window: (monthly/yearly):",c("Yearly"=0,"Monthly"=1)),
+              checkboxInput("EPASiteOn", "EPA Monitoring Station", value = TRUE, width = NULL),
+               "PM2.5 refers to atmospheric particulate matter (PM) that have a diameter of less than 
+              2.5 micrometers, which is about 3% the diameter of a human hair. PM2.5 measures in the air here are collected from Air Quality System (AQS) data, which contains 
+              representative ambient air pollution data across different states collected by federal, state, 
+              local, and tribal air pollution control agencies from over thousands of monitors."           
+
+              ),
+            
+            box(width = 8,
+                   sliderInput("EPAT", "Select time period:",
+                            min = strptime("2015/01/15","%Y/%m/%d"), 
+                            max = strptime("2017/12/31","%Y/%m/%d"),
+                            value = strptime("2015/07/16","%Y/%m/%d"),
+                            timeFormat = "%Y/%m",
+                            step = as.difftime(30,units = "days"),
+                            animate = animationOptions(interval = 500)),               
                 # tags$style(type="text/css",
                 #            "#MainMap.recalculating { opacity: 1.0 }"),
                 leafletOutput("MainMap",height = MapBHeight))
           ),
           fluidRow(
-            box(width = StoryBoardWidth,
-                sliderInput("EPAT", "EPA:",
-                            min = strptime("2015/01/15","%Y/%m/%d"), 
-                            max = strptime("2017/12/31","%Y/%m/%d"),
-                            value = strptime("2015/01/16","%Y/%m/%d"),
-                            timeFormat = "%Y/%m",
-                            step = as.difftime(30,units = "days"),
-                            animate = animationOptions(interval = 500)),
-                # actionButton("IniEPA","Initialize the EPA DATA"),
-                radioButtons("EPAYM","Average Time Window: (monthly/yearly):",c("Yearly"=1,"Monthly"=0)),
-                checkboxInput("EPASiteOn", "EPA Monitoring Station", value = FALSE, width = NULL)
+            box(width = 12, title = "About PM 2.5",
+                "PM2.5 are deadly because 
+              their particles are so small that they are inhaled and trapped more deeply in the lungs and 
+              bloodstream, posing significant health risks to the respiratory and cardiovascular systems 
+              including aggravated asthma, decreased lung function, nonfatal heart attacks etc.
+
+              Susceptible groups with pre-existing lung or heart disease, as well as elderly people and 
+              children, are particularly vulnerable.
+
+              Based on known health effects, both short-term (24-hour) and long-term (annual mean) guidelines 
+              are recommended by the World Health Organisation. These are 10 µg/m3 annual mean, and 25 µg/m3 
+              24-hour mean."
             )
           )
+
         )
       ),
 
@@ -993,16 +1015,16 @@ server = function(input, output,session){
     
     leaflet() %>% 
       addTiles(urlTemplate = BaseMapStyle) %>% 
-      setView(lng = -87.6298, lat = 41.8781, 8) %>% 
-      addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.1, stroke = FALSE,
-                  highlight = highlightOptions(
-                    # weight = 5,
-                    color = "#666",
-                    # dashArray = "",
-                    fillOpacity = 0.7,
-                    bringToFront = TRUE),
-                  label = labels,layerId = "ChicagoBoundary")%>%  
+      setView(lng = -87.6298, lat = 41.8781, 11) %>%  
       addRasterImage(RefreshEPASurface(),opacity=0.5,layerId = "EPA", colors=EPAPM2_5.pal)%>%
+      #addPolygons(data = Chicagoshp, color = "darkslategray",fillOpacity  = 0., stroke = TRUE,
+      #            highlight = highlightOptions(
+                    # weight = 5,
+      #              color = "#666",
+                    # dashArray = "",
+      #              fillOpacity = 0.7,
+      #              bringToFront = TRUE),
+      #            label = labels,layerId = "Chicago")%>% 
       addLegend(pal = EPAPM2_5.pal,values = (1:33), title = "EPA PM2.5",layerId = "EPALegend") %>% 
       addCircleMarkers(data=EPANode,opacity = ifelse(input$EPASiteOn,1,0),fillOpacity = ifelse(input$EPASiteOn,0.2,0))
     
