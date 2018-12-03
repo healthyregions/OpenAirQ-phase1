@@ -705,10 +705,14 @@ server = function(input, output,session){
   })
   output$epa_trace <- renderPlotly({
     index <- which(input$epa_trace_radio == c("CO","Pb","NO2","Ozone","PM10","PM2.5","SO2"))
-    epa_date <- as.Date(names(epadata[[index]])[2:(ncol(epadata[[index]])-2)],format = "%d/%m/%Y")
-    p<-plot_ly(x = epa_date, type = 'scatter', mode = 'lines+markers') 
+    epa_date <- as.Date(names(epadata[[index]])[2:(ncol(epadata[[index]])-2)],format = "%m/%d/%Y")
+    p<-plot_ly( type = 'scatter', mode = 'markers') 
     for(i in 1:nrow(epadata[[index]])){
-      p %>% add_trace(y = epadata[[index]][i,2:(ncol(epadata[[index]])-2)], mode = 'lines+markers',
+      thisy<- t(as.matrix(epadata[[index]][i,2:(ncol(epadata[[index]]) - 2)]))
+      p <-add_trace(p,
+                    x = epa_date,
+                    y = thisy[,1], 
+                    mode = 'markers',
                       name = epadata[[index]][i,1])
     }
     p
