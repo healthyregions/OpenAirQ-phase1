@@ -122,11 +122,13 @@ valuefield <- "Daily Mean PM2.5 Concentration"
 i<- 1 
 
 # s_epr<-as.data.frame(scale(as.data.frame(epr),))
-plot_ly(s_epr, x = s_epr$lat, y = s_epr$lon, z = s_epr$`01/05/2018`, type = "surface")
+# plot_ly(s_epr, x = s_epr$lat, y = s_epr$lon, z = s_epr$`01/05/2018`, type = "surface")
 epr<-CreateAirPollutantPointDataSet(epasource[2],valuefield = "Daily Mean PM10 Concentration")
 epr<-CreateAirPollutantPointDataSet(epasource[3])}
 
-  
+#create monthly or year avg
+
+#create dialy raw data
 CreateAirPollutantPointDataSet <-function(path, datefield = "Date",siteidfield = "Site ID",siteidinresulttable = "SiteID", valuefield = "",coordinatesfield = c("SITE_LATITUDE","SITE_LONGITUDE")){
 epadataframe <-fread(path)
 valuefield <- names(epadataframe)[5]
@@ -158,21 +160,125 @@ result <- cbind(result,coord[,2:3])
 # result<-merge(result,epadataframe,by.x = siteidinresulttable, by.y = siteidfield,)
 return(result)
 }
+#generate Grid
+pt2grid <- function(ptframe,n) {
+  bb <- bbox(ptframe)  
+  ptcrs <- proj4string(ptframe)  
+  xrange <- abs(bb[1,1] - bb[1,2])  
+  yrange <- abs(bb[2,1] - bb[2,2])  
+  cs <- c(xrange/n,yrange/n)  
+  cc <- bb[,1] + (cs/2)  
+  dc <- c(n,n)  
+  x1 <- GridTopology(cellcentre.offset=cc,cellsize=cs,cells.dim=dc)  
+  x2 <- SpatialGrid(grid=x1,proj4string=CRS(ptcrs))
+  return(x2)
+}
+#read a year and month avg from one epa point dataset
+#Create a object say both raw and processed data
+EPAMonthlyYearlyAVG <-function(EpaRawData){
+  epadataframe <-fread(EpaRawData)
+  valuefield <- names(epadataframe)[5]
+  epadataframe$date <- as.Date(epadataframe$Date,format = "%m/%d/%Y")
+  epadataframe$year <- year(epadataframe$date)
+  epadataframe$month <- month(epadataframe$date)
+  epaloc <- epadataframe[,.(.N),by = .(`Site ID`,SITE_LATITUDE,SITE_LONGITUDE)]
+  epasub <- epadataframe[,.(`Site ID`,get(valuefield),year,month)]
+  averagebymonth <- epasub[,lapply(.SD,mean,na.rm = T), by = .(`Site ID`,month,year)]
+  averagebyyear <- averagebymonth[,lapply(.SD,mean,na.rm = T), by = .(`Site ID`,year)]
+  
+  return(list(EPARAW = epadataframe, 
+              epamonth = averagebymonth, 
+              epayear = averagebyyear, 
+              datatype = valuefield,
+              loc = epaloc))
+
+}
+#Create Interpolatio Image
+CreateInterpolationImage<-function(EPAMYR,YEAR,MONTH,GRID = "",RESL = 100, Datafield = "V2",IDW = T,byMONTH = T)
+{
+
+#given a time 
+#year
+dfyear <- YEAR
+dfmonth <- MONTH
+datafield <- Datafield
+resl <- RESL # resolution
+if(byMONTH){
+  inputdatatable<-merge(EPAMYR$epamonth,EPAMYR$loc, by.x = "Site ID", by.y = "Site ID")
+  subtable <- inputdatatable[month == dfmonth & year == dfyear,]}
+else
+{
+  inputdatatable<-merge(EPAMYR$epayear,EPAMYR$loc, by.x = "Site ID", by.y = "Site ID")
+  subtable <- inputdatatable[year == dfyear,]
+}
+
+###
+# epadataframe$day <- day(epadataframe$date)
+# subtable <- epadataframe[month == dfmonth & year == dfyear & day ==2,]
+# datafield <- "Daily Max 8-hour Ozone Concentration"
+##
+df <- as.data.frame(subtable)
+df <- as.data.frame(subset(df,(!is.na(df[[datafield]]))))
+coordinates(df) <- df[,c("SITE_LONGITUDE", "SITE_LATITUDE")]
+proj4string(df) <- CRS("+init=epsg:4326")
 
 
+# plot(kr.vgm, kr.fit)
+# create a grid for interpolation
+if(GRID ==""){
+  itpgrid <- pt2grid(df,resl)
+  projection(itpgrid) <- CRS("+init=epsg:4326") 
+}else{
+  itpgrid <-GRID
+}
 
-# plot_ly(x = x.si[[1]], y = y.si[[1]], z = ~z.si[[1]]) %>% add_surface()
-# plot_ly(x = x.si, y = y.si, z = unlist(z.si) ,frame = 1:10) %>% add_contour()
-# persp3d(x.si, y.si, z.si, col = "gray")
 
-# parLapply(cl, inputs, processInput)
+if(IDW){
+  return(idw(df[[datafield]] ~ 1,df,itpgrid))
+}else
+{
+  kr.vgm <- variogram(df[[datafield]] ~ 1, df)
+  kr.fit <- fit.variogram(kr.vgm, model=vgm("Mat"),fit.kappa = T) # fit model
+  # optimize the value of kappa in a Matern model, using ugly <<- side effect:
+  f = function(x) attr(m.fit <<- fit.variogram(kr.vgm, vgm("Mat",nugget=NA,kappa=x)),"SSErr")
+  optimize(f, c(0.1, 1000))
+  return(krige(df[[datafield]] ~ 1,df,itpgrid, model= m.fit ))
+}
+#plot(Itpr)
+}
 
-# stopCluster(cl)
+# saveformat <- 'paste0(\"epa\",EPAMYR$datatype,\"_\",YEAR,\"_\",MONTH,\".tif\")'
+CreateInterpolationImageFile <- function(folderpath){
+  # run this if local test
+  # datadir = "dashboard/data/epa"
+  # setwd(datadir)
+  epasource<-list.files(folderpath,pattern = "*.csv")
+  for(i in 1 : length(epasource)){
+    EPAMYR <- EPAMonthlyYearlyAVG(epasource[i])
+    Monthlist<-EPAMYR$epamonth[,.(.N),by = .(month, year)]
+    for(j in 1:nrow(Monthlist)){
+      YEAR <- Monthlist$year[j]
+      MONTH <- Monthlist$month[j]
+      print(c(EPAMYR$datatype,YEAR,MONTH,i,j))
+      thisimage <- CreateInterpolationImage(EPAMYR,YEAR,MONTH)
+      SavePath <- paste0("epa",EPAMYR$datatype,"_",YEAR,"_",MONTH,".tif")
+      writeGDAL(thisimage,SavePath)
+    }
+    Yearlist <-EPAMYR$epamonth[,.(.N),by = .(year)]
+    for(j in 1:nrow(Yearlist)){
+      YEAR <- Yearlist$year[j]
+      MONTH <- 0
+      print(c(EPAMYR$datatype,YEAR,MONTH,i,j))
+      thisimage <- CreateInterpolationImage(EPAMYR,YEAR,MONTH,byMONTH = F)
+      SavePath <- paste0("epa",EPAMYR$datatype,"_",YEAR,"_",MONTH,".tif")
+      writeGDAL(thisimage,SavePath)
+    }
+  }
+  # run this for testing result
+  # plot(raster("epaDaily Mean PM2.5 Concentration_2018_9.tif")) 
+}
 
 
-
-# kd <- with(MASS::geyser, MASS::kde2d(duration, waiting, n = 50))
-# p <- plot_ly(x = kd$x, y = kd$y, z = kd$z) %>% add_surface()
 
 
 
