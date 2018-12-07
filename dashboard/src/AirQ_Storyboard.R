@@ -162,6 +162,7 @@ return(result)
 }
 #generate Grid
 pt2grid <- function(ptframe,n) {
+  
   bb <- bbox(ptframe)  
   ptcrs <- proj4string(ptframe)  
   xrange <- abs(bb[1,1] - bb[1,2])  
@@ -222,14 +223,19 @@ df <- as.data.frame(subset(df,(!is.na(df[[datafield]]))))
 coordinates(df) <- df[,c("SITE_LONGITUDE", "SITE_LATITUDE")]
 proj4string(df) <- CRS("+init=epsg:4326")
 
-
+griddf<-SpatialPoints(cbind(c(-87.439931,-87.969428),c(41.589314,42.050333)),proj4string = CRS("+init=epsg:4326"))
+# proj4string(griddf) <- CRS("+init=epsg:4326")
+# griddf <- SpatialPointsDataFrame(proj4string = CRS("+init=epsg:4326"),bbox = bbox(SpatialPoints(cbind(c(-87.439931,-87.969428),c(41.589314,42.050333)))))
 # plot(kr.vgm, kr.fit)
 # create a grid for interpolation
 if(GRID ==""){
-  itpgrid <- pt2grid(df,resl)
+  itpgrid <- pt2grid(griddf,resl)
+  print("ss")
   projection(itpgrid) <- CRS("+init=epsg:4326") 
 }else{
-  itpgrid <-GRID
+  itpgrid <- pt2grid(df,resl)
+  projection(itpgrid) <- CRS("+init=epsg:4326") 
+  # itpgrid <-GRID
 }
 
 
@@ -247,36 +253,60 @@ if(IDW){
 #plot(Itpr)
 }
 
+
+SpatialBoundary <- readOGR("Chicago.shp")
+projection(SpatialBoundary) <- CRS("+init=epsg:4326") 
+CHICAGOEPA<-CreateInterpolationImageFile("EPA/",SpatialBoundary)
+
+
 # saveformat <- 'paste0(\"epa\",EPAMYR$datatype,\"_\",YEAR,\"_\",MONTH,\".tif\")'
-CreateInterpolationImageFile <- function(folderpath){
+CreateInterpolationImageFile <- function(folderpath,SpatialBoundary = NULL){
   # run this if local test
   # datadir = "dashboard/data/epa"
   # setwd(datadir)
+  if(!is.null(SpatialBoundary)){
+    returnlist <- list(ID = 1:nrow(SpatialBoundary))
+  }
   epasource<-list.files(folderpath,pattern = "*.csv")
   for(i in 1 : length(epasource)){
-    EPAMYR <- EPAMonthlyYearlyAVG(epasource[i])
+    EPAMYR <- EPAMonthlyYearlyAVG(paste0(folderpath,epasource[i]))
     Monthlist<-EPAMYR$epamonth[,.(.N),by = .(month, year)]
     for(j in 1:nrow(Monthlist)){
       YEAR <- Monthlist$year[j]
       MONTH <- Monthlist$month[j]
-      print(c(EPAMYR$datatype,YEAR,MONTH,i,j))
+      # print(c(EPAMYR$datatype,YEAR,MONTH,i,j))
       thisimage <- CreateInterpolationImage(EPAMYR,YEAR,MONTH)
-      SavePath <- paste0("epa",EPAMYR$datatype,"_",YEAR,"_",MONTH,".tif")
-      writeGDAL(thisimage,SavePath)
+      Filename <- paste0("epa",EPAMYR$datatype,"_",YEAR,"_",MONTH)
+      SavePath <- paste0(folderpath,Filename,".tif")
+      writeGDAL(thisimage,SavePath, drivername="GTiff",type="Float32")
+      if(!is.null(SpatialBoundary)){
+      ext<-raster::extract(raster(SavePath),SpatialBoundary,fun = mean)
+      returnlist[[Filename]]<-ext
+      }
     }
     Yearlist <-EPAMYR$epamonth[,.(.N),by = .(year)]
     for(j in 1:nrow(Yearlist)){
       YEAR <- Yearlist$year[j]
       MONTH <- 0
-      print(c(EPAMYR$datatype,YEAR,MONTH,i,j))
+      # print(c(EPAMYR$datatype,YEAR,MONTH,i,j))
       thisimage <- CreateInterpolationImage(EPAMYR,YEAR,MONTH,byMONTH = F)
-      SavePath <- paste0("epa",EPAMYR$datatype,"_",YEAR,"_",MONTH,".tif")
-      writeGDAL(thisimage,SavePath)
+      Filename <- paste0("epa",EPAMYR$datatype,"_",YEAR,"_",MONTH)
+      SavePath <- paste0(folderpath,Filename,".tif")
+      writeGDAL(thisimage,SavePath, drivername="GTiff",type="Float32")
+      if(!is.null(SpatialBoundary)){
+        ext<-raster::extract(raster(SavePath),SpatialBoundary,fun = mean)
+        returnlist[[Filename]]<-ext
+      }
     }
+    
   }
+  return(returnlist)
   # run this for testing result
   # plot(raster("epaDaily Mean PM2.5 Concentration_2018_9.tif")) 
 }
+
+
+
 
 
 
