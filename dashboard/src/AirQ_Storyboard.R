@@ -252,14 +252,6 @@ if(IDW){
 }
 #plot(Itpr)
 }
-
-
-SpatialBoundary <- readOGR("Chicago.shp")
-projection(SpatialBoundary) <- CRS("+init=epsg:4326") 
-CHICAGOEPA<-CreateInterpolationImageFile("EPA/",SpatialBoundary)
-
-
-# saveformat <- 'paste0(\"epa\",EPAMYR$datatype,\"_\",YEAR,\"_\",MONTH,\".tif\")'
 CreateInterpolationImageFile <- function(folderpath,SpatialBoundary = NULL){
   # run this if local test
   # datadir = "dashboard/data/epa"
@@ -280,8 +272,8 @@ CreateInterpolationImageFile <- function(folderpath,SpatialBoundary = NULL){
       SavePath <- paste0(folderpath,Filename,".tif")
       writeGDAL(thisimage,SavePath, drivername="GTiff",type="Float32")
       if(!is.null(SpatialBoundary)){
-      ext<-raster::extract(raster(SavePath),SpatialBoundary,fun = mean)
-      returnlist[[Filename]]<-ext
+        ext<-raster::extract(raster(SavePath),SpatialBoundary,fun = mean)
+        returnlist[[Filename]]<-ext
       }
     }
     Yearlist <-EPAMYR$epamonth[,.(.N),by = .(year)]
@@ -304,6 +296,14 @@ CreateInterpolationImageFile <- function(folderpath,SpatialBoundary = NULL){
   # run this for testing result
   # plot(raster("epaDaily Mean PM2.5 Concentration_2018_9.tif")) 
 }
+
+# SpatialBoundary <- readOGR("Chicago.shp")
+# projection(SpatialBoundary) <- CRS("+init=epsg:4326") 
+# CHICAGOEPA<-CreateInterpolationImageFile("EPA/",SpatialBoundary)
+
+
+# saveformat <- 'paste0(\"epa\",EPAMYR$datatype,\"_\",YEAR,\"_\",MONTH,\".tif\")'
+
 
 
 
