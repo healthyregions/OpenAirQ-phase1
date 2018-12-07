@@ -68,13 +68,14 @@ datapath <-"data/"
 #initilization ----
 AotNodesNonspatial <- fread(paste0(datapath,"nodes.csv")) #readAotNodes
 AotNodes <- st_as_sf(AotNodesNonspatial, coords = c("lon", "lat"), crs = 4326, agr = "constant") #create points obj
-ChicagoBoundary <- readOGR("./data/Chicago.shp")
+ChicagoBoundary <- readOGR("./data/Chicago.shp") 
+
 
 ChicagoBoundary.NROW<-NROW(ChicagoBoundary)
 AotNodes_vis <- AotNodes
 Drawned <-1 #the drawned and intersected selection area. this might be infeasible for a multilayer case
 
-EPANode <- st_read(paste0(datapath,"PM2.5YearlyShapefile1.shp"))
+EPANode <- st_read(paste0(datapath,"PM2.5YearlyShapefile1.shp"),quiet = T)
 EPAPM2_5.breaks <- c(1:10,12,15,35) #Breaks for EPAPM2_5
 EPAPM2_5.pal <- colorNumeric(c("#D73027", "#FC8D59", "#D9EF8B", "#FEE08B", "#91CF60", "#1A9850"), 
                              EPAPM2_5.breaks, na.color = "transparent",reverse = T) #Palette for EPAPM2_5
@@ -1021,21 +1022,17 @@ server = function(input, output,session){
   })
   output$MainMap <- renderLeaflet({
     
-    leaflet() %>% 
+    m1<-leaflet() %>% 
       addTiles(urlTemplate = BaseMapStyle) %>% 
       setView(lng = -87.6298, lat = 41.8781, 11) %>%  
       addRasterImage(RefreshEPASurface(),opacity=0.5,layerId = "EPA", colors=EPAPM2_5.pal)%>%
-      #addPolygons(data = Chicagoshp, color = "darkslategray",fillOpacity  = 0., stroke = TRUE,
-      #            highlight = highlightOptions(
-                    # weight = 5,
-      #              color = "#666",
-                    # dashArray = "",
-      #              fillOpacity = 0.7,
-      #              bringToFront = TRUE),
-      #            label = labels,layerId = "Chicago")%>% 
       addLegend(pal = EPAPM2_5.pal,values = (1:33), title = "EPA PM2.5",layerId = "EPALegend") %>% 
-      addCircleMarkers(data=EPANode,opacity = ifelse(input$EPASiteOn,1,0),fillOpacity = ifelse(input$EPASiteOn,0.2,0))
-    
+      addCircleMarkers(data = EPANode,opacity = ifelse(input$EPASiteOn,1,0),fillOpacity = ifelse(input$EPASiteOn,0.2,0)) %>% 
+      leaflet::addPolygons(data = ChicagoBoundary, 
+                           color = "darkslategray",  opacity = 0.7, stroke = T,weight = 0.2, fillOpacity = 0.1,
+                           highlight = highlightOptions(color = "#666",fillOpacity = 0.7,bringToFront = F,sendToBack = T),
+                           label = labels)
+    m1
     # EPASiteOn  %>% 
     
   })
