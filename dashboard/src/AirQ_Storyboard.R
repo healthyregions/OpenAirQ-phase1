@@ -176,17 +176,25 @@ pt2grid <- function(ptframe,n) {
 }
 #read a year and month avg from one epa point dataset
 #Create a object say both raw and processed data
-EPAMonthlyYearlyAVG <-function(EpaRawData){
+EPAMonthlyYearlyAVG <-function(EpaRawData,valueFieldIndex = 5,timeFormat = "%m/%d/%Y", dayMax = F, daycut = 10){
+  tf<-function(x,b){sum(x>b)}
   epadataframe <-fread(EpaRawData)
-  valuefield <- names(epadataframe)[5]
-  epadataframe$date <- as.Date(epadataframe$Date,format = "%m/%d/%Y")
+  valuefield <- names(epadataframe)[valueFieldIndex]
+  epadataframe$date <- as.Date(epadataframe$Date,format = timeFormat)
   epadataframe$year <- year(epadataframe$date)
   epadataframe$month <- month(epadataframe$date)
   epaloc <- epadataframe[,.(.N),by = .(`Site ID`,SITE_LATITUDE,SITE_LONGITUDE)]
   epasub <- epadataframe[,.(`Site ID`,get(valuefield),year,month)]
-  averagebymonth <- epasub[,lapply(.SD,mean,na.rm = T), by = .(`Site ID`,month,year)]
-  averagebyyear <- averagebymonth[,lapply(.SD,mean,na.rm = T), by = .(`Site ID`,year)]
-  
+  if(dayMax)
+  {
+    averagebymonth <- epasub[,lapply(.SD,mean,na.rm = T), by = .(`Site ID`,month,year)]
+    averagebyyear <- averagebymonth[,lapply(.SD,mean,na.rm = T), by = .(`Site ID`,year)]
+  }
+  else
+  {
+    averagebymonth <- epasub[,lapply(.SD,tf,daycut), by = .(`Site ID`,month,year)]
+    averagebyyear <- averagebymonth[,lapply(.SD,tf,daycut), by = .(`Site ID`,year)]
+  }
   return(list(EPARAW = epadataframe, 
               epamonth = averagebymonth, 
               epayear = averagebyyear, 
@@ -252,7 +260,7 @@ if(IDW){
 }
 #plot(Itpr)
 }
-CreateInterpolationImageFile <- function(folderpath,SpatialBoundary = NULL){
+CreateInterpolationImageFile <- function(folderpath,SpatialBoundary = NULL,ExtractDailyCut = F){
   # run this if local test
   # datadir = "dashboard/data/epa"
   # setwd(datadir)
@@ -261,7 +269,8 @@ CreateInterpolationImageFile <- function(folderpath,SpatialBoundary = NULL){
   }
   epasource<-list.files(folderpath,pattern = "*.csv")
   for(i in 1 : length(epasource)){
-    EPAMYR <- EPAMonthlyYearlyAVG(paste0(folderpath,epasource[i]))
+    if((epasource[i] != "PM2.5.csv")&&ExtractDailyCut){next} 
+    EPAMYR <- EPAMonthlyYearlyAVG(paste0(folderpath,epasource[i]),dayMax = ExtractDailyCut)
     Monthlist<-EPAMYR$epamonth[,.(.N),by = .(month, year)]
     for(j in 1:nrow(Monthlist)){
       YEAR <- Monthlist$year[j]
@@ -297,11 +306,15 @@ CreateInterpolationImageFile <- function(folderpath,SpatialBoundary = NULL){
   # plot(raster("epaDaily Mean PM2.5 Concentration_2018_9.tif")) 
 }
 
-# SpatialBoundary <- readOGR("Chicago.shp")
-# projection(SpatialBoundary) <- CRS("+init=epsg:4326") 
-# CHICAGOEPA<-CreateInterpolationImageFile("EPA/",SpatialBoundary)
-
-
+if(F){
+#IF GENERATE SURFACE OF EPA TEST
+setwd("dashboard/data/")
+SpatialBoundary <- readOGR("Chicago.shp")
+projection(SpatialBoundary) <- CRS("+init=epsg:4326")
+CHICAGOEPA<-CreateInterpolationImageFile("EPA/",SpatialBoundary)
+ChicagoEPA <- as.data.frame(CHICAGOEPA)
+ChicagoEPA$COMMUNITYNAME <- SpatialBoundary$community
+write.csv(ChicagoEPA,'ChicagoEPA_DAYMAX.csv')}
 # saveformat <- 'paste0(\"epa\",EPAMYR$datatype,\"_\",YEAR,\"_\",MONTH,\".tif\")'
 
 
