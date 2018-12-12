@@ -541,8 +541,22 @@ ui <- dashboardPage(
                   h1("Road Emissions"),
                   selectInput(inputId="road_emit_type", 
                               label="Choose type of data",
-                              c("Traffic Volume", "Road Lengths")
-                  )
+                              c("Traffic Volume", "Road Lengths")),
+                  conditionalPanel(condition = "input.road_emit_type == 'Traffic Volume'",
+                                   br(),
+                                   h4("About Traffic Volume"),
+                                   p(" "),
+                                   br(),
+                                   h4("Data Source"),
+                                   p("The original traffic counts data set, Average Daily Traffic Counts, 
+                                     is from the City of Chicago Data Portal.")),
+                  conditionalPanel(condition = "input.road_emit_type == 'Road Lengths'",
+                                   br(),
+                                   h4("About Road Lengths"),
+                                   p(" "),
+                                   br(),
+                                   h4("Data Source"),
+                                   p("The original road lengths data set is from OpenStreetMap."))
                 ),
                 box(
                   width = 8,
