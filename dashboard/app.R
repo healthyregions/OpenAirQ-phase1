@@ -41,7 +41,7 @@ source("src/AirQ_Storyboard.R")
 #content(tar)[[111]]$value
 
 
-health <- st_read("data/HealthIndicators.shp")
+
 
 
 #css
@@ -280,7 +280,8 @@ ui <- dashboardPage(
                          menuSubItem("Aeorosol Optical Depth", "aod")),
                 menuItem("Pollution Drivers",
                          menuSubItem("Weather", "noaa"),
-                         menuSubItem("Traffic", "road_emissions")),
+                         menuSubItem("Traffic", "road_emissions"),
+                         menuSubItem("Elevation", "elevation")),
                 menuItem("Population Measures",
                          menuSubItem("Demographic Data", tabName = "demographic"),
                          menuSubItem("Public Health", tabName = "health")),
@@ -529,6 +530,19 @@ ui <- dashboardPage(
                 box(
                   width = 8,
                   leafletOutput("health_map",width = 800, height = 600)
+                )
+              )
+      ),
+      
+      tabItem(tabName = "elevation",
+              fluidRow(
+                box(
+                  width = 4,
+                  p("test text")
+                ),
+                box(
+                  width = 8,
+                  leafletOutput("elevation_map",width = 800, height = 600)
                 )
               )
       ),
@@ -1182,6 +1196,16 @@ server = function(input, output,session){
       # tm_layout(title = "Demographic Data by Community Area 2008-2012", title.position = c("right","bottom"))
     LF<-tmap_leaflet(demographic_map)
     LF
+  })
+  output$elevation_map <- renderLeaflet({
+    elevation_data <- raster("chicago_elevation.tif")
+  elevation_map <- tm_shape(ChicagoBoundary) +
+    tm_borders() +
+    tm_shape(r3) +
+    tm_raster() 
+  elev_map <- tmap_leaflet(elevation_map)
+  elev_map
+
   })
   #Chicago health map
   output$health_map <- renderLeaflet({
