@@ -115,6 +115,107 @@ CPTC.rankidtable <-""
 
 thisarrowcolor <-	rgb(0.5,0.5,0.5,0.5)
 
+#Import EPA panel variables --------
+EPA.Description <- fread("data/Description.csv",header = F)
+epa_panel.airpollutiontype <- c("CO","Pb","NO2","Ozone","PM10","PM2.5","SO2")#type of air pollution
+if(T){
+  
+  
+  #input epa data
+  ChicagoEPA <- fread("./data/ChicagoEPA.csv")
+  #input field validation function 
+  ValidateNameofEPA <-function(NameChrArray,month = T){
+    #return the valid month or year average field
+    #we might add check for the sub-type and other sensor source
+    if(month)
+      return((as.numeric(NameChrArray[[3]]) %in% 1:12)&
+               (as.numeric(NameChrArray[[2]]) %in% 1920:2050)&
+               (substr(NameChrArray[[1]],1,3) %in% c("epa")))
+    else
+      return((as.numeric(NameChrArray[[3]]) %in% 0)&
+               (as.numeric(NameChrArray[[2]]) %in% 1920:2050)&
+               (substr(NameChrArray[[1]],1,3) %in% c("epa")))
+  }
+  #extract epa data time point- remove id and community name
+  ChicagoEPATimePoint <- names(ChicagoEPA)[3:(ncol(ChicagoEPA)-1)]
+  #create the metadata from epa preprocessed result
+  CreateEPAMeta<-function(NameChrArray){
+    NameChrArray <- unlist(strsplit(NameChrArray,'_'))
+    Month <- as.numeric(NameChrArray[[3]])
+    Year <- as.numeric(NameChrArray[[2]])
+    DataSource <- substr(NameChrArray[[1]],1,3) 
+    Date <- (paste0(Year,"-",ifelse(Month ==0, 6,Month),"-01"))
+    #is valid field
+    Valid <- ((as.numeric(NameChrArray[[3]]) %in% 0:12)&
+                (as.numeric(NameChrArray[[2]]) %in% 1920:2050)&
+                (substr(NameChrArray[[1]],1,3) %in% c("epa")))
+    Subtype <- epa_panel.airpollutiontype[which(unlist(lapply(epa_panel.airpollutiontype, grepl, NameChrArray[[1]])))]
+    
+    # list(Month = Month, Year = Year, DataSource = DataSource, Valid = Valid, Subtype = Subtype)
+    
+    return(list(Month = Month, Year = Year, DataSource = DataSource, Valid = Valid, Subtype = Subtype, Date = Date))
+  }
+  
+  #create visualize 
+  EPAMeta<- (lapply(ChicagoEPATimePoint, CreateEPAMeta))
+  EPAMetaF<- setDT(do.call(rbind.data.frame, EPAMeta)) #do.call otherwise the list will be collapsed.
+  EPAMetaF$Subtype <- as.character(EPAMetaF$Subtype)
+  EPAMetaF$ID <- as.vector(1:length(ChicagoEPATimePoint)+2)
+  ifmonth <- T
+  #extractvalue
+  
+  #create the plotly result of pollutants
+  CreateTracePlotForOnePollutatn <- function(EPAMetaF, ChicagoEPA, typename = "CO", ifmonth = T){
+    p<-plot_ly( type = 'scatter', mode = 'markers') 
+    numobs <- nrow(ChicagoEPA)
+    for(i in 1:numobs){
+      #try to lapply this part, iteration migth cause severe lag
+      communityname <- ChicagoEPA$COMMUNITYNAME[i]
+      if(ifmonth)
+      {
+        extractedcol<-EPAMetaF[Subtype == typename & Month != 0 & Valid,]
+      }else{
+        extractedcol<-EPAMetaF[Subtype == typename & Month == 0 & Valid,]
+      }
+      extractedcol$Date <-  as.Date(extractedcol$Date)
+      extractedcol <- extractedcol[order(Date)]
+      extractedvalue <- as.numeric(as.matrix(ChicagoEPA[COMMUNITYNAME == communityname])[extractedcol$ID])
+      p<-add_lines(p,x = extractedcol$Date, y = extractedvalue ,name = communityname, color = I("grey"),
+                   line = list(shape = "spline"))
+      
+    }
+    return(p)}
+  #create epa-panel preload result
+  EPA.Proload <- T
+  EPA.ProloadPlotlychart <- list()
+  if(EPA.Proload){
+    for(i in 1:length(epa_panel.airpollutiontype))
+    {
+      p <- CreateTracePlotForOnePollutatn(EPAMetaF = EPAMetaF, ChicagoEPA =  ChicagoEPA, typename = epa_panel.airpollutiontype[i])
+      EPA.ProloadPlotlychart <- rbind(EPA.ProloadPlotlychart,data.table(PType = epa_panel.airpollutiontype[i], Chart = list(p)))
+    }
+    
+  }
+  
+  
+}#if not initilize
+#color
+ChicagoAirColor <- list(
+  transparent = 'rgba(0,0,0,0)',
+  default = '#708090',
+  highlight = "#AFEEEE"
+)
+#test text
+tt<-"We use data directly from NASA. The Moderate Resolution Imaging Spectroradiometer 
+                (MODIS) satellite provides daily global coverage"
+#margin of the plotly pie chart
+m <- list(
+  l = 10,
+  r = 10,
+  b = 10,
+  t = 30,
+  pad = 0
+)
 # Air pollution table epa -------------------------------------------------
 epa_panel.airpollutiontype <- c("CO","Pb","NO2","Ozone","PM10","PM2.5","SO2")#type of air pollution
 
@@ -266,8 +367,6 @@ CreateINPresult<-function(){
 
 InterpResultList<-CreateINPresult()#IinitializedEPA
 
-
-
 #ui ----
 ui <- dashboardPage(
   dashboardHeader(title = "Open Air Chicago"),
@@ -286,14 +385,14 @@ ui <- dashboardPage(
                          menuSubItem("Demographic Data", tabName = "demographic"),
                          menuSubItem("Public Health", tabName = "health")),
                 menuSubItem("Explore Array of Things", tabName = "aot"),
-                menuSubItem("Explore EPA Stations","epa_panel")
+                menuSubItem("Explore EPA Stations","expepa")
     )
   ),
   dashboardBody(
     tags$head(tags$style(
       HTML('
-            @keyframes example {
-              from {border-radius: 0px;}
+           @keyframes example {
+           from {border-radius: 0px;}
            to {border-radius: 20px;background-color:white;color:rgba(50,50,50,0.5);}
            }
            @keyframes slide-up {
@@ -339,15 +438,199 @@ ui <- dashboardPage(
            #Homepage-infp-plotly {padding: 0 0 0 15px}
            #comparedrow {margin-bottom: 5px; padding: 0 2px 0 2px}
            #epa_panel_page *  {padding-left: 0; padding-right: 0 margin-left: 2px; margin-right:2px}
+           
+           #box3col  {background-color:rgba(255,0,0,0)}
+           .leaflet-container {
+           }
+           @keyframes TransMap {
+           from {}
+           to {
+           transform: rotate(-90deg) scale(2) translateY(-50%) translateX(50%);}
+           }
+           @keyframes TransAbsPanel {
+           from {
+           top: -100px;
+           transform: translateY(-20%);
+           }
+           to {
+           transform: translateY(0%);
+           border-radius: 10px;}
+           }
+           div#lv2 {
+           height: 500px;
+           background-color: rgba(255,255,255,1)
+           }
+           div#lv2_ab:hover {
+           animation: TransMap;
+           animation-name: TransMap;
+           animation-duration: 1s;
+           animation-timing-function: ease-in-out;
+           animation-fill-mode: forwards;
+           -webkit-animation-fill-mode: forwards;
+           }
+           #EPAPolltantsControl {
+           margin-bottom: 2px;
+           }
+           #EPAPolltantsControl *{
+           margin-bottom: 1px;
+           }
+           #EPAPolltantsControl > *{
+           padding-bottom: 1px;
+           margin-left: 3px;
+           margin-right: 3px;
+           height: 54px;
+           }
+           #EPAPolltantsControl_Panel{
+           width: 80%;
+           margin: auto;
+           padding-bottom: 3px;
+           transform: translateY(-40%);
+           }
+           #CuteBox {
+           height: 0px;
+           position: relative;
+           }
+           #CuteBox > * {
+           z-index: 10000000;
+           position: relative;
+           top: -81px;
+           left: 69%;
+           }
+           #CuteBox *.box{
+           height: 100px;
+           width: 100px;
+           border: 0;
+           box-shadow: 0px 0px 5px #888888;
+           clip-path: polygon(-36% 32%, 76% 21%, 99% 62%, 3% 54%);
+           -webkit-clip-path: polygon(-36% 32%, 76% 21%, 99% 62%, 3% 54%);
+           }
+           #m1 {
+           width : 5px;
+           }
+           #m2 {
+           width : 10px!important;
+           height: 200px;!important;
+           background-color: green;
+           overflow: hidden;
+           }
+           #m2:hover {
+           transition: width 0.35s ease-in-out;
+           width : 7700%!important;
+           background-color: black;
+           overflow: visible;
+           }
+           #m3 {
+           height: 200px!important;
+           width: inhert!important;
+           z-index:1000000;
+           }
+           #m4 {
+           position: relative;
+           right: -10px;
+           top: -110%;
+           width: 85%!important;
+           height: 100%!important;
+           z-index: 5000;
+           }
+           #m3_1a{
+           height: 20%;
+           width: 10px;
+           background-color: #FFF0F5;
+           }
+           #m3_2a{
+           height: 80%;
+           width: 10px;
+           background-color: #708090;
+           }
+           #m3_1{
+           height: 40%;
+           width: 10px;
+           background-color: #AFEEEE;
+           }
+           #m3_2{
+           height: 60%;
+           width: 10px;
+           background-color: #708090;
+           }
+           #v1,#v1a{
+           width: 50%;
+           height:100%;
+           background-color: rgb(23, 48, 74);
+           }
+           #v2{
+           position: relative;
+           top:-100%;
+           right:-50%;
+           width: 120%;
+           height: 100%;
+           background-color:  #708090;
+           }
+           #CuteBox *.box{
+           background: -webkit-linear-gradient(left, rgba(112, 127, 143, 0.33) , rgb(112, 127, 143));
+           }
+           #CuteBox #CommunityName{
+           transform: translateX(-55%);
+           font-size: 20px;
+           position: relative;
+           top: -244px;
+           color: rgb(44, 60, 60);
+           animation: TransAbsPanel 1s ease-in-out;
+           -webkit-animation: TransAbsPanel 1s ease-in-out;
+           transition: ease-in-out;
+           text-align: center;
+           width: 179px;
+           background-color: #afeeee;
+           }
+           #CuteBox > h4{
+           position: relative;
+           top:-246px;
+           left: 88%;
+           color: rgb(226, 255, 255);
+           }
+           #v2 > p{
+           padding: 3em 4em 1em 3em;
+           color: rgba(255,255,255,1);
+           }
+           #v1 > h1{
+           font-size: 150px;
+           color: rgba(175,238,238,1);
+           text-align:left;
+           }
+           #v1 > h3{
+           font-size: 120px;
+           color: rgba(175,238,238,1);
+           text-align:right;
+           }
+           #v1a > h3{
+           font-size: 120px;
+           color: #FFF0F5;
+           text-align:right;
+           }
+           #radiob{
+           position: relative;
+           top: -7%;
+           }
+           .btn-default{
+           background-color: rgb(255,255,255);
+           border-color:  rgba(225,225,225,0.2);
+           }
+           .btn-default.active{
+           background-color: rgb(175,238,238)!important;
+           border-color:  rgba(175,238,238,0.2)!important;
+           }
+           .btn-default.hover{
+           background-color: rgb(175,238,238)!important;
+           border-color:  rgba(225,225,225,0.2);
+           }
            '))),
     tabItems(
       #First tab content ----
       tabItem(tabName = "Home",
               fixedRow(id = "titlerow", width = 12, 
-                          column(width = 4, checkboxInput("CPTCB", 
-                              label = "cross community comparison",
-                              value = F)),
-                          column(width = 8,verbatimTextOutput("CN"))),
+                       column(width = 4, checkboxInput("CPTCB", 
+                                                       label = "cross community comparison",
+                                                       value = F)),
+                       column(width = 8,verbatimTextOutput("CN"))),
               fixedRow(id = "homerow",column(id = "inf", width = 12,
                                              # uiOutput("HSB") #Homepae Stroy Board
                                              infoBoxOutput("inf1",width = 4),
@@ -355,24 +638,24 @@ ui <- dashboardPage(
                                              infoBoxOutput("inf3",width = 4))),
               fixedRow(id = "comparedrow",  
                        conditionalPanel(id = "sinf", condition = "input.CPTCB", 
-                                                  infoBoxOutput("inf4",width = 4),
-                                                  infoBoxOutput("inf5",width = 4),
-                                                  infoBoxOutput("inf6",width = 4))),
+                                        infoBoxOutput("inf4",width = 4),
+                                        infoBoxOutput("inf5",width = 4),
+                                        infoBoxOutput("inf6",width = 4))),
               fixedRow(id = "MainContent",
-               column(id = "InfPannel", width = 7,
-                      box(id = "Homepage-infp-plotly", width = 12,
-                          plotlyOutput("MainInfPlot"))
-                     ),
-                column(id = "MapPannel",
-                  width = 5,
-                  leafletOutput("HLM",height = 700) #Homepage Leaflet Map
-                )
+                       column(id = "InfPannel", width = 7,
+                              box(id = "Homepage-infp-plotly", width = 12,
+                                  plotlyOutput("MainInfPlot"))
+                       ),
+                       column(id = "MapPannel",
+                              width = 5,
+                              leafletOutput("HLM",height = 700) #Homepage Leaflet Map
+                       )
               )
       ),
       #About-----
       tabItem(tabName = "About",
-        img(src='AirQAbout.png', height = 800, align = "center")),
-
+              img(src='AirQAbout.png', height = 800, align = "center")),
+      
       #tabitem noaa ----
       tabItem(tabName = "noaa",
               
@@ -392,17 +675,17 @@ ui <- dashboardPage(
                   br(),
                   h4("About AOD"),
                   p("Temperature and preciptation both impact short and longterm air pollution trends,
-                   and together consitute long-term climate patterns"),
+                    and together consitute long-term climate patterns"),
                   br(),
                   h4("Data Source"),
                   p("This data is from NOAA.")
-                    ),
-
-
-                  box(
-                    width = 8,
-                    leafletOutput("working_map", width = 800, height = 600)
-                  )
+                  ),
+                
+                
+                box(
+                  width = 8,
+                  leafletOutput("working_map", width = 800, height = 600)
+                )
               ),
               fluidRow(
                 plotOutput("graph")
@@ -417,32 +700,32 @@ ui <- dashboardPage(
                             label = "Overall, Yearly, or Monthly Averages?",
                             choices = c("Overall", "Yearly",
                                         "Monthly")),
-
-              br(),
-              h4("About AOD"),
-              p("Aerosol optical depth is a measure of the extinction of the solar beam by dust 
-                and haze. In other words, particles in the atmosphere (dust, smoke, pollution) 
-                can block sunlight by absorbing or by scattering light."),
-              br(),
-              h4("Data Source"),
-              p("We use data directly from NASA. The Moderate Resolution Imaging Spectroradiometer 
-                (MODIS) satellite provides daily global coverage, but the 10 km resolution of its 
-                aerosol optical depth (AOD) product is not suitable for studying spatial variability 
-                f aerosols in urban areas. Recently, a new Multi-Angle Implementation of Atmospheric 
-                Correction (MAIAC) algorithm was developed for MODIS which provides AOD at 1 km 
-                resolution.")
-
-              ),
+                
+                br(),
+                h4("About AOD"),
+                p("Aerosol optical depth is a measure of the extinction of the solar beam by dust 
+                  and haze. In other words, particles in the atmosphere (dust, smoke, pollution) 
+                  can block sunlight by absorbing or by scattering light."),
+                br(),
+                h4("Data Source"),
+                p("We use data directly from NASA. The Moderate Resolution Imaging Spectroradiometer 
+                  (MODIS) satellite provides daily global coverage, but the 10 km resolution of its 
+                  aerosol optical depth (AOD) product is not suitable for studying spatial variability 
+                  f aerosols in urban areas. Recently, a new Multi-Angle Implementation of Atmospheric 
+                  Correction (MAIAC) algorithm was developed for MODIS which provides AOD at 1 km 
+                  resolution.")
+                
+                ),
               box(
                 width = 8,
                 conditionalPanel(condition = "input.selecttime == 'Yearly'", 
-                sliderInput("aodyear", "Select Year:",
-                            min = strptime("2014/01/04","%Y/%m/%d"), 
-                            max = strptime("2018/09/18","%Y/%m/%d"),
-                            value = strptime("2014/01/04","%Y/%m/%d"),
-                            timeFormat = "%Y/%m",
-                            step = as.difftime(365, units = "days"),
-                            animate = animationOptions(interval = 500))
+                                 sliderInput("aodyear", "Select Year:",
+                                             min = strptime("2014/01/04","%Y/%m/%d"), 
+                                             max = strptime("2018/09/18","%Y/%m/%d"),
+                                             value = strptime("2014/01/04","%Y/%m/%d"),
+                                             timeFormat = "%Y/%m",
+                                             step = as.difftime(365, units = "days"),
+                                             animate = animationOptions(interval = 500))
                 ),
                 conditionalPanel(condition = "input.selecttime == 'Monthly'", 
                                  sliderInput("aodmonth", "Select Month:",
@@ -453,24 +736,24 @@ ui <- dashboardPage(
                                              step = as.difftime(30 ,units = "days"),
                                              animate = animationOptions(interval = 500))
                                  
-              ),
-              conditionalPanel(condition = "input.selecttime == 'Yearly'",
-                               box(
-                                 width = 8, height = 600,
-                                 leafletOutput("aodmapyearly", width = 800, height = MapBHeight)
-                               )),
-              conditionalPanel(condition = "input.selecttime == 'Monthly'",
-                               box(
-                                 width = 8, height = 600,
-                                 leafletOutput("aodmapmonthly",width = 800, height = MapBHeight)
-                               )),
-              conditionalPanel(condition = "input.selecttime == 'Overall'",
-                               box(
-                                 width = 8, height = 600,
-                                 leafletOutput("aodmapoverall",width = 800, height = MapBHeight)
-                               ))
-              
-      )),
+                ),
+                conditionalPanel(condition = "input.selecttime == 'Yearly'",
+                                 box(
+                                   width = 8, height = 600,
+                                   leafletOutput("aodmapyearly", width = 800, height = MapBHeight)
+                                 )),
+                conditionalPanel(condition = "input.selecttime == 'Monthly'",
+                                 box(
+                                   width = 8, height = 600,
+                                   leafletOutput("aodmapmonthly",width = 800, height = MapBHeight)
+                                 )),
+                conditionalPanel(condition = "input.selecttime == 'Overall'",
+                                 box(
+                                   width = 8, height = 600,
+                                   leafletOutput("aodmapoverall",width = 800, height = MapBHeight)
+                                 ))
+                
+              )),
       
       
       #tabitem aot ----
@@ -525,7 +808,7 @@ ui <- dashboardPage(
                                           "Lung Cancer",
                                           "Cancer",
                                           "Tuberculosis"
-                                          ))
+                              ))
                 ),
                 box(
                   width = 8,
@@ -546,7 +829,7 @@ ui <- dashboardPage(
                 )
               )
       ),
-        
+      
       #tabitem road_emissions ----
       tabItem(tabName = "road_emissions",
               fluidRow(
@@ -571,18 +854,18 @@ ui <- dashboardPage(
                                    br(),
                                    h4("Data Source"),
                                    p("The original road lengths data set is from OpenStreetMap."))
-                ),
+                                   ),
                 box(
                   width = 8,
                   leafletOutput("road_emissions_map", width = 800, height = 600)
                 )
-              )
+      )
       ),
-
-# pm tab ------------------------------------------------------------------
+      
+      # pm tab ------------------------------------------------------------------
       tabItem(
         "pm", fluidPage(
-
+          
           fluidRow(
             box(
               width = 4,
@@ -590,26 +873,26 @@ ui <- dashboardPage(
               radioButtons("EPAYM","Average Time Window: (monthly/yearly):",c("Yearly"=0,"Monthly"=1)),
               checkboxInput("EPASiteOn", "Show EPA Monitoring Station", value = TRUE, width = NULL),
               br(),
-               h4("About PM 2.5"),
-               p("PM2.5 refers to atmospheric particulate matter (PM) that have a diameter of less than 
-              2.5 micrometers, which is about 3% the diameter of a human hair. PM2.5 are deadly because 
-              their particles are so small that they are inhaled and trapped more deeply in the lungs and 
-              bloodstream, posing significant health risks to the respiratory and cardiovascular systems 
-              including aggravated asthma, decreased lung function, nonfatal heart attacks etc."),
+              h4("About PM 2.5"),
+              p("PM2.5 refers to atmospheric particulate matter (PM) that have a diameter of less than 
+                2.5 micrometers, which is about 3% the diameter of a human hair. PM2.5 are deadly because 
+                their particles are so small that they are inhaled and trapped more deeply in the lungs and 
+                bloodstream, posing significant health risks to the respiratory and cardiovascular systems 
+                including aggravated asthma, decreased lung function, nonfatal heart attacks etc."),
               p("Susceptible groups with pre-existing lung or heart disease, as well as elderly people and 
-              children, are particularly vulnerable. Based on known health effects, both short-term (24-hour) and long-term (annual mean) guidelines 
-              are recommended by the World Health Organisation. These are 10 µg/m3 annual mean, and 25 µg/m3 
-              24-hour mean."),
+                children, are particularly vulnerable. Based on known health effects, both short-term (24-hour) and long-term (annual mean) guidelines 
+                are recommended by the World Health Organisation. These are 10 µg/m3 annual mean, and 25 µg/m3 
+                24-hour mean."),
               br(),
               h4("Data Source"),
               p("PM2.5 measures in the air here are collected from Air Quality System (AQS) data, which contains 
-              representative ambient air pollution data across different states collected by federal, state, 
-              local, and tribal air pollution control agencies from over thousands of monitors. Stations in this area are from the EPA.")           
-
+                representative ambient air pollution data across different states collected by federal, state, 
+                local, and tribal air pollution control agencies from over thousands of monitors. Stations in this area are from the EPA.")           
+              
               ),
             
             box(width = 8,
-                   sliderInput("EPAT", "Select time period:",
+                sliderInput("EPAT", "Select time period:",
                             min = strptime("2015/01/15","%Y/%m/%d"), 
                             max = strptime("2017/12/31","%Y/%m/%d"),
                             value = strptime("2015/07/16","%Y/%m/%d"),
@@ -619,53 +902,94 @@ ui <- dashboardPage(
                 # tags$style(type="text/css",
                 #            "#MainMap.recalculating { opacity: 1.0 }"),
                 leafletOutput("MainMap",height = MapBHeight))
-          )
-
-        )
-      ),
-
-# epa_panel ---------------------------------------------------------------
-tabItem("epa_panel",fluidPage(id = "epa_panel_page",
-                              column(width = 1, 
-                                     checkboxGroupButtons(inputId = "epa_panel_checkbox",
-                                                          direction = "vertical",
-                                                          label = "Air Pollutants",
-                                                          width = 6,
-                                                          choices = epa_panel.airpollutiontype)),
-                              column(width = 11,
-                                     fluidRow("epa_panel_global",background = "aqua",
-                                              column(width= 8,
-                                                     plotlyOutput("epa_trace"),
-                                                     radioGroupButtons(inputId = "epa_trace_radio",
-                                                                       label = "Air Pollutants",
-                                                                       width = 6,
-                                                                       choices = epa_panel.airpollutiontype,
-                                                                       choiceValues = 1:length(epa_panel.airpollutiontype)),
-                                                     plotlyOutput("epa_panel_global_plotly",height = 700),
-                                                     sliderInput("epa_panel_time","epa time",min = 1, max = 100,1)),
-                                              column(width = 4,
-                                                     tabBox(width = 12,
-                                                            tabPanel(title = "Pie",
-                                                                     h1("epa_panel_global_tab1_box")),
-                                                            tabPanel(title = "Surface", h1("epa_panel_global_tab2_box")),
-                                                            tabPanel(title = "Stat.", h1("epa_panel_global_tab3_box")))
-                                              )
-                                              
-                                     ),
-                                     fluidRow(
-                                       box("epa_panel_local",background = "orange", width = 12)
-                                     ))
-                              
-))
-
+              )
+          
+              )
+          ),
+      tabItem("expepa",  fluidPage(id = "fluidpage1",
+                                      fluidRow(id = "EPAMainContent",
+                                               column(width = 8,
+                                                      fixedRow( 
+                                                        column(id = "lv2",width = 12,
+                                                               div(id = "radiob",radioGroupButtons(inputId = "epa_panel_checkbox",justified = T,
+                                                                                                   direction = "horizontal",
+                                                                                                   label = "Air Pollutants",
+                                                                                                   choices = epa_panel.airpollutiontype)),
+                                                               fixedRow(
+                                                                 column(width = 1,div(id="m1",
+                                                                                      div(id = "m2",
+                                                                                          div(id = "m3",
+                                                                                              div(id = "m3_1"),div(id="m3_2")),
+                                                                                          div(id = "m4",
+                                                                                              div(id="v1",h3("5%")),
+                                                                                              div(id="v2",p(tt))
+                                                                                          ))),
+                                                                        br(),
+                                                                        div(id="m1",
+                                                                            div(id = "m2",
+                                                                                div(id = "m3",
+                                                                                    div(id = "m3_1a"),div(id="m3_2a")),
+                                                                                div(id = "m4",
+                                                                                    div(id="v1a",h3("10%")),
+                                                                                    div(id="v2",p(tt))
+                                                                                )))),
+                                                                 column(textOutput("EPA_Description"), width = 10)))
+                                                        # fixedRow(
+                                                        #   plotlyOutput("EPAPieChart_DataRealiability",width = "49%",height = "200px",inline = T),
+                                                        #   plotlyOutput("EPAPieChart_MaximumDailyCut",width = "49%",height = "200px",inline = T))
+                                                        # )
+                                                      )
+                                               ),
+                                               column(id = "box3col",width = 4,
+                                                      div(id = "CuteBox",box(id = "Q1B",height = 200,width = 200),textOutput("CommunityName"),h4("CO")),
+                                                      fixedRow( width = 12, leafletOutput("EPANMAP",height = 500)))),
+                                      fluidRow(id = "EPAPlotlyPanel",
+                                               plotlyOutput("EPAPlotlyChart"))
+      )),
+      # epa_panel ---------------------------------------------------------------
+      tabItem("epa_panel",fluidPage(id = "epa_panel_page",
+                                    column(width = 1, 
+                                           checkboxGroupButtons(inputId = "epa_panel_checkbox",
+                                                                direction = "vertical",
+                                                                label = "Air Pollutants",
+                                                                width = 6,
+                                                                choices = epa_panel.airpollutiontype)),
+                                    column(width = 11,
+                                           fluidRow("epa_panel_global",background = "aqua",
+                                                    column(width= 8,
+                                                           plotlyOutput("epa_trace"),
+                                                           radioGroupButtons(inputId = "epa_trace_radio",
+                                                                             label = "Air Pollutants",
+                                                                             width = 6,
+                                                                             choices = epa_panel.airpollutiontype,
+                                                                             choiceValues = 1:length(epa_panel.airpollutiontype)),
+                                                           plotlyOutput("epa_panel_global_plotly",height = 700),
+                                                           sliderInput("epa_panel_time","epa time",min = 1, max = 100,1)),
+                                                    column(width = 4,
+                                                           tabBox(width = 12,
+                                                                  tabPanel(title = "Pie",
+                                                                           h1("epa_panel_global_tab1_box")),
+                                                                  tabPanel(title = "Surface", h1("epa_panel_global_tab2_box")),
+                                                                  tabPanel(title = "Stat.", h1("epa_panel_global_tab3_box")))
+                                                    )
+                                                    
+                                           ),
+                                           fluidRow(
+                                             box("epa_panel_local",background = "orange", width = 12)
+                                           ))
+                                    
+      ))
+      
       
     )
     
     
     
-  )
+    )
   
-)
+    )
+
+
 
 
 #server ----
@@ -1289,7 +1613,117 @@ server = function(input, output,session){
     }
     tmap_leaflet(road_emissions_map)
   })
-
+  #expepa-----
+  output$CommunityName <- renderText({
+    ThisHighLight <- HPR1()
+    # if(is.null(ThisHighLight)){
+    #   
+    # }
+    ThisHighLight
+  })
+  
+  output$EPA_Description <- renderText({
+    #the check epa source part is repeated create it as a function!
+    index <- which(input$epa_panel_checkbox == epa_panel.airpollutiontype)
+    typename <- epa_panel.airpollutiontype[index]
+    
+    EPA.Description[V1==typename]$V2
+    
+  })
+  #load map in the main pannel
+  output$EPANMAP <- renderLeaflet({
+    p<-leaflet(height = 1000) %>% 
+      addTiles(urlTemplate = BaseMapStyle) %>%
+      flyTo(lng = -87.6298, lat = 41.8781, 10 ,options = list(duration = 5, easeLinearity = 0.1)) 
+    # APPENDMAP()
+    p
+  })
+  #reactive to click event on the map
+  HPR1 <- reactive({
+    click<-input$EPANMAP_shape_click
+    if(is.null(click)){
+      if(!is.null(ChicagoBoundary))
+        return(as.character(ChicagoBoundary$community[1]))}
+    return(click$id)
+  })
+  #when the flyto is about stopping load the map
+  observe({
+    zoom <-input$EPANMAP_zoom
+    ThisHPR<-HPR1()
+    if(!is.null(ThisHPR))
+    {
+      index <- which(ChicagoBoundary$community == ThisHPR)
+      thiscolor <- rep("grey",77)
+      thiscolor[index] <- ChicagoAirColor$highlight
+    }
+    
+    if(!is.null(zoom)){
+      if(zoom > 6){
+        if(is.null(ThisHPR)){
+          leafletProxy('EPANMAP') %>% 
+            addPolygons(data = ChicagoBoundary, color= ChicagoAirColor$default, opacity = 1, weight = 1, fillOpacity = 0.2,smoothFactor = 0.9,
+                        layerId = ~community)
+          
+        }else
+        {
+          leafletProxy('EPANMAP') %>% 
+            addPolygons(data = ChicagoBoundary,color= thiscolor, opacity = 1, weight = 1, fillOpacity = 0.2,smoothFactor = 0.9,
+                        layerId = ~community)
+        }
+      }
+      # APPENDMAP()
+      
+    }
+  })
+  
+  #plotly
+  output$EPAPlotlyChart <- renderPlotly({
+    # plotly() %>% 
+    ThisHighLight <- HPR1()
+    # print(ThisHighLight)
+    index <- which(input$epa_panel_checkbox == epa_panel.airpollutiontype)
+    p <- EPA.ProloadPlotlychart$Chart[[index]]
+    typename <- epa_panel.airpollutiontype[index]
+    # p<-CreateTracePlotForOnePollutatn(EPAMetaF = EPAMetaF, ChicagoEPA =  ChicagoEPA, typename = "Ozone")
+    if(!is.null(ThisHighLight))
+    {
+      if(ifmonth)
+      {
+        extractedcol<-EPAMetaF[Subtype == typename & Month != 0 & Valid,]
+      }else{
+        extractedcol<-EPAMetaF[Subtype == typename & Month == 0 & Valid,]
+      }
+      extractedcol$Date <-  as.Date(extractedcol$Date)
+      extractedcol <- extractedcol[order(Date)]
+      #plotly::style() use plotly style to change the style
+      extractedvalue <- as.numeric(as.matrix(ChicagoEPA[COMMUNITYNAME == ThisHighLight])[extractedcol$ID])
+      p <- add_lines(EPA.ProloadPlotlychart$Chart[[index]] ,x = extractedcol$Date, y = extractedvalue ,name = ThisHighLight, color = I("#AFEEEE"),
+                     line = list(shape = "spline"))
+    }
+    p
+  })
+  
+  output$EPAPieChart_MaximumDailyCut <- renderPlotly({
+    
+    labels <- c("Polluted","Good Weather")
+    values <- c("0.2","0.8")
+    plot_ly(labels = labels, values = values, marker = list(colors = c(ChicagoAirColor$default,ChicagoAirColor$highlight))) %>%
+      add_pie(hole = 0.6) %>% 
+      layout(showlegend = F,margin = m,paper_bgcolor= ChicagoAirColor$transparent,
+             plot_bgcolor= ChicagoAirColor$transparent)
+  })
+  
+  output$EPAPieChart_DataRealiability <- renderPlotly({
+    input <- which(input$epa_panel_checkbox == epa_panel.airpollutiontype)
+    thinr <- runif(1)
+    labels <- c("Missing Data","Validate Data")
+    values <- c(thinr,1-thinr)
+    plot_ly(labels = labels, values = values) %>%
+      add_pie(hole = 0.6) %>% 
+      layout(showlegend = F,margin = m, 
+             paper_bgcolor= ChicagoAirColor$transparent,
+             plot_bgcolor= ChicagoAirColor$transparent)
+  })
 }
 
 shinyApp(ui = ui, server=server)
