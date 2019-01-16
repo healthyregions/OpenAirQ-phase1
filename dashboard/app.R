@@ -80,23 +80,37 @@ EPAPM2_5.breaks <- c(1:10,12,15,35) #Breaks for EPAPM2_5
 EPAPM2_5.pal <- colorNumeric(c("#D73027", "#FC8D59", "#D9EF8B", "#FEE08B", "#91CF60", "#1A9850"), 
                              EPAPM2_5.breaks, na.color = "transparent",reverse = T) #Palette for EPAPM2_5
 
-aod.yearly <- stack("./data/Yearly_Aod_Stack_Reproj.tif") #Yearly AOD Data
-names(aod.yearly) <- c("2014", "2015", "2016", "2017") 
-aod.average <- raster("./data/AOD_Average_4_Year_Reproj.tif")
+aod.quarterly <- stack("AOD_Large_Quarterly.tif") #Quarterly AOD Data
 
-#Manually fix faulty value
+unique.quarters <- seq(from=as.Date("2014-01-01"), #Names for quarterly data
+                       to=as.Date("2018-09-18"),
+                       by="quarter")
+
+names(aod.quarterly) <- unique.quarters
+
+aod.average <- raster("largebbox_mean.tif") #4 yr avg
+
+#Manually fix faulty values
 values(aod.average)[which(values(aod.average) == 0)] <- NA
+values(aod.quarterly)[which(values(aod.average) == 0)] <- NA
 
-aod.monthly.names <- read.csv("./data/aod.monthly.names.csv")
-aod.monthly <- stack("./data/AOD_Monthly_Avgs.tif")
-
-names(aod.monthly) <- aod.monthly.names$x
-
-monthly.breaks <- seq(from = 0, to = 1, 0.1) #Breaks for AOD data
+monthly.breaks <- seq(from = 0, to = 0.6, 0.05) #Breaks for AOD data
 monthly.aod.pal <- colorNumeric(c("green", "yellow", "red", "purple"), monthly.breaks, na.color = "transparent") #Palette for AOD
 
-yearly.breaks <- seq(from = 0.1, to = 0.3, 0.02) #Breaks for AOD data
-yearly.aod.pal <- colorNumeric(c("green", "yellow", "red", "purple"), yearly.breaks, na.color = "transparent") #Palette for AOD
+overall.breaks <- seq(from = 0, to = 0.5, 0.02) #Breaks for AOD data
+overall.aod.pal <- colorNumeric(c("green", "yellow", "red"), overall.breaks, na.color = "transparent") #Palette for AOD
+
+
+ndvi.quarterly <- stack("2017_Quarterly_NDVI.tif")
+ndvi.qtrs <- seq(from=as.Date("2017-01-01"), #Names for quarterly data
+                 to=as.Date("2017-12-31"),
+                 by="quarter")
+names(ndvi.quarterly) <- ndvi.qtrs
+
+ndvi.breaks <- seq(from = -0.2, to = 1, 0.1)
+ndvi.pal <- colorNumeric(c("lightblue", "yellow", "lightgreen", "green", "darkgreen"), ndvi.breaks, na.color = "transparent")
+
+lc.map <- readOGR("Land_Cover_Indices")
 
 
 #story board predefinied variables -------------
@@ -207,7 +221,7 @@ ChicagoAirColor <- list(
 )
 #test text
 tt<-"We use data directly from NASA. The Moderate Resolution Imaging Spectroradiometer 
-                (MODIS) satellite provides daily global coverage"
+(MODIS) satellite provides daily global coverage"
 #margin of the plotly pie chart
 m <- list(
   l = 10,
@@ -378,9 +392,11 @@ ui <- dashboardPage(
                          menuSubItem("PM 2.5", "pm"),
                          menuSubItem("Aeorosol Optical Depth", "aod")),
                 menuItem("Pollution Drivers",
-                         menuSubItem("Weather", "noaa"),
-                         menuSubItem("Traffic", "road_emissions"),
-                         menuSubItem("Elevation", "elevation")),
+                         menuSubItem("Weather", tabName = "noaa"),
+                         menuSubItem("Traffic", tabName = "road_emissions"),
+                         menuSubItem("Elevation",tabName = "elevation"),
+                         menuSubItem("Greenness", tabName = "ndvi"),
+                         menuSubItem("Land Cover", tabName = "landcover")),
                 menuItem("Population Measures",
                          menuSubItem("Demographic Data", tabName = "demographic"),
                          menuSubItem("Public Health", tabName = "health")),
@@ -692,69 +708,50 @@ ui <- dashboardPage(
               )
       ),
       #tabitem aod
-      tabItem(tabName = "aod",
-              box(
-                h1("Aerosol Optical Depth (AOD)"),
-                width = 4,
-                selectInput(inputId = "selecttime",
-                            label = "Overall, Yearly, or Monthly Averages?",
-                            choices = c("Overall", "Yearly",
-                                        "Monthly")),
+      tabItem(
+        "aod", fluidPage(
+          
+          fluidRow(
+            box(
+              width = 4,
+              h1("Aerosol Optical Depth"),
+              radioButtons("AODYM","Average Time Window: (Quarterly/4 Year Average):",c("Quarterly"= "qtr","Overall"= "ovr")),
+              br(),
+              h4("About Aerosol Optical Depth (AOD)"),
+              p("Aerosol optical depth is a measure of the extinction of the solar beam by dust
+                and haze. In other words, particles in the atmosphere (dust, smoke, pollution)
+                can block sunlight by absorbing or by scattering light."),
+              br(),
+              h4("Data Source"),
+              p("We use data directly from NASA. The Moderate Resolution Imaging Spectroradiometer
+                (MODIS) satellite provides daily global coverage, but the 10 km resolution of its
+                aerosol optical depth (AOD) product is not suitable for studying spatial variability
+                of aerosols in urban areas. Recently, a new Multi-Angle Implementation of Atmospheric
+                Correction (MAIAC) algorithm was developed for MODIS which provides AOD at 1 km
+                resolution.")
+              
+              ),
+            
+            box(width = 8,
+                sliderInput("AODT", "Select time period:",
+                            min = strptime("2014/01/01","%Y/%m/%d"), 
+                            max = strptime("2018/07/01","%Y/%m/%d"),
+                            value = strptime("2016/04/01","%Y/%m/%d"),
+                            timeFormat = "%Y/%m",
+                            step = as.difftime(92, units = "days"),
+                            animate = animationOptions(interval = 2000)),
                 
-                br(),
-                h4("About AOD"),
-                p("Aerosol optical depth is a measure of the extinction of the solar beam by dust 
-                  and haze. In other words, particles in the atmosphere (dust, smoke, pollution) 
-                  can block sunlight by absorbing or by scattering light."),
-                br(),
-                h4("Data Source"),
-                p("We use data directly from NASA. The Moderate Resolution Imaging Spectroradiometer 
-                  (MODIS) satellite provides daily global coverage, but the 10 km resolution of its 
-                  aerosol optical depth (AOD) product is not suitable for studying spatial variability 
-                  f aerosols in urban areas. Recently, a new Multi-Angle Implementation of Atmospheric 
-                  Correction (MAIAC) algorithm was developed for MODIS which provides AOD at 1 km 
-                  resolution.")
-                
-                ),
-              box(
-                width = 8,
-                conditionalPanel(condition = "input.selecttime == 'Yearly'", 
-                                 sliderInput("aodyear", "Select Year:",
-                                             min = strptime("2014/01/04","%Y/%m/%d"), 
-                                             max = strptime("2018/09/18","%Y/%m/%d"),
-                                             value = strptime("2014/01/04","%Y/%m/%d"),
-                                             timeFormat = "%Y/%m",
-                                             step = as.difftime(365, units = "days"),
-                                             animate = animationOptions(interval = 500))
-                ),
-                conditionalPanel(condition = "input.selecttime == 'Monthly'", 
-                                 sliderInput("aodmonth", "Select Month:",
-                                             min = strptime("2014/01/01","%Y/%m/%d"), 
-                                             max = strptime("2018/09/18","%Y/%m/%d"),
-                                             value = strptime("2015/06/15","%Y/%m/%d"),
-                                             timeFormat = "%Y/%m",
-                                             step = as.difftime(30 ,units = "days"),
-                                             animate = animationOptions(interval = 500))
-                                 
-                ),
-                conditionalPanel(condition = "input.selecttime == 'Yearly'",
-                                 box(
-                                   width = 8, height = 600,
-                                   leafletOutput("aodmapyearly", width = 800, height = MapBHeight)
-                                 )),
-                conditionalPanel(condition = "input.selecttime == 'Monthly'",
-                                 box(
-                                   width = 8, height = 600,
-                                   leafletOutput("aodmapmonthly",width = 800, height = MapBHeight)
-                                 )),
-                conditionalPanel(condition = "input.selecttime == 'Overall'",
-                                 box(
-                                   width = 8, height = 600,
-                                   leafletOutput("aodmapoverall",width = 800, height = MapBHeight)
-                                 ))
-                
-              )),
-      
+                # tags$style(type="text/css",
+                #            "#MainMap.recalculating { opacity: 1.0 }"),
+                conditionalPanel(condition = "input.AODYM == 'qtr'",
+                                 leafletOutput("aodmapquarterly",height = MapBHeight)),
+                conditionalPanel(condition = "input.AODYM == 'ovr'",
+                                 leafletOutput("aodmapoverall",height = MapBHeight))
+            )
+              )
+          
+              )
+          ),
       
       #tabitem aot ----
       tabItem(tabName = "aot",
@@ -829,6 +826,83 @@ ui <- dashboardPage(
                 )
               )
       ),
+      
+      tabItem(tabName = "ndvi",
+              fluidRow(
+                box(
+                  width = 4,
+                  h1("NDVI"),
+                  h4("About Normalized Difference Vegetation Index (NDVI)"),
+                  p("NDVI is a measure of greenness calculated from near infrared and red bands.
+                    It ranges in value from -0.1 to 0.1, with 0.1 and below generally corresponding 
+                    to areas with little greenery while 0.5-0.6 and above typically indicate the
+                    presence of large amounts of vegetation coverage. "),
+                  br(),
+                  h4("Data Source"),
+                  p("We used NDVI data from NASA's MODIS Terra satellite. While NDVI is available 
+                    at higher resolutions through datasets such as LANDSAT 8, the MODIS dataset 
+                    provides a consistent, 16-day NDVI image. This  product comes at a 250 meter 
+                    spatial resolution and is less susceptible to interference from heavy cloud 
+                    coverage due to the time scale.")
+                  ),
+                
+                box(width = 8,
+                    sliderInput("NDVIT", "Select quarter:",
+                                min = strptime("2017/01/01","%Y/%m/%d"), 
+                                max = strptime("2017/10/01","%Y/%m/%d"),
+                                value = strptime("2017/01/01","%Y/%m/%d"),
+                                timeFormat = "%Y/%m",
+                                step = as.difftime(92, units = "days"),
+                                animate = animationOptions(interval = 2000)),
+                    
+                    # tags$style(type="text/css",
+                    #            "#MainMap.recalculating { opacity: 1.0 }"),
+                    
+                    leafletOutput("ndvimap",height = MapBHeight))
+                  )
+                  ),
+      tabItem(tabName = "landcover",
+              fluidRow(
+                box(
+                  width = 4,
+                  h1("Land Cover"),
+                  radioButtons("lctype",
+                               "Select Land Cover Index to Show:",
+                               c("Green Index" = "grn_ndx",
+                                 "Blue Index" = "blu_ndx",
+                                 "Gray Index" = "gry_ndx")),
+                  br(),
+                  h4("About Land Cover"),
+                  p("Land cover indicates the development or material occupying a given area.
+                    While the dataset used for this dashboard provided hundreds of detailed 
+                    categories of land coverage, we aggregated these into three color-indices
+                    in order to quantify the most important aspects. The green index is the 
+                    sum-total percentage of the following classifications provided by the USGS:
+                    Agricultural & Developed Vegetation, Forest & Woodland, Introduced & Semi-Natural 
+                    Vegetation, and Shrub & Herb Vegetation as part of a given Community Area. The 
+                    blue index is the sum-total percentage of Open Water as part of a given Community 
+                    Area. Lastly, the gray index is the sum-total percentage of Developed & Other 
+                    Human Use and Recently Disturbed or Modified land as part of a given Community Area."),
+                  br(),
+                  h4("Data Source"),
+                  p("The land cover data was created from a modified version of the USGS's
+                    National Gap Analysis Project Land Cover satellite imagery. The raster
+                    data was aggregated by Community Area and then converted into the 
+                    respective indices using the afformentioned methodology.")
+                  
+                  ),
+                
+                box(width = 8,
+                    conditionalPanel(condition = "input.lctype == 'grn_ndx'",
+                                     leafletOutput("lcgreenmap",height = MapBHeight)),
+                    conditionalPanel(condition = "input.lctype == 'blu_ndx'",
+                                     leafletOutput("lcbluemap",height = MapBHeight)),
+                    conditionalPanel(condition = "input.lctype == 'gry_ndx'",
+                                     leafletOutput("lcgraymap",height = MapBHeight))
+                )
+                  )
+              
+                  ),
       
       #tabitem road_emissions ----
       tabItem(tabName = "road_emissions",
@@ -907,44 +981,44 @@ ui <- dashboardPage(
               )
           ),
       tabItem("expepa",  fluidPage(id = "fluidpage1",
-                                      fluidRow(id = "EPAMainContent",
-                                               column(width = 8,
-                                                      fixedRow( 
-                                                        column(id = "lv2",width = 12,
-                                                               div(id = "radiob",radioGroupButtons(inputId = "epa_panel_checkbox",justified = T,
-                                                                                                   direction = "horizontal",
-                                                                                                   label = "Air Pollutants",
-                                                                                                   choices = epa_panel.airpollutiontype)),
-                                                               fixedRow(
-                                                                 column(width = 1,div(id="m1",
-                                                                                      div(id = "m2",
-                                                                                          div(id = "m3",
-                                                                                              div(id = "m3_1"),div(id="m3_2")),
-                                                                                          div(id = "m4",
-                                                                                              div(id="v1",h3("5%")),
-                                                                                              div(id="v2",p(tt))
-                                                                                          ))),
-                                                                        br(),
-                                                                        div(id="m1",
-                                                                            div(id = "m2",
-                                                                                div(id = "m3",
-                                                                                    div(id = "m3_1a"),div(id="m3_2a")),
-                                                                                div(id = "m4",
-                                                                                    div(id="v1a",h3("10%")),
-                                                                                    div(id="v2",p(tt))
-                                                                                )))),
-                                                                 column(textOutput("EPA_Description"), width = 10)))
-                                                        # fixedRow(
-                                                        #   plotlyOutput("EPAPieChart_DataRealiability",width = "49%",height = "200px",inline = T),
-                                                        #   plotlyOutput("EPAPieChart_MaximumDailyCut",width = "49%",height = "200px",inline = T))
-                                                        # )
-                                                      )
-                                               ),
-                                               column(id = "box3col",width = 4,
-                                                      div(id = "CuteBox",box(id = "Q1B",height = 200,width = 200),textOutput("CommunityName"),h4("CO")),
-                                                      fixedRow( width = 12, leafletOutput("EPANMAP",height = 500)))),
-                                      fluidRow(id = "EPAPlotlyPanel",
-                                               plotlyOutput("EPAPlotlyChart"))
+                                   fluidRow(id = "EPAMainContent",
+                                            column(width = 8,
+                                                   fixedRow( 
+                                                     column(id = "lv2",width = 12,
+                                                            div(id = "radiob",radioGroupButtons(inputId = "epa_panel_checkbox",justified = T,
+                                                                                                direction = "horizontal",
+                                                                                                label = "Air Pollutants",
+                                                                                                choices = epa_panel.airpollutiontype)),
+                                                            fixedRow(
+                                                              column(width = 1,div(id="m1",
+                                                                                   div(id = "m2",
+                                                                                       div(id = "m3",
+                                                                                           div(id = "m3_1"),div(id="m3_2")),
+                                                                                       div(id = "m4",
+                                                                                           div(id="v1",h3("5%")),
+                                                                                           div(id="v2",p(tt))
+                                                                                       ))),
+                                                                     br(),
+                                                                     div(id="m1",
+                                                                         div(id = "m2",
+                                                                             div(id = "m3",
+                                                                                 div(id = "m3_1a"),div(id="m3_2a")),
+                                                                             div(id = "m4",
+                                                                                 div(id="v1a",h3("10%")),
+                                                                                 div(id="v2",p(tt))
+                                                                             )))),
+                                                              column(textOutput("EPA_Description"), width = 10)))
+                                                     # fixedRow(
+                                                     #   plotlyOutput("EPAPieChart_DataRealiability",width = "49%",height = "200px",inline = T),
+                                                     #   plotlyOutput("EPAPieChart_MaximumDailyCut",width = "49%",height = "200px",inline = T))
+                                                     # )
+                                                   )
+                                            ),
+                                            column(id = "box3col",width = 4,
+                                                   div(id = "CuteBox",box(id = "Q1B",height = 200,width = 200),textOutput("CommunityName"),h4("CO")),
+                                                   fixedRow( width = 12, leafletOutput("EPANMAP",height = 500)))),
+                                   fluidRow(id = "EPAPlotlyPanel",
+                                            plotlyOutput("EPAPlotlyChart"))
       )),
       # epa_panel ---------------------------------------------------------------
       tabItem("epa_panel",fluidPage(id = "epa_panel_page",
@@ -981,25 +1055,25 @@ ui <- dashboardPage(
       ))
       
       
-    )
+              )
     
     
     
-    )
+  )
   
-    )
+  )
 
 
 
 
 #server ----
 server = function(input, output,session){
-
+  
   # aot logic ----
   ns <- NS("editor")# set namespace
-
-
-
+  
+  
+  
   labels <- sprintf(
     "<strong>%s</strong><br/>%g Area",
     ChicagoBoundary$community, ChicagoBoundary$shape_area
@@ -1098,12 +1172,12 @@ server = function(input, output,session){
                     x = epa_date,
                     y = thisy[,1], 
                     mode = 'markers',
-                      name = epadata[[index]][i,1])
+                    name = epadata[[index]][i,1])
     }
     p
   })
-
-# Home Page logic ---------------------------------------------------------
+  
+  # Home Page logic ---------------------------------------------------------
   output$MainInfPlot <- renderPlotly({
     thisnut <- HPR()
     #name of the community 
@@ -1147,13 +1221,13 @@ server = function(input, output,session){
                                "#00ff80","orange")
       fixb_bar_color2 <- fixb_bar_color
       p<-add_bars(p,
-                orientation = 'h',
-                name = CPTC.name,
-                width = 0.2,
-                text = (ExtractOneRow[[fixb_epa]]),  hoverinfo = 'text',
-                marker = list(color = fixb_bar_color,
-                              line = list(color = fixb_bar_color2)),
-                x = thisx , y = fixb_name)
+                  orientation = 'h',
+                  name = CPTC.name,
+                  width = 0.2,
+                  text = (ExtractOneRow[[fixb_epa]]),  hoverinfo = 'text',
+                  marker = list(color = fixb_bar_color,
+                                line = list(color = fixb_bar_color2)),
+                  x = thisx , y = fixb_name)
       p<-add_annotations(p,"City", x = fixb_avg , y = fixb_name, ax =0, arrowwidth = 1,arrowcolor = "#B0E0E6",
                          showarrow = T,arrowhead = 4, ay = -20, arrowsize = 0.5, yshift = -8,
                          font = list(color = '#264E86',
@@ -1163,7 +1237,7 @@ server = function(input, output,session){
       if(CPTC){
         RExtractOneRow <- infTable[CPTC.regionid,]
         fixb_compared <- ifelse(is.na(RExtractOneRow[[fixb_epa]]/fixb_max)
-                                         ,0,RExtractOneRow[[fixb_epa]]/fixb_max)
+                                ,0,RExtractOneRow[[fixb_epa]]/fixb_max)
         p<-add_annotations(p,CPTC.name, x = fixb_compared , y = fixb_name, ax =0, arrowwidth = 1,arrowcolor = "#B0E0E6",
                            showarrow = T,arrowhead = 4, ay = -24, arrowsize = 0.5, yshift = -8,
                            font = list(color = '#264E86',
@@ -1202,7 +1276,7 @@ server = function(input, output,session){
       flyTo(lng = -87.6298, lat = 41.8781, 10) 
     # APPENDMAP()
     p
-  
+    
   })
   APPENDMAP <-function(){
     thispal <-AirQ_PAL(domain = ChicagoBoundary$epa)
@@ -1231,14 +1305,14 @@ server = function(input, output,session){
     zoom<-input$HLM_zoom
     if(!is.null(zoom)){
       if(zoom >6)
-      APPENDMAP()
+        APPENDMAP()
     }
-      
+    
   })
   HPR <- reactive({
     click<-input$HLM_shape_click
     if(is.null(click))
-       click$id <- "Hyde Park"
+      click$id <- "Hyde Park"
     
     # if(CPTC){
     #   CPTC.name <<- click$id
@@ -1253,7 +1327,7 @@ server = function(input, output,session){
                                       paste0("⬆️",CPTC.name,"  V.S.  ",CPTC.namecompared,"⬇️"),
                                       CPTC.name)})
     
-     
+    
     
     
     
@@ -1266,10 +1340,10 @@ server = function(input, output,session){
     # storyname<<-FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix)
     # thisstory$longstory <- NULL
     # if(!CPTC||storyname==""){
-      resultstory <- FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix,CPTC,CPTC.rankidtable)
-      storyname<<-resultstory$result
-      
-      CPTC.rankidtable <<-resultstory$CPTC.rankidtable 
+    resultstory <- FindtheStory(regionid,BestStory_n,infTable,ncol,ChicagoBoundary.NROW,rankmatrix,CPTC,CPTC.rankidtable)
+    storyname<<-resultstory$result
+    
+    CPTC.rankidtable <<-resultstory$CPTC.rankidtable 
     # }
     
     wholestory<-GenrateStoryBoards(storyname,`Community Area Name`,ChicagoBoundary.NROW,MSB)
@@ -1306,20 +1380,20 @@ server = function(input, output,session){
                     color = thisinut$Color[id],
                     fill = T,
                     width = 12
-                    )
+      )
     }else{
       INFB<-infoBox(CPTC.originstory$FieldName[id],
-              value = paste0(CPTC.originstory$Value[id],CPTC.originstory$unit[id]),
-              subtitle =  CPTC.originstory$Subtitle[id],
-              icon = AirQGetIcon(CPTC.originstory$Icon[id]),
-              color = CPTC.originstory$Color[id],
-              fill = T,
-              width = 12)
+                    value = paste0(CPTC.originstory$Value[id],CPTC.originstory$unit[id]),
+                    subtitle =  CPTC.originstory$Subtitle[id],
+                    icon = AirQGetIcon(CPTC.originstory$Icon[id]),
+                    color = CPTC.originstory$Color[id],
+                    fill = T,
+                    width = 12)
       
     }
     
     return(INFB)
-
+    
   }
   output$inf4 <- renderInfoBox({
     CreateInfbox(4)
@@ -1394,48 +1468,30 @@ server = function(input, output,session){
   #AOD start
   
   #Generate AOD map
-  output$aodmapyearly <- renderLeaflet({
-    in.timeyr <- input$aodyear
-    in.time <- as.POSIXct(in.timeyr, origin="1970-01-01")
-    yr <- year(in.time)
-    selected.yr <- paste("X", yr, sep = "")
+  output$aodmapquarterly <- renderLeaflet({
+    in.time <- input$AODT
+    in.time <- as.Date(in.time)
     
-    yr.names <- names(aod.yearly)
-    selected.yr <- which(yr.names == selected.yr)
+    in.time <- floor_date(in.time, "month") #Round to first of month (easier w names) 
     
-    a <- leaflet() %>% 
-      addTiles(urlTemplate = BaseMapStyle) %>% 
-      setView(lng = -87.6298, lat = 41.8781, 11) %>% 
-      addRasterImage(aod.yearly[[selected.yr]], opacity = 0.7, colors = yearly.aod.pal) %>% 
-      leaflet::addLegend(pal = yearly.aod.pal, values = values(aod.yearly[[selected.yr]])) %>% 
-      addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.01, stroke = FALSE,
-                  highlight = highlightOptions(
-                    # weight = 5,
-                    color = "#666",
-                    # dashArray = "",
-                    fillOpacity = 0.3),
-                  # bringToFront = TRUE),
-                  label = labels)
-
-  })
-
-  output$aodmapmonthly <- renderLeaflet({
+    alt.time <- paste("X", as.character(in.time), sep = "")
+    alt.time <- gsub(pattern = "-", replacement = ".", alt.time)
+    print(alt.time)
     
-    in.timemo <- input$aodmonth
-    in.timemo <- as.POSIXct(in.timemo, origin="1970-01-01")
-    mo <- lubridate::month(in.timemo)
-    yr <- year(in.timemo)
-    selected.mo <- paste(mo, yr, sep = "")
-    selected.mo <- paste("X", selected.mo, sep = "")
-    mo.names <- names(aod.monthly)
-    selected.mo.index <- which(mo.names == selected.mo)
+    qtr.names <- names(aod.quarterly)
+    selected.qtr <- which(qtr.names == alt.time)
     
-    a <- leaflet() %>% 
-      addTiles(urlTemplate = BaseMapStyle) %>% 
-      setView(lng = -87.6298, lat = 41.8781, 11) %>% 
-      addRasterImage(aod.monthly[[selected.mo.index]], opacity = 0.7, colors = monthly.aod.pal) %>% 
-      leaflet::addLegend(pal = monthly.aod.pal, values = values(aod.monthly[[selected.mo.index]])) %>% 
-      addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.01, stroke = FALSE,
+    a <- leaflet() %>%
+      addTiles(urlTemplate = BaseMapStyle) %>%
+      setView(lng = -87.6298, lat = 41.8781, 9) %>%
+      addRasterImage(aod.quarterly[[selected.qtr]], opacity = 0.4, colors = monthly.aod.pal) %>%
+      leaflet::addLegend(pal = monthly.aod.pal, values = values(aod.quarterly[[selected.qtr]])) %>%
+      addPolygons(data = ChicagoBoundary, 
+                  color = "darkslategray",
+                  fillOpacity  = 0.01, 
+                  stroke = TRUE,
+                  opacity = 1,
+                  weight = 1,
                   highlight = highlightOptions(
                     # weight = 5,
                     color = "#666",
@@ -1447,12 +1503,17 @@ server = function(input, output,session){
   })
   
   output$aodmapoverall <- renderLeaflet({
-    a <- leaflet() %>% 
-      addTiles(urlTemplate = BaseMapStyle) %>% 
-      setView(lng = -87.6298, lat = 41.8781, 11) %>% 
-      addRasterImage(aod.average, opacity = 0.7, colors = yearly.aod.pal) %>% 
-      leaflet::addLegend(pal = yearly.aod.pal, values = values(aod.average)) %>% 
-      addPolygons(data = ChicagoBoundary, color = "darkslategray",fillOpacity  = 0.01, stroke = FALSE,
+    a <- leaflet() %>%
+      addTiles(urlTemplate = BaseMapStyle) %>%
+      setView(lng = -87.6298, lat = 41.8781, 9) %>%
+      addRasterImage(aod.average, opacity = 0.4, colors = monthly.aod.pal) %>%
+      leaflet::addLegend(pal = monthly.aod.pal, values = values(aod.average)) %>%
+      addPolygons(data = ChicagoBoundary, 
+                  color = "darkslategray",
+                  fillOpacity  = 0.01, 
+                  stroke = TRUE,
+                  opacity = 1,
+                  weight = 1,
                   highlight = highlightOptions(
                     # weight = 5,
                     color = "#666",
@@ -1461,7 +1522,6 @@ server = function(input, output,session){
                   # bringToFront = TRUE),
                   label = labels)
   })
-    
   
   #AOD End
   
@@ -1517,20 +1577,97 @@ server = function(input, output,session){
               title = "test"
       )  +
       tm_borders() 
-      # tm_layout(title = "Demographic Data by Community Area 2008-2012", title.position = c("right","bottom"))
+    # tm_layout(title = "Demographic Data by Community Area 2008-2012", title.position = c("right","bottom"))
     LF<-tmap_leaflet(demographic_map)
     LF
   })
   output$elevation_map <- renderLeaflet({
     elevation_data <- raster("chicago_elevation.tif")
-  elevation_map <- tm_shape(ChicagoBoundary) +
-    tm_borders() +
-    tm_shape(r3) +
-    tm_raster() 
-  elev_map <- tmap_leaflet(elevation_map)
-  elev_map
-
+    elevation_map <- tm_shape(ChicagoBoundary) +
+      tm_borders() +
+      tm_shape(r3) +
+      tm_raster() 
+    elev_map <- tmap_leaflet(elevation_map)
+    elev_map
+    
   })
+  
+  #### NDVI Start ####
+  
+  output$ndvimap <- renderLeaflet({
+    in.ndvi.time <- input$NDVIT
+    
+    in.ndvi.time <- as.Date(in.ndvi.time)
+    
+    in.ndvi.time <- floor_date(in.ndvi.time, "quarter") #Round to first of month (easier w names) 
+    
+    alt.ndvi.time <- paste("X", as.character(in.ndvi.time), sep = "")
+    alt.ndvi.time <- gsub(pattern = "-", replacement = ".", alt.ndvi.time)
+    
+    ndvi.names <- names(ndvi.quarterly)
+    selected.ndvi.qtr <- which(ndvi.names == alt.ndvi.time)
+    
+    a <- leaflet() %>%
+      leaflet::addTiles(urlTemplate = BaseMapStyle) %>%
+      setView(lng = -87.6298, lat = 41.8781, 9) %>%
+      leaflet::addRasterImage(ndvi.quarterly[[selected.ndvi.qtr]], opacity = 0.4, colors = ndvi.pal) %>%
+      leaflet::addLegend(pal = ndvi.pal, values = values(ndvi.quarterly[[selected.ndvi.qtr]])) %>%
+      leaflet::addPolygons(data = ChicagoBoundary, 
+                           color = "darkslategray",
+                           fillOpacity  = 0.01, 
+                           stroke = TRUE,
+                           opacity = 1,
+                           weight = 1,
+                           highlight = highlightOptions(
+                             # weight = 5,
+                             color = "#666",
+                             # dashArray = "",
+                             fillOpacity = 0.3),
+                           # bringToFront = TRUE),
+                           label = labels)
+    
+  })
+  
+  #### NDVI END ####
+  
+  
+  #### LAND COVER START ####
+  output$lcgreenmap <- renderLeaflet({
+    grn.map <- tm_shape(lc.map) +
+      tm_borders() +
+      tm_fill(col = "grn_ndx", 
+              style = "jenks", 
+              palette = "Greens",
+              alpha = 0.5,
+              title = "Green Index")
+    grn.map <- tmap_leaflet(grn.map) 
+  })
+  
+  output$lcbluemap <- renderLeaflet({
+    blu.map <- tm_shape(lc.map) +
+      tm_borders() +
+      tm_fill(col = "blu_ndx", 
+              style = "jenks", 
+              palette = "Blues", 
+              alpha = 0.5,
+              title = "Blue Index")
+    blu.map <- tmap_leaflet(blu.map) 
+  })
+  
+  output$lcgraymap <- renderLeaflet({
+    gry.map <- tm_shape(lc.map) +
+      tm_borders() +
+      tm_fill(col = "gry_ndx", 
+              style = "jenks", 
+              palette = "Greys", 
+              alpha = 0.5,
+              title = "Gray Index")
+    gry.map <- tmap_leaflet(gry.map) 
+  })
+  
+  
+  #### LAND COVER END ####
+  
   #Chicago health map
   output$health_map <- renderLeaflet({
     health_data <- st_read("data/HealthIndicators.shp")
@@ -1540,7 +1677,7 @@ server = function(input, output,session){
              "Lung Cancer",
              "Cancer",
              "Tuberculosis"
-             )
+    )
     val = c("BirthRate",
             "LowBi_ight",
             "TeenB_Rate",
