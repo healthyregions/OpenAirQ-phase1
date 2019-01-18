@@ -394,6 +394,7 @@ ui <- dashboardPage(
                 menuItem("Pollution Drivers",
                          menuSubItem("Weather", tabName = "noaa"),
                          menuSubItem("Traffic", tabName = "road_emissions"),
+                         menuSubItem("Factory", tabName = "factory_emissions"),
                          menuSubItem("Elevation",tabName = "elevation"),
                          menuSubItem("Greenness", tabName = "ndvi"),
                          menuSubItem("Land Cover", tabName = "landcover")),
@@ -916,7 +917,13 @@ ui <- dashboardPage(
                   conditionalPanel(condition = "input.road_emit_type == 'Traffic Volume'",
                                    br(),
                                    h4("About Traffic Volume"),
-                                   p(" "),
+                                   p("Traffic volume is one way of measuring traffic pollution. 
+                                     We aggregated at the community-area level the original traffic counts 
+                                     collected in each point of the road and divided them by the area of 
+                                     each community area to estimate the average traffic pollution per 1 squared-mile. 
+                                     The darker red area indicates the higher traffic volume, 
+                                     which implies that traffic volumes are highly concentrated on 
+                                     Loop (downtown area) and Hyde Park."),
                                    br(),
                                    h4("Data Source"),
                                    p("The original traffic counts data set, Average Daily Traffic Counts, 
@@ -924,7 +931,13 @@ ui <- dashboardPage(
                   conditionalPanel(condition = "input.road_emit_type == 'Road Lengths'",
                                    br(),
                                    h4("About Road Lengths"),
-                                   p(" "),
+                                   p("Road length is another way of measuring traffic pollution. 
+                                     We calculated the total length of roads in each community area and 
+                                     divided it by the area of each community area 
+                                     to estimate the average traffic pollution per 1 squared-mile. 
+                                     Since the darker red color indicates the longer length of roads, 
+                                     Edison Park and Montclare seem to have longer length of roads in total than the other areas. 
+                                     Besides, the roads are also concentrated in community areas near downtown."),
                                    br(),
                                    h4("Data Source"),
                                    p("The original road lengths data set is from OpenStreetMap."))
@@ -935,7 +948,26 @@ ui <- dashboardPage(
                 )
       )
       ),
-      
+
+      #tabitem factory_emissions ----
+      tabItem(tabName = "factory_emissions",
+              fluidRow(
+                box(
+                  width = 4,
+                  h1("Factory Emission"),
+                  h4("About Factory Emission"),
+                  p(" "),
+                  br(),
+                  h4("Data Source"),
+                  p(" ")
+                ),
+                box(
+                  width = 8,
+                  leafletOutput("factory_emissions_map", width = 800, height = 600)
+                )
+              )
+      ),
+            
       # pm tab ------------------------------------------------------------------
       tabItem(
         "pm", fluidPage(
@@ -1750,6 +1782,18 @@ server = function(input, output,session){
     }
     tmap_leaflet(road_emissions_map)
   })
+  
+  # factory_emissions output ----
+  output$factory_emissions_map <- renderLeaflet({
+    factory <- readOGR("./data", "Chicago_Factory_Point_Emissions")
+    
+    factory_emissions_map <-
+    
+    tmap_leaflet(factory_emissions_map)
+  })  
+  
+  
+  
   #expepa-----
   output$CommunityName <- renderText({
     ThisHighLight <- HPR1()
