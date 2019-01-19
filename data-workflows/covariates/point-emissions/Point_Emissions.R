@@ -8,7 +8,7 @@ library(gstat)
 library(tmap)
 
 #Read in Point Emissions data
-Point.Emissions <- read_csv("final.csv")
+Point.Emissions <- read_csv("./data-workflows/covariates/point-emissions/final.csv")
 glimpse(Point.Emissions)
 
 #Set lat/lon
@@ -39,7 +39,7 @@ tm_shape(Chi.Map) +
   tm_bubbles(size  ="Square Root of Emissions in Tons") + 
   tm_layout(main.title = "Chicago PM2.5 Emissions Sources")
 
-chi.map <- readOGR("Chi_Boundaries")
+chi.map <- readOGR("./data-workflows/covariates/point-emissions/Chi_Boundaries", "Chi_Boundaries")
 
 #Distance from centroids to nearest emissions source
 library(geosphere)
@@ -74,6 +74,8 @@ tm_shape(chi.map) +
   tm_dots(size = 0.05) +
   tm_layout(main.title = "Distance from Community Area Centroid to Nearest Point Emissions Source", main.title.size = 1.05)
 
+# Save the min-distances as a Shapefile
+writeOGR(chi.map, dsn = "./data-workflows/covariates/point-emissions", layer = "Community_Areas_with_Factory_Distances", driver="ESRI Shapefile")
 
 #Create prediction surface
 pt2grid <- function(ptframe,n) {
