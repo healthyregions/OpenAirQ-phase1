@@ -1785,9 +1785,21 @@ server = function(input, output,session){
   
   # factory_emissions output ----
   output$factory_emissions_map <- renderLeaflet({
-    factory <- readOGR("./data", "Chicago_Factory_Point_Emissions")
-    
+    factory <- readOGR("./data", "Community_Areas_with_Factory_Distances")
     factory_emissions_map <-
+      tm_shape(factory) +
+      tm_fill(col = "min_dist", 
+              style = "jenks", 
+              n = 5,
+              bolder.lwd = 0.1,
+              bolder.alpha = 0.4,
+              palette = "Reds",
+              title = "Distance (km)") +
+      tm_layout(
+        main.title = "Distance from Community Area Centroid to Nearest Point Emissions Source", 
+        main.title.size = 1.05
+      )
+    
     
     tmap_leaflet(factory_emissions_map)
   })  
