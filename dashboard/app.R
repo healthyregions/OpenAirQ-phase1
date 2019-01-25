@@ -1614,10 +1614,11 @@ server = function(input, output,session){
     LF
   })
   output$elevation_map <- renderLeaflet({
+    ChicagoBoundary <- st_read("data/Chicago.shp")
     elevation_data <- raster("chicago_elevation.tif")
     elevation_map <- tm_shape(ChicagoBoundary) +
       tm_borders() +
-      tm_shape(r3) +
+      tm_shape(elevation_data) +
       tm_raster() 
     elev_map <- tmap_leaflet(elevation_map)
     elev_map
