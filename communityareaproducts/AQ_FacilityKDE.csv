@@ -1,0 +1,78 @@
+Category,SubCategory,Indicator,Year,Geography,Geo_Group,Geo_ID,Demography,Demo_Group,Number,Cum_Number,Ave_Annual_Number,Crude_Rate,Lower_95CI_Crude_Rate,Upper_95CI_Crude_Rate,Age_Adj_Rate,Lower_95CI_Age_Adj_Rate,Upper_95CI_Age_Adj_Rate,Percent,Lower_95CI_Percent,Upper_95CI_Percent,Weight_Number,Weight_Percent,Lower_95CI_Weight_Percent,Upper_95CI_Weight_Percent,Map_Key,Flag
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,1-Rogers Park,1,NA,NA,2.60010015551535,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,2-West Ridge,2,NA,NA,4.52355403732981,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,3-Uptown,3,NA,NA,6.75548814187677,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,4-Lincoln Square,4,NA,NA,8.02316533395312,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,5-North Center,5,NA,NA,13.7925560291535,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,6-Lakeview,6,NA,NA,12.5034485512194,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,7-Lincoln Park,7,NA,NA,20.9823245638787,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,8-Near North Side,8,NA,NA,28.7473162754373,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,9-Edison Park,9,NA,NA,1.8764538892068101,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,10-Norwood Park,10,NA,NA,3.04225170047394,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,11-Jefferson Park,11,NA,NA,4.88525194739057,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,12-Forest Glen,12,NA,NA,4.45370453756697,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,13-North Park,13,NA,NA,7.10165716417252,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,14-Albany Park,14,NA,NA,9.28046021663296,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,15-Portage Park,15,NA,NA,7.22185912065276,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,16-Irving Park,16,NA,NA,11.1759773099919,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,17-Dunning,17,NA,NA,3.4060472539732,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,18-Montclare,18,NA,NA,4.15546647965316,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,19-Belmont Cragin,19,NA,NA,9.14589142036539,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,20-Hermosa,20,NA,NA,14.3821793567896,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,21-Avondale,21,NA,NA,14.7131116404673,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,22-Logan Square,22,NA,NA,19.4290417045602,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,23-Humboldt Park,23,NA,NA,20.0537070778223,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,24-West Town,24,NA,NA,29.356478409705,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,25-Austin,25,NA,NA,11.4002823062222,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,26-West Garfield Park,26,NA,NA,19.8207665034915,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,27-East Garfield Park,27,NA,NA,25.8391631890284,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,28-Near West Side,28,NA,NA,35.4953167958496,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,29-North Lawndale,29,NA,NA,23.5909978776557,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,30-South Lawndale,30,NA,NA,23.4083801756144,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,31-Lower West Side,31,NA,NA,33.0824478874098,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,32-Loop,32,NA,NA,31.1192168223186,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,33-Near South Side,33,NA,NA,26.6189665317911,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,34-Armour Square,34,NA,NA,28.3968385523961,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,35-Douglas,35,NA,NA,20.6788961660053,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,36-Oakland,36,NA,NA,12.3544108726543,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,37-Fuller Park,37,NA,NA,18.8713145013852,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,38-Grand Boulevard,38,NA,NA,15.6594577216487,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,39-Kenwood,39,NA,NA,8.72976038998624,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,40-Washington Park,40,NA,NA,12.0027290315246,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,41-Hyde Park,41,NA,NA,7.04094645081931,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,42-Woodlawn,42,NA,NA,6.8837980230425,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,43-South Shore,43,NA,NA,5.13972819047196,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,44-Chatham,44,NA,NA,7.7164968460576,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,45-Avalon Park,45,NA,NA,7.2857546219606,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,46-South Chicago,46,NA,NA,6.47982552233812,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,47-Burnside,47,NA,NA,8.91458528204461,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,48-Calumet Heights,48,NA,NA,9.24477713404913,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,49-Roseland,49,NA,NA,7.58492141698772,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,50-Pullman,50,NA,NA,10.7860224547328,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,51-South Deering,51,NA,NA,12.6537226987001,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,52-East Side,52,NA,NA,9.08265967282623,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,53-West Pullman,53,NA,NA,5.0056316907591,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,54-Riverdale,54,NA,NA,8.38341127988875,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,55-Hegewisch,55,NA,NA,8.16838436656054,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,56-Garfield Ridge,56,NA,NA,7.64754793862259,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,57-Archer Heights,57,NA,NA,16.96300128041,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,58-Brighton Park,58,NA,NA,22.5187786173684,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,59-McKinley Park,59,NA,NA,28.5624357181974,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,60-Bridgeport,60,NA,NA,29.7518234721437,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,61-New City,61,NA,NA,21.8060718821382,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,62-West Elsdon,62,NA,NA,13.437685272509,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,63-Gage Park,63,NA,NA,16.1671543687696,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,64-Clearing,64,NA,NA,5.66693433464247,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,65-West Lawn,65,NA,NA,8.41603350999667,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,66-Chicago Lawn,66,NA,NA,9.63499351215785,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,67-West Englewood,67,NA,NA,11.493431178486,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,68-Englewood,68,NA,NA,11.836972227697,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,69-Greater Grand Crossing,69,NA,NA,8.25823342083186,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,70-Ashburn,70,NA,NA,4.95979620849698,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,71-Auburn Gresham,71,NA,NA,6.41468980063195,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,72-Beverly,72,NA,NA,3.00847275830224,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,73-Washington Heights,73,NA,NA,5.14356953551078,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,74-Mount Greenwood,74,NA,NA,1.10584839957965,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,75-Morgan Park,75,NA,NA,2.45236392535803,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,76-OHare,76,NA,NA,3.82126982020246,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Point Emission,Facility KDE,2018,Community Area,77-Edgewater,77,NA,NA,4.4231226317349,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
