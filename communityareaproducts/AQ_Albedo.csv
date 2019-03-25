@@ -1,78 +1,78 @@
 Category,SubCategory,Indicator,Year,Geography,Geo_Group,Geo_ID,Demography,Demo_Group,Number,Cum_Number,Ave_Annual_Number,Crude_Rate,Lower_95CI_Crude_Rate,Upper_95CI_Crude_Rate,Age_Adj_Rate,Lower_95CI_Age_Adj_Rate,Upper_95CI_Age_Adj_Rate,Percent,Lower_95CI_Percent,Upper_95CI_Percent,Weight_Number,Weight_Percent,Lower_95CI_Weight_Percent,Upper_95CI_Weight_Percent,Map_Key,Flag
 Environmental Quality,Climate,Albedo,2017,Community Area,1-Rogers Park,1,NA,NA,0.181489121,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2018,Community Area,2-West Ridge,2,NA,NA,0.161263933,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2019,Community Area,3-Uptown,3,NA,NA,0.172995734,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2020,Community Area,4-Lincoln Square,4,NA,NA,0.165344951,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2021,Community Area,5-North Center,5,NA,NA,0.17335925,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2022,Community Area,6-Lakeview,6,NA,NA,0.168414551,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2023,Community Area,7-Lincoln Park,7,NA,NA,0.176256616,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2024,Community Area,8-Near North Side,8,NA,NA,0.168431969,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2025,Community Area,9-Edison Park,9,NA,NA,0.139117832,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2026,Community Area,10-Norwood Park,10,NA,NA,0.14675786,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2027,Community Area,11-Jefferson Park,11,NA,NA,0.147084475,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2028,Community Area,12-Forest Glen,12,NA,NA,0.113257689,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2029,Community Area,13-North Park,13,NA,NA,0.13822144,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2030,Community Area,14-Albany Park,14,NA,NA,0.161711315,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2031,Community Area,15-Portage Park,15,NA,NA,0.163835876,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2032,Community Area,16-Irving Park,16,NA,NA,0.168982048,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2033,Community Area,17-Dunning,17,NA,NA,0.148661185,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2034,Community Area,18-Montclare,18,NA,NA,0.167514394,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2035,Community Area,19-Belmont Cragin,19,NA,NA,0.176825741,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2036,Community Area,20-Hermosa,20,NA,NA,0.180173397,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2037,Community Area,21-Avondale,21,NA,NA,0.190691324,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2038,Community Area,22-Logan Square,22,NA,NA,0.180527949,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2039,Community Area,23-Humboldt Park,23,NA,NA,0.173649894,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2040,Community Area,24-West Town,24,NA,NA,0.187430643,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2041,Community Area,25-Austin,25,NA,NA,0.168389782,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2042,Community Area,26-West Garfield Park,26,NA,NA,0.172044143,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2043,Community Area,27-East Garfield Park,27,NA,NA,0.170636258,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2044,Community Area,28-Near West Side,28,NA,NA,0.2030596,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2045,Community Area,29-North Lawndale,29,NA,NA,0.157342528,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2046,Community Area,30-South Lawndale,30,NA,NA,0.178362461,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2047,Community Area,31-Lower West Side,31,NA,NA,0.20234516,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2048,Community Area,32-Loop,32,NA,NA,0.155378208,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2049,Community Area,33-Near South Side,33,NA,NA,0.18748072,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2050,Community Area,34-Armour Square,34,NA,NA,0.197655633,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2051,Community Area,35-Douglas,35,NA,NA,0.184522301,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2052,Community Area,36-Oakland,36,NA,NA,0.156521715,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2053,Community Area,37-Fuller Park,37,NA,NA,0.184441503,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2054,Community Area,38-Grand Boulevard,38,NA,NA,0.175860785,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2055,Community Area,39-Kenwood,39,NA,NA,0.146025111,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2056,Community Area,40-Washington Park,40,NA,NA,0.155203812,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2057,Community Area,41-Hyde Park,41,NA,NA,0.147840012,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2058,Community Area,42-Woodlawn,42,NA,NA,0.15517262,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2059,Community Area,43-South Shore,43,NA,NA,0.152701858,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2060,Community Area,44-Chatham,44,NA,NA,0.155013363,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2061,Community Area,45-Avalon Park,45,NA,NA,0.154347688,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2062,Community Area,46-South Chicago,46,NA,NA,0.142496748,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2063,Community Area,47-Burnside,47,NA,NA,0.14825359,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2064,Community Area,48-Calumet Heights,48,NA,NA,0.152464812,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2065,Community Area,49-Roseland,49,NA,NA,0.147897238,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2066,Community Area,50-Pullman,50,NA,NA,0.162645247,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2067,Community Area,51-South Deering,51,NA,NA,0.128256541,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2068,Community Area,52-East Side,52,NA,NA,0.15373385,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2069,Community Area,53-West Pullman,53,NA,NA,0.131931586,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2070,Community Area,54-Riverdale,54,NA,NA,0.121227253,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2071,Community Area,55-Hegewisch,55,NA,NA,0.112843738,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2072,Community Area,56-Garfield Ridge,56,NA,NA,0.184230117,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2073,Community Area,57-Archer Heights,57,NA,NA,0.221796011,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2074,Community Area,58-Brighton Park,58,NA,NA,0.186503505,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2075,Community Area,59-McKinley Park,59,NA,NA,0.181748256,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2076,Community Area,60-Bridgeport,60,NA,NA,0.191331632,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2077,Community Area,61-New City,61,NA,NA,0.173080321,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2078,Community Area,62-West Elsdon,62,NA,NA,0.178976443,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2079,Community Area,63-Gage Park,63,NA,NA,0.174830327,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2080,Community Area,64-Clearing,64,NA,NA,0.190874927,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2081,Community Area,65-West Lawn,65,NA,NA,0.17623601,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Climate,Albedo,2082,Community Area,66-Chicago Lawn,66,NA,NA,0.149275083,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Climate,Albedo,2083,Community Area,67-West Englewood,67,NA,NA,0.145529611,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2084,Community Area,68-Englewood,68,NA,NA,0.144241193,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2085,Community Area,69-Greater Grand Crossing,69,NA,NA,0.15672917,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2086,Community Area,70-Ashburn,70,NA,NA,0.162084345,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2087,Community Area,71-Auburn Gresham,71,NA,NA,0.1579437,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Climate,Albedo,2088,Community Area,72-Beverly,72,NA,NA,0.123777508,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2089,Community Area,73-Washington Heights,73,NA,NA,0.146472629,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2090,Community Area,74-Mount Greenwood,74,NA,NA,0.141443567,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2091,Community Area,75-Morgan Park,75,NA,NA,0.134761748,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Climate,Albedo,2092,Community Area,76-OHare,76,NA,NA,0.206381914,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Climate,Albedo,2093,Community Area,77-Edgewater,77,NA,NA,0.17852547,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,2-West Ridge,2,NA,NA,0.161263933,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,3-Uptown,3,NA,NA,0.172995734,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,4-Lincoln Square,4,NA,NA,0.165344951,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,5-North Center,5,NA,NA,0.17335925,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,6-Lakeview,6,NA,NA,0.168414551,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,7-Lincoln Park,7,NA,NA,0.176256616,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,8-Near North Side,8,NA,NA,0.168431969,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,9-Edison Park,9,NA,NA,0.139117832,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,10-Norwood Park,10,NA,NA,0.14675786,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,11-Jefferson Park,11,NA,NA,0.147084475,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,12-Forest Glen,12,NA,NA,0.113257689,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,13-North Park,13,NA,NA,0.13822144,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,14-Albany Park,14,NA,NA,0.161711315,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,15-Portage Park,15,NA,NA,0.163835876,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,16-Irving Park,16,NA,NA,0.168982048,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,17-Dunning,17,NA,NA,0.148661185,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,18-Montclare,18,NA,NA,0.167514394,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,19-Belmont Cragin,19,NA,NA,0.176825741,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,20-Hermosa,20,NA,NA,0.180173397,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,21-Avondale,21,NA,NA,0.190691324,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,22-Logan Square,22,NA,NA,0.180527949,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,23-Humboldt Park,23,NA,NA,0.173649894,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,24-West Town,24,NA,NA,0.187430643,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,25-Austin,25,NA,NA,0.168389782,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,26-West Garfield Park,26,NA,NA,0.172044143,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,27-East Garfield Park,27,NA,NA,0.170636258,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,28-Near West Side,28,NA,NA,0.2030596,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,29-North Lawndale,29,NA,NA,0.157342528,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,30-South Lawndale,30,NA,NA,0.178362461,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,31-Lower West Side,31,NA,NA,0.20234516,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,32-Loop,32,NA,NA,0.155378208,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,33-Near South Side,33,NA,NA,0.18748072,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,34-Armour Square,34,NA,NA,0.197655633,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,35-Douglas,35,NA,NA,0.184522301,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,36-Oakland,36,NA,NA,0.156521715,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,37-Fuller Park,37,NA,NA,0.184441503,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,38-Grand Boulevard,38,NA,NA,0.175860785,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,39-Kenwood,39,NA,NA,0.146025111,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,40-Washington Park,40,NA,NA,0.155203812,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,41-Hyde Park,41,NA,NA,0.147840012,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,42-Woodlawn,42,NA,NA,0.15517262,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,43-South Shore,43,NA,NA,0.152701858,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,44-Chatham,44,NA,NA,0.155013363,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,45-Avalon Park,45,NA,NA,0.154347688,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,46-South Chicago,46,NA,NA,0.142496748,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,47-Burnside,47,NA,NA,0.14825359,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,48-Calumet Heights,48,NA,NA,0.152464812,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,49-Roseland,49,NA,NA,0.147897238,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,50-Pullman,50,NA,NA,0.162645247,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,51-South Deering,51,NA,NA,0.128256541,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,52-East Side,52,NA,NA,0.15373385,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,53-West Pullman,53,NA,NA,0.131931586,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,54-Riverdale,54,NA,NA,0.121227253,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,55-Hegewisch,55,NA,NA,0.112843738,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,56-Garfield Ridge,56,NA,NA,0.184230117,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,57-Archer Heights,57,NA,NA,0.221796011,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,58-Brighton Park,58,NA,NA,0.186503505,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,59-McKinley Park,59,NA,NA,0.181748256,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,60-Bridgeport,60,NA,NA,0.191331632,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,61-New City,61,NA,NA,0.173080321,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,62-West Elsdon,62,NA,NA,0.178976443,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,63-Gage Park,63,NA,NA,0.174830327,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,64-Clearing,64,NA,NA,0.190874927,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,65-West Lawn,65,NA,NA,0.17623601,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Climate,Albedo,2017,Community Area,66-Chicago Lawn,66,NA,NA,0.149275083,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Climate,Albedo,2017,Community Area,67-West Englewood,67,NA,NA,0.145529611,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,68-Englewood,68,NA,NA,0.144241193,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,69-Greater Grand Crossing,69,NA,NA,0.15672917,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,70-Ashburn,70,NA,NA,0.162084345,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,71-Auburn Gresham,71,NA,NA,0.1579437,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Climate,Albedo,2017,Community Area,72-Beverly,72,NA,NA,0.123777508,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,73-Washington Heights,73,NA,NA,0.146472629,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,74-Mount Greenwood,74,NA,NA,0.141443567,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,75-Morgan Park,75,NA,NA,0.134761748,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Climate,Albedo,2017,Community Area,76-OHare,76,NA,NA,0.206381914,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Climate,Albedo,2017,Community Area,77-Edgewater,77,NA,NA,0.17852547,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
