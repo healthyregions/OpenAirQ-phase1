@@ -1,0 +1,78 @@
+Category,SubCategory,Indicator,Year,Geography,Geo_Group,Geo_ID,Demography,Demo_Group,Number,Cum_Number,Ave_Annual_Number,Crude_Rate,Lower_95CI_Crude_Rate,Upper_95CI_Crude_Rate,Age_Adj_Rate,Lower_95CI_Age_Adj_Rate,Upper_95CI_Age_Adj_Rate,Percent,Lower_95CI_Percent,Upper_95CI_Percent,Weight_Number,Weight_Percent,Lower_95CI_Weight_Percent,Upper_95CI_Weight_Percent,Map_Key,Flag
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,1-Rogers Park,1,NA,NA,96.23758594,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,2-West Ridge,2,NA,NA,98.49787528,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,3-Uptown,3,NA,NA,96.38608643,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,4-Lincoln Square,4,NA,NA,97.07959794,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,5-North Center,5,NA,NA,96.67345553,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,6-Lakeview,6,NA,NA,95.83889631,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,7-Lincoln Park,7,NA,NA,95.97182479,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,8-Near North Side,8,NA,NA,94.12813654,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,9-Edison Park,9,NA,NA,99.81389578,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,10-Norwood Park,10,NA,NA,98.15862894,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,11-Jefferson Park,11,NA,NA,96.90629203,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,12-Forest Glen,12,NA,NA,85.75055188,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,13-North Park,13,NA,NA,91.62636452,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,14-Albany Park,14,NA,NA,98.2278481,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,15-Portage Park,15,NA,NA,99.52506596,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,16-Irving Park,16,NA,NA,98.71337442,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,17-Dunning,17,NA,NA,99.90584691,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,18-Montclare,18,NA,NA,99.61199295,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,19-Belmont Cragin,19,NA,NA,99.48508523,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,20-Hermosa,20,NA,NA,98.84135472,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,21-Avondale,21,NA,NA,98.73839145,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,22-Logan Square,22,NA,NA,98.36351312,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,23-Humboldt Park,23,NA,NA,98.38009835,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,24-West Town,24,NA,NA,98.89108309,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,25-Austin,25,NA,NA,98.97630886,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,26-West Garfield Park,26,NA,NA,98.04079442,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,27-East Garfield Park,27,NA,NA,98.1837799,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,28-Near West Side,28,NA,NA,98.06187332,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,29-North Lawndale,29,NA,NA,98.96581755,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,30-South Lawndale,30,NA,NA,96.63840097,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,31-Lower West Side,31,NA,NA,96.23515439,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,32-Loop,32,NA,NA,89.1668528,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,33-Near South Side,33,NA,NA,97.67488475,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,34-Armour Square,34,NA,NA,95.77366399,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,35-Douglas,35,NA,NA,98.64893392,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,36-Oakland,36,NA,NA,99.52095808,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,37-Fuller Park,37,NA,NA,97.56690998,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,38-Grand Boulevard,38,NA,NA,98.62220447,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,39-Kenwood,39,NA,NA,97.92849983,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,40-Washington Park,40,NA,NA,96.54620311,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,41-Hyde Park,41,NA,NA,95.52976574,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,42-Woodlawn,42,NA,NA,94.50881612,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,43-South Shore,43,NA,NA,96.56938654,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,44-Chatham,44,NA,NA,98.52958475,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,45-Avalon Park,45,NA,NA,99.80539338,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,46-South Chicago,46,NA,NA,98.15663403,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,47-Burnside,47,NA,NA,98.74786568,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,48-Calumet Heights,48,NA,NA,99.72227733,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,49-Roseland,49,NA,NA,99.75463665,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,50-Pullman,50,NA,NA,99.24429111,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,51-South Deering,51,NA,NA,74.44745655,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,52-East Side,52,NA,NA,96.84636439,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,53-West Pullman,53,NA,NA,98.70992963,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,54-Riverdale,54,NA,NA,83.99209486,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,55-Hegewisch,55,NA,NA,69.19248889,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,56-Garfield Ridge,56,NA,NA,99.70365492,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,57-Archer Heights,57,NA,NA,98.63179771,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,58-Brighton Park,58,NA,NA,98.72302388,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,59-McKinley Park,59,NA,NA,98.3546169,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,60-Bridgeport,60,NA,NA,98.62034574,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,61-New City,61,NA,NA,99.07926917,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,62-West Elsdon,62,NA,NA,99.88158674,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,63-Gage Park,63,NA,NA,99.71554994,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,64-Clearing,64,NA,NA,99.61717255,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,65-West Lawn,65,NA,NA,99.19896336,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,66-Chicago Lawn,66,NA,NA,98.17680102,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,67-West Englewood,67,NA,NA,99.59219663,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,68-Englewood,68,NA,NA,99.21945701,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,69-Greater Grand Crossing,69,NA,NA,98.34443574,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,70-Ashburn,70,NA,NA,99.68975469,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,71-Auburn Gresham,71,NA,NA,99.28057554,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,72-Beverly,72,NA,NA,96.21170528,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,73-Washington Heights,73,NA,NA,99.78120822,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,74-Mount Greenwood,74,NA,NA,99.32781799,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,75-Morgan Park,75,NA,NA,99.72478035,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,76-OHare,76,NA,NA,85.98783154,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,Land Cover,Gray Index,2011,Community Area,77-Edgewater,77,NA,NA,97.42967011,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
