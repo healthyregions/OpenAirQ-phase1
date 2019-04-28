@@ -1,5 +1,7 @@
 ## EPA Sensor Data
 
-Managed by Yao Xen Tan
+Interpolation methods for the following included here:
 
-Add info here.
+* PM 2.5
+* PM 10
+
