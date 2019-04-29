@@ -1,78 +1,78 @@
 Category,SubCategory,Indicator,Year,Geography,Geo_Group,Geo_ID,Demography,Demo_Group,Number,Cum_Number,Ave_Annual_Number,Crude_Rate,Lower_95CI_Crude_Rate,Upper_95CI_Crude_Rate,Age_Adj_Rate,Lower_95CI_Age_Adj_Rate,Upper_95CI_Age_Adj_Rate,Percent,Lower_95CI_Percent,Upper_95CI_Percent,Weight_Number,Weight_Percent,Lower_95CI_Weight_Percent,Upper_95CI_Weight_Percent,Map_Key,Flag
-Environmental Quality,Air Quality,PM 10,2017,Community Area,1-Rogers Park,1,NA,NA,19.23195076,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,2-West Ridge,2,NA,NA,19.47457695,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,3-Uptown,3,NA,NA,20.24295568,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,4-Lincoln Square,4,NA,NA,19.99763012,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,5-North Center,5,NA,NA,20.5070858,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,6-Lakeview,6,NA,NA,20.47806358,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,7-Lincoln Park,7,NA,NA,20.95763588,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,8-Near North Side,8,NA,NA,21.38537407,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,9-Edison Park,9,NA,NA,19.40192795,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,10-Norwood Park,10,NA,NA,19.99546242,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,11-Jefferson Park,11,NA,NA,20.00027657,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,12-Forest Glen,12,NA,NA,19.70817757,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,13-North Park,13,NA,NA,20.00097084,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,14-Albany Park,14,NA,NA,20.2179081,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,15-Portage Park,15,NA,NA,20.57833576,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,16-Irving Park,16,NA,NA,20.54400063,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,17-Dunning,17,NA,NA,20.58869362,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,18-Montclare,18,NA,NA,21.17856979,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,19-Belmont Cragin,19,NA,NA,21.15212059,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,20-Hermosa,20,NA,NA,21.39437294,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,21-Avondale,21,NA,NA,20.85244331,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,22-Logan Square,22,NA,NA,21.08150578,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,23-Humboldt Park,23,NA,NA,21.63899422,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,24-West Town,24,NA,NA,21.53666687,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,25-Austin,25,NA,NA,21.99386311,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,26-West Garfield Park,26,NA,NA,22.15267944,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,27-East Garfield Park,27,NA,NA,22.06132889,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,28-Near West Side,28,NA,NA,21.91614819,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,29-North Lawndale,29,NA,NA,22.56953144,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,30-South Lawndale,30,NA,NA,22.97132587,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,31-Lower West Side,31,NA,NA,22.33359432,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,32-Loop,32,NA,NA,21.76701927,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
-Environmental Quality,Air Quality,PM 10,2017,Community Area,33-Near South Side,33,NA,NA,22.15677452,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,34-Armour Square,34,NA,NA,22.33141422,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,35-Douglas,35,NA,NA,22.34641329,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,36-Oakland,36,NA,NA,22.37641144,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,37-Fuller Park,37,NA,NA,22.80646324,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,38-Grand Boulevard,38,NA,NA,22.67362595,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,39-Kenwood,39,NA,NA,22.53631592,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,40-Washington Park,40,NA,NA,22.86431789,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,41-Hyde Park,41,NA,NA,22.73194122,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,42-Woodlawn,42,NA,NA,22.85891151,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,43-South Shore,43,NA,NA,22.94036961,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,44-Chatham,44,NA,NA,23.27275085,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,45-Avalon Park,45,NA,NA,23.08895747,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,46-South Chicago,46,NA,NA,22.89982224,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,47-Burnside,47,NA,NA,23.22935772,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,48-Calumet Heights,48,NA,NA,23.12820816,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,49-Roseland,49,NA,NA,23.34063339,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,50-Pullman,50,NA,NA,23.28969574,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,51-South Deering,51,NA,NA,23.227808,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,52-East Side,52,NA,NA,23.13868713,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,53-West Pullman,53,NA,NA,23.25286484,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,54-Riverdale,54,NA,NA,23.1586647,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,55-Hegewisch,55,NA,NA,22.82406553,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,56-Garfield Ridge,56,NA,NA,23.51804733,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,57-Archer Heights,57,NA,NA,23.36050606,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,58-Brighton Park,58,NA,NA,23.2127037,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,59-McKinley Park,59,NA,NA,22.76691628,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,60-Bridgeport,60,NA,NA,22.63554192,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
-Environmental Quality,Air Quality,PM 10,2017,Community Area,61-New City,61,NA,NA,23.00558853,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,62-West Elsdon,62,NA,NA,23.46598848,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,63-Gage Park,63,NA,NA,23.25340366,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,64-Clearing,64,NA,NA,23.85896683,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,65-West Lawn,65,NA,NA,23.6125288,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,66-Chicago Lawn,66,NA,NA,23.36405563,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,67-West Englewood,67,NA,NA,23.17438126,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,68-Englewood,68,NA,NA,23.05140686,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,69-Greater Grand Crossing,69,NA,NA,23.18194389,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
-Environmental Quality,Air Quality,PM 10,2017,Community Area,70-Ashburn,70,NA,NA,23.49551964,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,71-Auburn Gresham,71,NA,NA,23.38131809,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,72-Beverly,72,NA,NA,23.49193764,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,73-Washington Heights,73,NA,NA,23.40198898,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,74-Mount Greenwood,74,NA,NA,23.50516243,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,75-Morgan Park,75,NA,NA,23.38523102,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
-Environmental Quality,Air Quality,PM 10,2017,Community Area,76-OHare,76,NA,NA,20.03778594,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
-Environmental Quality,Air Quality,PM 10,2017,Community Area,77-Edgewater,77,NA,NA,19.99069595,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,1-Rogers Park,1,NA,NA,19.4140753,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,2-West Ridge,2,NA,NA,19.5096392,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,3-Uptown,3,NA,NA,20.7820195,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,4-Lincoln Square,4,NA,NA,20.4949616,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,5-North Center,5,NA,NA,21.3225544,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,6-Lakeview,6,NA,NA,21.342888,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,7-Lincoln Park,7,NA,NA,21.7995797,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,8-Near North Side,8,NA,NA,22.101081,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,9-Edison Park,9,NA,NA,18.7508111,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,10-Norwood Park,10,NA,NA,19.9813824,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,11-Jefferson Park,11,NA,NA,20.2240774,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,12-Forest Glen,12,NA,NA,19.5174375,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,13-North Park,13,NA,NA,20.056192,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,14-Albany Park,14,NA,NA,20.655164,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,15-Portage Park,15,NA,NA,21.2708269,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,16-Irving Park,16,NA,NA,21.2070199,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
+Environmental Quality,EPA,PM10,2017,Community Area,17-Dunning,17,NA,NA,21.7254876,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,18-Montclare,18,NA,NA,22.356626,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,19-Belmont Cragin,19,NA,NA,22.295801,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,20-Hermosa,20,NA,NA,22.1964815,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,21-Avondale,21,NA,NA,21.7070084,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,22-Logan Square,22,NA,NA,22.0534809,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,23-Humboldt Park,23,NA,NA,22.7748671,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,24-West Town,24,NA,NA,22.3637992,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,25-Austin,25,NA,NA,23.3458361,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,26-West Garfield Park,26,NA,NA,23.3630274,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,27-East Garfield Park,27,NA,NA,23.0597642,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,28-Near West Side,28,NA,NA,22.6676054,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,29-North Lawndale,29,NA,NA,23.5101158,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,30-South Lawndale,30,NA,NA,23.7747795,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,31-Lower West Side,31,NA,NA,22.9808856,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,32-Loop,32,NA,NA,22.3120088,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,33-Near South Side,33,NA,NA,22.4752528,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,34-Armour Square,34,NA,NA,22.6813502,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,35-Douglas,35,NA,NA,22.6062774,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,36-Oakland,36,NA,NA,22.5416053,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,37-Fuller Park,37,NA,NA,22.8302024,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,38-Grand Boulevard,38,NA,NA,22.7030719,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,39-Kenwood,39,NA,NA,22.5849065,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,40-Washington Park,40,NA,NA,22.7878988,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,41-Hyde Park,41,NA,NA,22.6618438,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,2
+Environmental Quality,EPA,PM10,2017,Community Area,42-Woodlawn,42,NA,NA,22.7852771,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,43-South Shore,43,NA,NA,22.9083182,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,44-Chatham,44,NA,NA,23.1243312,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,45-Avalon Park,45,NA,NA,23.1753907,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,46-South Chicago,46,NA,NA,23.2687671,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,47-Burnside,47,NA,NA,23.3725091,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,48-Calumet Heights,48,NA,NA,23.5406085,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,49-Roseland,49,NA,NA,23.2618432,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,50-Pullman,50,NA,NA,23.5926583,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,51-South Deering,51,NA,NA,24.0627274,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,52-East Side,52,NA,NA,24.2730356,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,53-West Pullman,53,NA,NA,23.0139996,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,54-Riverdale,54,NA,NA,23.1910228,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,55-Hegewisch,55,NA,NA,23.7054852,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,56-Garfield Ridge,56,NA,NA,24.9075535,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,57-Archer Heights,57,NA,NA,24.1671485,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,58-Brighton Park,58,NA,NA,23.6269043,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,59-McKinley Park,59,NA,NA,23.159378,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,60-Bridgeport,60,NA,NA,22.8512401,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,61-New City,61,NA,NA,23.0916527,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,62-West Elsdon,62,NA,NA,24.1000983,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,63-Gage Park,63,NA,NA,23.5895889,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,64-Clearing,64,NA,NA,24.9009321,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,65-West Lawn,65,NA,NA,24.0239661,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,66-Chicago Lawn,66,NA,NA,23.5243536,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,67-West Englewood,67,NA,NA,23.1758547,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,68-Englewood,68,NA,NA,22.9768148,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,69-Greater Grand Crossing,69,NA,NA,22.9478265,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,70-Ashburn,70,NA,NA,23.572884,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,5
+Environmental Quality,EPA,PM10,2017,Community Area,71-Auburn Gresham,71,NA,NA,23.1067017,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,72-Beverly,72,NA,NA,23.0727247,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,73-Washington Heights,73,NA,NA,23.0987308,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,74-Mount Greenwood,74,NA,NA,23.0770036,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,4
+Environmental Quality,EPA,PM10,2017,Community Area,75-Morgan Park,75,NA,NA,22.9763139,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,3
+Environmental Quality,EPA,PM10,2017,Community Area,76-OHare,76,NA,NA,,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,
+Environmental Quality,EPA,PM10,2017,Community Area,77-Edgewater,77,NA,NA,20.152453,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Quintile,1
