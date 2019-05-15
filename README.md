@@ -55,7 +55,6 @@ In the second stage, we will implement two models: Land Use Regression (LUR) and
 
 
 ## Resources
-
 ### Trainings
 [NASA Applied Remote Sensing Training](https://arset.gsfc.nasa.gov) (ARSET) program offers satellite remote sensing training that builds the skills to integrate NASA Earth Science data into an agency’s decision-making activities. Trainings are offered in air quality, climate, disaster, health, land, water resources, and wildfire management.
 * [Fundamentals of Remote Sensing](https://arset.gsfc.nasa.gov/webinars/fundamentals-remote-sensing)
