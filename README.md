@@ -60,6 +60,7 @@ In the second stage, we will implement two models: Land Use Regression (LUR) and
 * [Fundamentals of Remote Sensing](https://arset.gsfc.nasa.gov/webinars/fundamentals-remote-sensing)
 * [High Temporal Resolution Air Quality Observations from Space](https://arset.gsfc.nasa.gov/airquality/webinars/2018-geospatial)
 * [Advanced Webinar: Data Analysis Tools for High Resolution Air Quality Satellite Data Sets](https://arset.gsfc.nasa.gov/airquality/webinars/2018-hiresdatasets)
+
 Array of Things (AoT)
 * [Mapping Array of Things (AoT) Data with Spatial Statistics](https://geodacenter.github.io/aot-workshop/)
 
