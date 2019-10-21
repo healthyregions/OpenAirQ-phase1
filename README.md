@@ -64,7 +64,7 @@ In the second stage, we will implement two models: Land Use Regression (LUR) and
 Array of Things (AoT)
 * [Mapping Array of Things (AoT) Data with Spatial Statistics](https://geodacenter.github.io/aot-workshop/)
 
-### COMMUNITIES of PRACTICE
+### Communities of Practice
 [NASA Health and Air Quality Applied Sciences Team](https://haqast.org/) (HAQAST) is a collaborative team that works in partnership with public health and air quality agencies to use NASA data and tools for the public benefit.
 
 
