@@ -1,11 +1,15 @@
 # Air Quality Project
 
 ## About
-The University of Chicago Center for Spatial Data Science (CSDS) and the Chicago Department of Public Health (CDPH) worked alongside the [Partnership for Healthy Cities](https://partnershipforhealthycities.bloomberg.org/), a global network of cities committed to reducing noncommunicable diseases that is supported by Bloomberg Philanthropies in partnership with the World Health Organization and Vital Strategies, and with partners at City Tech Collaborative, to collect and visualize baseline air quality data onto the [Chicago Health Atlas](https://www.chicagohealthatlas.org/).
+### Phase 1
+The University of Chicago Center for Spatial Data Science (CSDS) and the Chicago Department of Public Health (CDPH) worked alongside the [Partnership for Healthy Cities](https://partnershipforhealthycities.bloomberg.org/), a global network of cities committed to reducing noncommunicable diseases that is supported by Bloomberg Philanthropies in partnership with the World Health Organization and Vital Strategies, and with partners at City Tech Collaborative, to collect and visualize baseline air quality data onto the [Chicago Health Atlas](https://www.chicagohealthatlas.org/) from NASA satellites, EPA sensor networks, the US Geological Survey, and the National Oceanic and Atmospheric Administration climate data.
 
-In the next step of this initiative, CDPH and CSDS will continue to work with the Partnership to analyze air quality data by taking community characteristics into account.
+### Phase 2
+In the next step of this initiative, CDPH and CSDS will continue to work with the Partnership to analyze air quality data by taking community characteristics into account and build on this extensive spatial data infrastructure to refine the policy informatic tools developed, implement analytic models for more precise estimates of air quality, and more fully explore the complex relationships between air quality, land use, and health.
 
-Considering health status and demographics are crucial to understanding the disproportionate effect air pollution has on some communities. Together, these air quality and community data can inform strategies that will improve health outcomes for all residents.
+The following 14 measurements were collected for the last 5 years across Chicago, the county it inhabits, and surrounding counties through Indiana and Wisconsin: Climate & Weather - Precipitation (NOAA) and Temperature (NOAA); Land Use – green spaces with open land and vegetation (as Green Index), blue spaces with water bodies (as Blue Index), and gray spaces as developed land (as Gray Index) (all from USGS land cover classification); Digital Elevation Model (USGS); Albedo (NASA); Permitted Businesses (EPA); Road Lengths (Open Street Map); Vegetation Index (NASA); and Air Quality - Aerosol Optical Depth (NASA), Particulate Matter 10 (EPA), Particulate Matter 2.5 (EPA), Nitrogen Dioxide (EPA), Ozone (EPA).
+
+By creating this novel system to collect, analyze, and disseminate air pollution information, the City and other stakeholders, like community based organizations, can be better informed to develop strategies and interventions to improve air quality together.
 
 ## Dashboard
 An interactive dashboard will provide user access to sensor locations and aggregated data products of sensor and covariates by community area.
