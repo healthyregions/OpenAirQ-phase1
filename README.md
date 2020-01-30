@@ -9,6 +9,12 @@ In the next step of this initiative, CDPH and CSDS will continue to work with th
 
 The following 14 measurements were collected for the last 5 years across Chicago, the county it inhabits, and surrounding counties through Indiana and Wisconsin: Climate & Weather - Precipitation (NOAA) and Temperature (NOAA); Land Use – green spaces with open land and vegetation (as Green Index), blue spaces with water bodies (as Blue Index), and gray spaces as developed land (as Gray Index) (all from USGS land cover classification); Digital Elevation Model (USGS); Albedo (NASA); Permitted Businesses (EPA); Road Lengths (Open Street Map); Vegetation Index (NASA); and Air Quality - Aerosol Optical Depth (NASA), Particulate Matter 10 (EPA), Particulate Matter 2.5 (EPA), Nitrogen Dioxide (EPA), Ozone (EPA).
 
+A land use regression will be performed to predict localized estimates of PM 2.5 and PM 10 concentrations using characteristics of the area that influence the emission of pollutants and will extend this study with a hybrid MAIAC-adjusted regression at 1km scale, at yearly and seasonal time scales from 2012-2017, to explore Chicagoland estimates of PM2.5 and PM10 using additional covariates from multiple sources (EPA, NASA, USGS). This extension enables the use of NASA Aerosol Optical Density (AOD) data, which has a multivariate correlation with PM2.5. AOD satellite-derived data also has greater coverage across the entire region as compared to a few air quality sensor locations, allowing for greater precision of local variations of air pollution.
+
+Using these estimated, we will aggregate outcomes at the census-tract scale and explore relationships between air quality, land use, and health outcomes (e.g. asthma) with attention to variations and potential interactions with relevant socioeconomic indicators. We will release final modelled air quality predictions and core health outcomes on the Open AirQ Dashboard prototype, a policy informatics tool developed to support decision-making with health departments.
+
+We'll also develop and release an open-source analytic toolkit to include user-friendly tutorials for core data processing tasks and analytic models implemented.
+
 By creating this novel system to collect, analyze, and disseminate air pollution information, the City and other stakeholders, like community based organizations, can be better informed to develop strategies and interventions to improve air quality together.
 
 ## Dashboard
